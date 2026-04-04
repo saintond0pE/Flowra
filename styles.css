@@ -336,3 +336,21 @@ footer {
 .footer-links li { margin-bottom: 1rem; }
 .footer-links a { color: var(--c-white); text-decoration: none; font-weight: 700; text-transform: uppercase; }
 .footer-links a:hover { color: var(--c-mint); }
+
+/* Chatbot Widget Styles */
+.chat-bubble {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--c-black);
+  max-width: 85%;
+  word-wrap: break-word;
+}
+.chat-bubble.bot {
+  background-color: var(--c-white);
+  border-bottom-left-radius: 0;
+  align-self: flex-start;
+}
+.chat-bubble.user {
+  background-color: var(--c-mustard);
+  border-bottom-right-radius: 0;
+  align-self: flex-end;
+}
