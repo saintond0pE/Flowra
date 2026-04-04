@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#f6f6f6",
+                    "inverse-primary": "#ffffff",
+                    "primary-fixed": "#ebebeb",
+                    "primary-dim": "#4f4f4f",
+                    "primary": "#5b5b5b",
+                    "on-secondary-fixed": "#443100",
+                    "outline-variant": "#acadad",
+                    "surface-container": "#e7e8e8",
+                    "inverse-on-surface": "#9c9d9d",
+                    "outline": "#757777",
+                    "on-secondary": "#fff1da",
+                    "error-dim": "#a70138",
+                    "on-background": "#2d2f2f",
+                    "tertiary": "#006947",
+                    "surface-variant": "#dbdddd",
+                    "secondary-container": "#ffca44",
+                    "on-tertiary": "#c8ffe0",
+                    "tertiary-fixed": "#69f6b8",
+                    "surface-tint": "#5b5b5b",
+                    "on-error-container": "#510017",
+                    "surface-container-high": "#e1e3e3",
+                    "on-primary-fixed": "#444444",
+                    "surface-dim": "#d2d5d5",
+                    "primary-container": "#ebebeb",
+                    "tertiary-dim": "#005c3d",
+                    "on-surface-variant": "#5a5c5c",
+                    "on-tertiary-container": "#005a3c",
+                    "surface-container-lowest": "#ffffff",
+                    "on-error": "#ffefef",
+                    "tertiary-fixed-dim": "#58e7ab",
+                    "on-secondary-fixed-variant": "#674d00",
+                    "on-tertiary-fixed": "#00452d",
+                    "on-primary-container": "#575757",
+                    "background": "#f6f6f6",
+                    "secondary-fixed-dim": "#f2bc2a",
+                    "secondary-dim": "#654c00",
+                    "surface-bright": "#f6f6f6",
+                    "primary-fixed-dim": "#dddddd",
+                    "on-secondary-container": "#5b4400",
+                    "error-container": "#f74b6d",
+                    "secondary": "#745700",
+                    "inverse-surface": "#0c0f0f",
+                    "surface-container-low": "#f0f1f1",
+                    "on-primary": "#f3f3f3",
+                    "error": "#b41340",
+                    "on-tertiary-fixed-variant": "#006544",
+                    "on-surface": "#2d2f2f",
+                    "surface-container-highest": "#dbdddd",
+                    "secondary-fixed": "#ffca44",
+                    "on-primary-fixed-variant": "#616161",
+                    "tertiary-container": "#69f6b8",
+                    "brand-mustard": "#FFC837",
+                    "brand-mint": "#10B981",
+                    "brand-pink": "#FFB7B2"
+            },
+            "borderRadius": {
+                    "none": "0px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter", "sans-serif"],
+                    "body": ["Inter", "sans-serif"],
+                    "label": ["Inter", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 48;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: #FFFFFF; }
+        .hard-border { border: 2px solid #000000; }
+        .block-shadow { shadow: 6px 6px 0px 0px #000000; }
+    </style>
+</head>
+<body class="m-0 p-0 overflow-x-hidden"><nav class="bg-white border-b-2 border-black flex justify-between items-center w-full px-8 py-4 max-w-full sticky top-0 z-50">
+<div class="flex items-center gap-2 cursor-pointer w-64" onclick="window.location.href='/'">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">local_florist</span>
+<span class="text-4xl font-black text-black tracking-tighter uppercase font-['Inter']">FLOWRA</span>
+</div>
+<div class="hidden xl:flex flex-col items-center gap-2">
+<div class="flex gap-6 items-center">
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/pricing.html">Pricing</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/case-study.html">Case Study</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/validation.html">Customer Validation</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/resources.html">Resources</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/solutions.html">Playbook Solution</a>
+</div>
+<button class="font-['Inter'] font-black uppercase tracking-tighter bg-[#10B981] text-black border-2 border-black px-4 py-1 neo-shadow hover:bg-black hover:text-[#10B981] transition-all text-xs" onclick="window.location.href='/pages/everything-we-offer.html'">
+        Everything We Built
+    </button>
+</div>
+<div class="flex items-center justify-end w-64">
+<button class="bg-[#FFC837] text-black border-2 border-black px-6 py-3 font-black uppercase tracking-tighter neo-shadow neo-shadow-hover neo-shadow-active transition-all" onclick="window.location.href='/pages/contact.html'">
+        Contact &amp; Get Started
+    </button>
+</div>
+</nav>
+<!-- TopNavBar -->
+<!-- Hero Section -->
+<section class="w-full bg-[#FFB7B2] border-b-2 border-black flex flex-col items-center justify-center py-32 px-8 text-center relative overflow-hidden">
+<div class="z-10 max-w-6xl">
+<h1 class="text-[96px] md:text-[120px] font-black leading-[0.9] tracking-tighter text-black uppercase mb-8">
+                The Playbooks.
+            </h1>
+<p class="text-2xl md:text-3xl font-bold text-black uppercase tracking-tight bg-white inline-block px-4 py-2 border-2 border-black shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                Steal our exact automation workflows.
+            </p>
+</div>
+<!-- Decorative Vector -->
+<div class="absolute top-10 right-10 opacity-20 transform rotate-12 pointer-events-none">
+<span class="material-symbols-outlined text-[200px]" style="font-variation-settings: 'FILL' 1;">auto_awesome_motion</span>
+</div>
+<div class="absolute bottom-10 left-10 opacity-20 transform -rotate-12 pointer-events-none">
+<span class="material-symbols-outlined text-[200px]" style="font-variation-settings: 'FILL' 1;">deployed_code</span>
+</div>
+</section>
+<!-- Featured Resources Grid -->
+<section class="py-24 px-8 bg-white max-w-7xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+<!-- Card 1: Zero-Touch Support -->
+<div class="group flex flex-col bg-white border-2 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-[16px_16px_0px_0px_rgba(0,0,0,1)]">
+<div class="h-16 bg-[#FFC837] border-b-2 border-black flex items-center px-6">
+<span class="font-black text-xl uppercase tracking-widest">Efficiency 101</span>
+</div>
+<div class="p-10 flex-grow flex flex-col justify-between min-h-[400px]">
+<div>
+<h3 class="text-5xl font-black leading-tight uppercase mb-6">The Zero-Touch Support Guide</h3>
+<div class="w-full h-48 border-2 border-black mb-8 flex items-center justify-center bg-[#f0f1f1] overflow-hidden relative">
+<div class="absolute inset-0 flex items-center justify-center">
+<div class="w-24 h-24 border-4 border-black rotate-45 flex items-center justify-center bg-[#FFC837]">
+<span class="material-symbols-outlined text-5xl -rotate-45">support_agent</span>
+</div>
+<div class="w-16 h-16 border-4 border-black absolute -top-4 -left-4 bg-[#10B981]"></div>
+<div class="w-12 h-12 rounded-full border-4 border-black absolute -bottom-4 -right-4 bg-[#FFB7B2]"></div>
+</div>
+</div>
+</div>
+<button class="w-full bg-black text-white text-xl font-black py-4 uppercase border-2 border-black hover:bg-white hover:text-black transition-colors" onclick="window.location.href='/pages/solutions.html'">Download Playbook</button>
+</div>
+</div>
+<!-- Card 2: CRM Data Routing -->
+<div class="group flex flex-col bg-white border-2 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-[16px_16px_0px_0px_rgba(0,0,0,1)]">
+<div class="h-16 bg-[#10B981] border-b-2 border-black flex items-center px-6 text-white">
+<span class="font-black text-xl uppercase tracking-widest">Internal Systems</span>
+</div>
+<div class="p-10 flex-grow flex flex-col justify-between min-h-[400px]">
+<div>
+<h3 class="text-5xl font-black leading-tight uppercase mb-6">CRM Data Routing Secrets</h3>
+<div class="w-full h-48 border-2 border-black mb-8 flex items-center justify-center bg-[#f0f1f1] overflow-hidden relative">
+<div class="absolute inset-0 flex items-center justify-center space-x-4">
+<div class="w-20 h-20 border-4 border-black bg-white flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl">database</span>
+</div>
+<span class="material-symbols-outlined text-4xl">trending_flat</span>
+<div class="w-20 h-20 border-4 border-black bg-[#10B981] flex items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-white">hub</span>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full bg-black text-white text-xl font-black py-4 uppercase border-2 border-black hover:bg-white hover:text-black transition-colors" onclick="window.location.href='/pages/contact.html'">Claim Access</button>
+</div>
+</div>
+<!-- Card 3: AI Workflow -->
+<div class="group flex flex-col bg-white border-2 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-[16px_16px_0px_0px_rgba(0,0,0,1)]">
+<div class="h-16 bg-[#FFB7B2] border-b-2 border-black flex items-center px-6">
+<span class="font-black text-xl uppercase tracking-widest">Future Proof</span>
+</div>
+<div class="p-10 flex-grow flex flex-col justify-between min-h-[400px]">
+<div>
+<h3 class="text-5xl font-black leading-tight uppercase mb-6">AI Workflow Blueprints</h3>
+<div class="w-full h-48 border-2 border-black mb-8 flex items-center justify-center bg-[#f0f1f1] overflow-hidden relative">
+<div class="absolute inset-0">
+<svg class="w-full h-full" viewbox="0 0 200 100">
+<path d="M0,50 L200,50" stroke="black" stroke-dasharray="10 5" stroke-width="4"></path>
+<rect fill="#FFB7B2" height="50" stroke="black" stroke-width="2" width="50" x="75" y="25"></rect>
+<circle cx="100" cy="50" fill="white" r="15" stroke="black" stroke-width="2"></circle>
+</svg>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+<span class="material-symbols-outlined text-4xl">psychology</span>
+</div>
+</div>
+</div>
+</div>
+<button class="w-full bg-black text-white text-xl font-black py-4 uppercase border-2 border-black hover:bg-white hover:text-black transition-colors" onclick="window.location.href='/pages/contact.html'">View Blueprints</button>
+</div>
+</div>
+<!-- Card 4: Lead Gen -->
+<div class="group flex flex-col bg-white border-2 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[-4px] hover:translate-y-[-4px] hover:shadow-[16px_16px_0px_0px_rgba(0,0,0,1)]">
+<div class="h-16 bg-black border-b-2 border-black flex items-center px-6 text-white">
+<span class="font-black text-xl uppercase tracking-widest">Growth Engines</span>
+</div>
+<div class="p-10 flex-grow flex flex-col justify-between min-h-[400px]">
+<div>
+<h3 class="text-5xl font-black leading-tight uppercase mb-6">Lead Gen Automation Hack</h3>
+<div class="w-full h-48 border-2 border-black mb-8 flex items-center justify-center bg-[#f0f1f1] overflow-hidden relative">
+<div class="grid grid-cols-3 gap-2">
+<div class="w-12 h-12 bg-black"></div>
+<div class="w-12 h-12 bg-[#FFC837] border-2 border-black"></div>
+<div class="w-12 h-12 bg-black"></div>
+<div class="w-12 h-12 bg-[#10B981] border-2 border-black"></div>
+<div class="w-12 h-12 bg-black flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-2xl">bolt</span>
+</div>
+<div class="w-12 h-12 bg-[#FFB7B2] border-2 border-black"></div>
+</div>
+</div>
+</div>
+<button class="w-full bg-black text-white text-xl font-black py-4 uppercase border-2 border-black hover:bg-white hover:text-black transition-colors" onclick="window.location.href='/pages/contact.html'">Steal This Hack</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Sub-Section Callout -->
+<section class="py-24 px-8 border-t-2 border-black bg-white flex flex-col items-center">
+<div class="max-w-4xl text-center">
+<h2 class="text-6xl font-black uppercase mb-8 leading-none">Need something custom?</h2>
+<p class="text-2xl font-bold text-on-surface-variant mb-12">We don't just give you the tools. We build the factory.</p>
+<a class="inline-block bg-[#10B981] text-black border-4 border-black px-12 py-6 text-3xl font-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none transition-all uppercase" href="/pages/contact.html">
+                Book A Strategy Call
+            </a>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-black text-white px-8 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mt-32">
+<div class="lg:col-span-3 mb-12">
+<h2 class="text-5xl md:text-7xl font-black uppercase tracking-tighter text-white mb-8">No fluff. Just systems that work.</h2>
+</div>
+<div class="lg:col-span-2">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-6xl text-white">local_florist</span>
+<span class="text-6xl font-black text-white tracking-tighter font-['Inter'] uppercase">FLOWRA</span>
+</div>
+<p class="font-['Inter'] font-bold uppercase text-xl text-white/80 max-w-md">NO NONSENSE. NO FLUFF. JUST SCALE.</p>
+</div>
+<div>
+<h4 class="text-xl font-black uppercase mb-8 text-[#FFC837]">Company</h4>
+<ul class="space-y-4 font-['Inter'] font-bold uppercase">
+<li><a class="text-white hover:text-[#10B981] transition-colors" href="/pages/contact.html">Twitter</a></li>
+<li><a class="text-white hover:text-[#10B981] transition-colors" href="/pages/contact.html">LinkedIn</a></li>
+<li><a class="text-white hover:text-[#10B981] transition-colors" href="/pages/contact.html">Privacy</a></li>
+</ul>
+</div>
+<div class="lg:col-span-3 pt-16 border-t border-white/20 flex flex-col md:flex-row justify-between items-center gap-8">
+<p class="font-['Inter'] font-bold uppercase text-sm">© 2024 FLOWRA. NO NONSENSE.</p>
+<div class="flex gap-8">
+<span class="material-symbols-outlined">eco</span>
+<span class="material-symbols-outlined">bolt</span>
+<span class="material-symbols-outlined">public</span>
+</div>
+</div>
+</footer>
+</body></html>

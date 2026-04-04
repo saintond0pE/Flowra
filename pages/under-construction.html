@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error-dim": "#a70138",
+                    "on-surface": "#2d2f2f",
+                    "on-tertiary-fixed-variant": "#006544",
+                    "on-secondary-fixed": "#443100",
+                    "secondary": "#FFC837", /* Mustard Yellow from Design System */
+                    "background": "#FFFFFF",
+                    "surface-dim": "#d2d5d5",
+                    "on-error": "#ffefef",
+                    "on-secondary": "#000000",
+                    "inverse-on-surface": "#9c9d9d",
+                    "primary-dim": "#4f4f4f",
+                    "inverse-primary": "#ffffff",
+                    "on-primary-container": "#575757",
+                    "tertiary": "#10B981", /* Mint Green from Design System */
+                    "tertiary-container": "#69f6b8",
+                    "on-secondary-container": "#000000",
+                    "surface-container-low": "#f0f1f1",
+                    "surface-container-high": "#e1e3e3",
+                    "surface-container-highest": "#dbdddd",
+                    "surface-bright": "#f6f6f6",
+                    "on-primary-fixed-variant": "#616161",
+                    "surface": "#f6f6f6",
+                    "primary-container": "#ebebeb",
+                    "primary-fixed-dim": "#dddddd",
+                    "outline-variant": "#acadad",
+                    "on-tertiary": "#c8ffe0",
+                    "on-background": "#2d2f2f",
+                    "error-container": "#FFB7B2", /* Pink highlight */
+                    "surface-container": "#e7e8e8",
+                    "inverse-surface": "#0c0f0f",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#f3f3f3",
+                    "primary": "#000000",
+                    "tertiary-fixed": "#69f6b8",
+                    "on-tertiary-fixed": "#00452d",
+                    "on-error-container": "#510017",
+                    "tertiary-fixed-dim": "#58e7ab",
+                    "on-surface-variant": "#5a5c5c",
+                    "secondary-dim": "#654c00",
+                    "secondary-container": "#ffca44",
+                    "secondary-fixed-dim": "#f2bc2a",
+                    "outline": "#000000",
+                    "on-secondary-fixed-variant": "#674d00",
+                    "error": "#b41340",
+                    "on-tertiary-container": "#005a3c",
+                    "on-primary-fixed": "#444444",
+                    "tertiary-dim": "#005c3d",
+                    "surface-variant": "#dbdddd",
+                    "surface-tint": "#5b5b5b",
+                    "primary-fixed": "#ebebeb",
+                    "secondary-fixed": "#ffca44"
+            },
+            "borderRadius": {
+                    "none": "0px",
+                    "DEFAULT": "0px",
+                    "lg": "0px",
+                    "xl": "0px",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter", "sans-serif"],
+                    "body": ["Inter", "sans-serif"],
+                    "label": ["Inter", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFFFF;
+        }
+    </style>
+</head>
+<body class="bg-white text-black overflow-x-hidden"><nav class="bg-white border-b-2 border-black flex justify-between items-center w-full px-8 py-4 max-w-full sticky top-0 z-50">
+<div class="flex items-center gap-2 cursor-pointer w-64" onclick="window.location.href='/'">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">local_florist</span>
+<span class="text-4xl font-black text-black tracking-tighter uppercase font-['Inter']">FLOWRA</span>
+</div>
+<div class="hidden xl:flex flex-col items-center gap-2">
+<div class="flex gap-6 items-center">
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/pricing.html">Pricing</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/case-study.html">Case Study</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/validation.html">Customer Validation</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/resources.html">Resources</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/solutions.html">Playbook Solution</a>
+</div>
+<button class="font-['Inter'] font-black uppercase tracking-tighter bg-[#10B981] text-black border-2 border-black px-4 py-1 neo-shadow hover:bg-black hover:text-[#10B981] transition-all text-xs" onclick="window.location.href='/pages/everything-we-offer.html'">
+        Everything We Built
+    </button>
+</div>
+<div class="flex items-center justify-end w-64">
+<button class="bg-[#FFC837] text-black border-2 border-black px-6 py-3 font-black uppercase tracking-tighter neo-shadow neo-shadow-hover neo-shadow-active transition-all" onclick="window.location.href='/pages/contact.html'">
+        Contact &amp; Get Started
+    </button>
+</div>
+</nav>
+<!-- TopNavBar (Shared Component Execution) -->
+<main class="min-h-screen flex flex-col items-center justify-center px-6 py-24 text-center max-w-7xl mx-auto">
+<!-- Hero Content Section -->
+<div class="w-full mb-16">
+<h1 class="text-5xl md:text-[80px] font-black text-black leading-[1.0] mb-8 tracking-tighter uppercase">
+                WORK IN PROGRESS.<br/>HOLD THE LINE.
+            </h1>
+<p class="text-xl md:text-2xl font-bold text-on-surface-variant max-w-4xl mx-auto leading-relaxed">
+                This feature is currently under construction. We're tuning the gears for maximum efficiency. Check back shortly—we'll update you as soon as the transmission is live.
+            </p>
+</div>
+<!-- Central Massive Illustration -->
+<div class="relative w-full max-w-4xl mx-auto mb-20 bg-surface-container-low border-2 border-black p-8 shadow-[12px_12px_0px_0px_rgba(16,185,129,1)]">
+<img alt="Illustration of a character with a hard hat operating a giant mechanical brain with gears and wires" class="w-full h-auto grayscale-0 object-contain" data-alt="Premium editorial Neo-Brutalist flat hand-drawn vector art. Extremely thick 8px black outlines. Solid flat colors using Mustard Yellow and Mint Green. A quirky character with a hard hat operating a giant mechanical brain with massive gears and thick tangled black jagged wires. Pure stark white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA8r22QFX22-K4YPd3HJUH791IGzZYUSTZO9NqNn3L33_2zjnI2hJt-c9MxxUEBcD6-e3OIxDSy1z5oOc9sqXIEesJU-saigzX0zaV_owVEcJqSuPPulr_2T9Wp91QqZteNmapneTcayzX3diC89JnFnYuCJzzTFLCWq8jCFb_8SlUQglgBDM0vSvl-797iozig2fAHSxk_K1hatS8X1QbPzqHiih44ZwpdQGtWutCJ_KITTOeFHMbd5UzThrS2rOszFn6EUkooQoRs"/>
+<!-- Asymmetric Floating Accent -->
+<div class="absolute -top-6 -right-6 bg-error-container border-2 border-black px-4 py-2 font-black uppercase shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -rotate-3">
+                SYSTEMS LOADING...
+            </div>
+</div>
+<!-- Primary Call to Action -->
+<div class="flex flex-col items-center gap-6">
+<button class="bg-black text-white border-2 border-black text-2xl md:text-4xl px-12 py-6 font-black uppercase tracking-tighter shadow-[8px_8px_0px_0px_rgba(255,200,55,1)] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[4px_4px_0px_0px_rgba(255,200,55,1)] transition-all active:translate-x-[8px] active:translate-y-[8px] active:shadow-none" onclick="window.location.href='/pages/contact.html'">
+                NOTIFY ME WHEN LIVE
+            </button>
+<p class="font-bold text-black/50 uppercase tracking-widest text-sm">Flowra Cloud Transmission System v.2.04</p>
+</div>
+</main>
+<!-- Bento Grid Section for Secondary Context -->
+<section class="max-w-7xl mx-auto px-6 pb-24 grid grid-cols-1 md:grid-cols-3 gap-8">
+<div class="border-2 border-black p-8 bg-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all">
+<div class="flex items-center gap-4 mb-4">
+<span class="material-symbols-outlined text-4xl" data-icon="settings">settings</span>
+<h3 class="text-xl font-black uppercase">Engineered Speed</h3>
+</div>
+<p class="font-bold text-on-surface-variant">We're rewriting the core kernel to ensure latency stays below 10ms. No fluff, just pure performance.</p>
+</div>
+<div class="border-2 border-black p-8 bg-tertiary shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all">
+<div class="flex items-center gap-4 mb-4 text-black">
+<span class="material-symbols-outlined text-4xl" data-icon="terminal" data-weight="fill" style="font-variation-settings: 'FILL' 1;">terminal</span>
+<h3 class="text-xl font-black uppercase">Validation</h3>
+</div>
+<p class="font-bold text-black">Rigorous testing phase in progress. 14,000 unit tests remaining. We don't ship broken code.</p>
+</div>
+<div class="border-2 border-black p-8 bg-secondary shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[3px] hover:translate-y-[3px] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all">
+<div class="flex items-center gap-4 mb-4 text-black">
+<span class="material-symbols-outlined text-4xl" data-icon="bolt">bolt</span>
+<h3 class="text-xl font-black uppercase">Manifesto</h3>
+</div>
+<p class="font-bold text-black">Clarity over complexity. Every line of code is intentional. Every UI choice is a statement.</p>
+</div>
+</section>
+<!-- Footer (Shared Component Execution) -->
+<footer class="bg-black text-white px-8 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mt-32">
+<div class="lg:col-span-3 mb-12">
+<h2 class="text-5xl md:text-7xl font-black uppercase tracking-tighter text-white mb-8">No fluff. Just systems that work.</h2>
+</div>
+<div class="lg:col-span-2">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-6xl text-white">local_florist</span>
+<span class="text-6xl font-black text-white tracking-tighter font-['Inter'] uppercase">FLOWRA</span>
+</div>
+<p class="font-['Inter'] font-bold uppercase text-xl text-white/80 max-w-md">NO NONSENSE. NO FLUFF. JUST SCALE.</p>
+</div>
+<div>
+<h4 class="text-xl font-black uppercase mb-8 text-[#FFC837]">Company</h4>
+<ul class="space-y-4 font-['Inter'] font-bold uppercase">
+<li><a class="text-white hover:text-[#10B981] transition-colors" href="/pages/contact.html">Twitter</a></li>
+<li><a class="text-white hover:text-[#10B981] transition-colors" href="/pages/contact.html">LinkedIn</a></li>
+<li><a class="text-white hover:text-[#10B981] transition-colors" href="/pages/contact.html">Privacy</a></li>
+</ul>
+</div>
+<div class="lg:col-span-3 pt-16 border-t border-white/20 flex flex-col md:flex-row justify-between items-center gap-8">
+<p class="font-['Inter'] font-bold uppercase text-sm">© 2024 FLOWRA. NO NONSENSE.</p>
+<div class="flex gap-8">
+<span class="material-symbols-outlined">eco</span>
+<span class="material-symbols-outlined">bolt</span>
+<span class="material-symbols-outlined">public</span>
+</div>
+</div>
+</footer>
+</body></html>

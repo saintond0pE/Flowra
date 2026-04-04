@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FLOWRA | Customer Validation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "surface-container-highest": "#dbdddd",
+                "on-secondary-container": "#5b4400",
+                "outline-variant": "#acadad",
+                "on-primary-container": "#575757",
+                "inverse-surface": "#0c0f0f",
+                "primary-dim": "#4f4f4f",
+                "on-tertiary-container": "#005a3c",
+                "tertiary": "#10B981",
+                "tertiary-container": "#69f6b8",
+                "primary-container": "#ebebeb",
+                "surface-container-high": "#e1e3e3",
+                "on-secondary": "#fff1da",
+                "on-primary-fixed": "#444444",
+                "on-error-container": "#510017",
+                "primary-fixed-dim": "#dddddd",
+                "tertiary-dim": "#005c3d",
+                "inverse-on-surface": "#9c9d9d",
+                "surface-dim": "#d2d5d5",
+                "surface-bright": "#f6f6f6",
+                "secondary-fixed-dim": "#f2bc2a",
+                "secondary": "#FFC837",
+                "surface-container-low": "#f0f1f1",
+                "error-dim": "#a70138",
+                "on-error": "#ffefef",
+                "primary-fixed": "#ebebeb",
+                "tertiary-fixed-dim": "#58e7ab",
+                "background": "#ffffff",
+                "on-secondary-fixed": "#443100",
+                "primary": "#000000",
+                "on-tertiary": "#c8ffe0",
+                "on-background": "#2d2f2f",
+                "secondary-fixed": "#ffca44",
+                "error-container": "#FFB7B2",
+                "on-primary-fixed-variant": "#616161",
+                "on-primary": "#f3f3f3",
+                "surface-container-lowest": "#ffffff",
+                "inverse-primary": "#ffffff",
+                "surface": "#ffffff",
+                "on-surface": "#000000",
+                "on-secondary-fixed-variant": "#674d00",
+                "tertiary-fixed": "#69f6b8",
+                "surface-variant": "#dbdddd",
+                "on-tertiary-fixed-variant": "#006544",
+                "on-tertiary-fixed": "#00452d",
+                "error": "#b41340",
+                "surface-tint": "#5b5b5b",
+                "outline": "#000000",
+                "surface-container": "#e7e8e8",
+                "on-surface-variant": "#5a5c5c",
+                "secondary-dim": "#654c00",
+                "secondary-container": "#ffca44"
+            },
+            "borderRadius": {
+                "none": "0px",
+                "DEFAULT": "0px",
+                "lg": "0px",
+                "xl": "0px",
+                "full": "9999px"
+            },
+            "fontFamily": {
+                "headline": ["Inter", "sans-serif"],
+                "body": ["Inter", "sans-serif"],
+                "label": ["Inter", "sans-serif"]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .kinetic-shadow {
+            box-shadow: 6px 6px 0px 0px rgba(0,0,0,1);
+        }
+        .kinetic-shadow-hover:hover {
+            box-shadow: 12px 12px 0px 0px rgba(0,0,0,1);
+            transform: translateY(-12px);
+        }
+        .kinetic-shadow-white {
+            box-shadow: 6px 6px 0px 0px rgba(255,255,255,1);
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface selection:bg-secondary selection:text-black"><nav class="bg-white border-b-2 border-black flex justify-between items-center w-full px-8 py-4 max-w-full sticky top-0 z-50">
+<div class="flex items-center gap-2 cursor-pointer w-64" onclick="window.location.href='/'">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">local_florist</span>
+<span class="text-4xl font-black text-black tracking-tighter uppercase font-['Inter']">FLOWRA</span>
+</div>
+<div class="hidden xl:flex flex-col items-center gap-2">
+<div class="flex gap-6 items-center">
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/pricing.html">Pricing</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/case-study.html">Case Study</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/validation.html">Customer Validation</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/resources.html">Resources</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/solutions.html">Playbook Solution</a>
+</div>
+<button class="font-['Inter'] font-black uppercase tracking-tighter bg-[#10B981] text-black border-2 border-black px-4 py-1 neo-shadow hover:bg-black hover:text-[#10B981] transition-all text-xs" onclick="window.location.href='/pages/everything-we-offer.html'">
+        Everything We Built
+    </button>
+</div>
+<div class="flex items-center justify-end w-64">
+<button class="bg-[#FFC837] text-black border-2 border-black px-6 py-3 font-black uppercase tracking-tighter neo-shadow neo-shadow-hover neo-shadow-active transition-all" onclick="window.location.href='/pages/contact.html'">
+        Contact &amp; Get Started
+    </button>
+</div>
+</nav>
+<!-- TopNavBar -->
+<!-- Hero Section -->
+<section class="bg-black py-24 px-8 md:px-16 flex flex-col md:flex-row items-center justify-between gap-12 border-b-2 border-black overflow-hidden">
+<div class="max-w-4xl z-10">
+<h1 class="text-[64px] md:text-[96px] font-black text-white leading-[0.9] tracking-tighter uppercase mb-6">
+                Don't trust us.<br/>Trust the math.
+            </h1>
+<p class="text-secondary text-2xl md:text-4xl font-black uppercase tracking-tight">
+                Real companies eliminating manual work.
+            </p>
+</div>
+<div class="relative w-full md:w-1/2 flex justify-center">
+<div class="w-full max-w-lg aspect-square bg-transparent relative">
+<img class="w-full h-full object-contain filter drop-shadow-[10px_10px_0px_#FFC837]" data-alt="A massive neon-brutalist vector doodle of a giant chaotic calculator exploding with receipts and data bits, thick black outlines, flat mustard and mint colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgO30u0WwO-l2YFQr_ztS7CXEN5ehLUkdMsyUAU3xYMOagB2gwrk5Mg1mFqqjxwnq9ayFGSKci4gk-xoBN8QglQAtEVNuHbPosTztNxyvc432OM-Vg5C8V0uUReKoA6TYxjTqjsW-L2KbSAl4g51uxH5ED1834xnB3QAYUagbMOwx1hXeOGEIHpbfcRfxZ6HTBiYEK7JvBuT_00XIB_Ihc05gXI3AS5VM08lF0-A4mEHR8EsVBpSPschW67v7gtakNv8WtG0_8yQvI"/>
+</div>
+</div>
+</section>
+<!-- Case Study Cards -->
+<section class="py-24 px-8 md:px-16 bg-white">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+<!-- Card 1 (Mustard) -->
+<div class="bg-white border-2 border-black kinetic-shadow kinetic-shadow-hover transition-all flex flex-col">
+<div class="bg-secondary p-8 border-b-2 border-black">
+<span class="material-symbols-outlined text-6xl font-black">bolt</span>
+</div>
+<div class="p-8 flex-grow flex flex-col justify-between">
+<div>
+<h2 class="text-6xl font-black mb-4 tracking-tighter uppercase leading-none">75% Faster Support</h2>
+<p class="text-xl font-bold uppercase mb-8">"We stopped typing and started solving. FLOWRA turned our ticket queue into a ghost town."</p>
+</div>
+<div class="border-t-2 border-black pt-4">
+<span class="font-black uppercase tracking-tighter">— LOGIC_SHIFT INC.</span>
+</div>
+</div>
+</div>
+<!-- Card 2 (Mint) -->
+<div class="bg-white border-2 border-black kinetic-shadow kinetic-shadow-hover transition-all flex flex-col">
+<div class="bg-tertiary p-8 border-b-2 border-black">
+<span class="material-symbols-outlined text-6xl font-black text-white">dataset</span>
+</div>
+<div class="p-8 flex-grow flex flex-col justify-between">
+<div>
+<h2 class="text-6xl font-black mb-4 tracking-tighter uppercase leading-none text-tertiary">0 Manual Entries</h2>
+<p class="text-xl font-bold uppercase mb-8">"Human error is a choice. We chose to delete it entirely using the Kinetic Engine."</p>
+</div>
+<div class="border-t-2 border-black pt-4">
+<span class="font-black uppercase tracking-tighter">— NEURAL_CORE</span>
+</div>
+</div>
+</div>
+<!-- Card 3 (Pink) -->
+<div class="bg-white border-2 border-black kinetic-shadow kinetic-shadow-hover transition-all flex flex-col">
+<div class="bg-error-container p-8 border-b-2 border-black">
+<span class="material-symbols-outlined text-6xl font-black">flowsheet</span>
+</div>
+<div class="p-8 flex-grow flex flex-col justify-between">
+<div>
+<h2 class="text-6xl font-black mb-4 tracking-tighter uppercase leading-none">400% Growth</h2>
+<p class="text-xl font-bold uppercase mb-8">"Our infrastructure finally caught up with our ambition. No more bottlenecks, just flow."</p>
+</div>
+<div class="border-t-2 border-black pt-4">
+<span class="font-black uppercase tracking-tighter">— VELOCITY LABS</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Impact Matrix -->
+<section class="bg-tertiary py-32 px-8 md:px-16 border-y-2 border-black">
+<h2 class="text-6xl md:text-8xl font-black uppercase text-black tracking-tighter mb-16 leading-none">The Raw Data</h2>
+<div class="overflow-x-auto">
+<table class="w-full border-4 border-black bg-white kinetic-shadow">
+<thead>
+<tr class="bg-black text-white">
+<th class="border-4 border-black p-6 text-left text-2xl font-black uppercase tracking-widest">Company</th>
+<th class="border-4 border-black p-6 text-left text-2xl font-black uppercase tracking-widest">Before FLOWRA</th>
+<th class="border-4 border-black p-6 text-left text-2xl font-black uppercase tracking-widest">After FLOWRA</th>
+</tr>
+</thead>
+<tbody class="text-xl font-bold uppercase">
+<tr>
+<td class="border-4 border-black p-8 bg-surface-container-low">Global_Ops</td>
+<td class="border-4 border-black p-8">14 Days Latency</td>
+<td class="border-4 border-black p-8 bg-secondary">Real-time Sync</td>
+</tr>
+<tr>
+<td class="border-4 border-black p-8 bg-surface-container-low">FastTrack</td>
+<td class="border-4 border-black p-8">40 Admins</td>
+<td class="border-4 border-black p-8 bg-secondary">2 Automated Flows</td>
+</tr>
+<tr>
+<td class="border-4 border-black p-8 bg-surface-container-low">StreamLine</td>
+<td class="border-4 border-black p-8">85% Error Rate</td>
+<td class="border-4 border-black p-8 bg-secondary">&lt;0.01% Errors</td>
+</tr>
+<tr>
+<td class="border-4 border-black p-8 bg-surface-container-low">Apex_Scale</td>
+<td class="border-4 border-black p-8">$1.2M Waste</td>
+<td class="border-4 border-black p-8 bg-secondary">$94K Efficiency</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Heavy CTA Banner -->
+<section class="bg-secondary py-32 px-8 md:px-16 flex flex-col items-center text-center">
+<h2 class="text-6xl md:text-[80px] font-black uppercase text-black tracking-tighter leading-none mb-12 max-w-5xl">
+            Ready to be our next metric?
+        </h2>
+<button class="bg-black text-white px-12 py-8 text-3xl font-black uppercase tracking-tighter kinetic-shadow-white hover:translate-x-[6px] hover:translate-y-[6px] hover:shadow-none transition-all" onclick="window.location.href='/pages/contact.html'">
+            Build My System
+        </button>
+</section>
+<!-- Footer -->
+<footer class="bg-black text-white px-8 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mt-32">
+<div class="lg:col-span-3 mb-12">
+<h2 class="text-5xl md:text-7xl font-black uppercase tracking-tighter text-white mb-8">No fluff. Just systems that work.</h2>
+</div>
+<div class="lg:col-span-2">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-6xl text-white">local_florist</span>
+<span class="text-6xl font-black text-white tracking-tighter font-['Inter'] uppercase">FLOWRA</span>
+</div>
+<p class="font-['Inter'] font-bold uppercase text-xl text-white/80 max-w-md">NO NONSENSE. NO FLUFF. JUST SCALE.</p>
+</div>
+<div>
+<h4 class="text-xl font-black uppercase mb-8 text-[#FFC837]">Company</h4>
+<ul class="space-y-4 font-['Inter'] font-bold uppercase">
+<li><a class="text-white hover:text-[#10B981] transition-colors" href="/pages/contact.html">Twitter</a></li>
+<li><a class="text-white hover:text-[#10B981] transition-colors" href="/pages/contact.html">LinkedIn</a></li>
+<li><a class="text-white hover:text-[#10B981] transition-colors" href="/pages/contact.html">Privacy</a></li>
+</ul>
+</div>
+<div class="lg:col-span-3 pt-16 border-t border-white/20 flex flex-col md:flex-row justify-between items-center gap-8">
+<p class="font-['Inter'] font-bold uppercase text-sm">© 2024 FLOWRA. NO NONSENSE.</p>
+<div class="flex gap-8">
+<span class="material-symbols-outlined">eco</span>
+<span class="material-symbols-outlined">bolt</span>
+<span class="material-symbols-outlined">public</span>
+</div>
+</div>
+</footer>
+</body></html>
