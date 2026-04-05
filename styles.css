@@ -4,11 +4,11 @@
 
 :root {
   --c-black: #000000;
-  --c-white: #FFFFFF;
-  --c-mint: #10B981;
-  --c-mustard: #FFC837;
-  --c-pink: #FFB7B2;
-  --c-bg: #f6f6f6;
+  --c-white: #FFF9E6;
+  --c-mint: #38BDF8;
+  --c-mustard: #B19CD9;
+  --c-pink: #FF8A65;
+  --c-bg: #FFF9E6;
   
   --shadow-block: 6px 6px 0px 0px rgba(0,0,0,1);
   --shadow-hover: 3px 3px 0px 0px rgba(0,0,0,1);
