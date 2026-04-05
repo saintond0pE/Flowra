@@ -81,6 +81,32 @@
         }
         .animate-spring { animation: spring-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
         .animate-pulse-glow { animation: pulse-success 2s infinite; }
+    
+        /* DISABLE HOVER ANIMATIONS ON MOBILE (touch devices) */
+        @media (max-width: 767px) {
+            .service-card-pop:hover,
+            .neo-shadow-hover:hover,
+            [class*="hover\:translate"],
+            [class*="hover\:shadow"] {
+                transform: none !important;
+                box-shadow: none !important;
+            }
+            .neo-shadow {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+            }
+            .neo-shadow-hover:hover {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+                transform: none !important;
+            }
+            .neo-shadow-active:active {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+                transform: none !important;
+            }
+            .service-card-pop:hover {
+                transform: none !important;
+                box-shadow: 4px 4px 0px 0px rgba(0,0,0,1) !important;
+            }
+        }
     </style>
 </head>
 <body class="overflow-x-hidden">
@@ -105,27 +131,27 @@
 </div>
 </nav>
 
-    <section class="system-bg min-h-screen py-8 md:py-24 px-6 flex flex-col items-center justify-center relative">
+    <section class="system-bg min-h-screen py-4 md:py-24 px-3 md:px-6 flex flex-col items-center justify-center relative">
         <div class="absolute inset-0 bg-black/10 pointer-events-none"></div>
         
-        <div class="glass-panel neo-shadow w-full max-w-3xl p-8 md:p-12 relative z-10">
-            <div class="mb-12 text-center">
-                <h1 class="text-5xl md:text-7xl font-black uppercase tracking-tighter mb-4 leading-none strike">System Entry</h1>
-                <p class="text-xl font-bold uppercase text-black/60 tracking-widest">Protocol: Direct Communication</p>
+        <div class="glass-panel neo-shadow w-full max-w-3xl p-4 md:p-12 relative z-10">
+            <div class="mb-4 md:mb-12 text-center">
+                <h1 class="text-2xl md:text-7xl font-black uppercase tracking-tighter mb-2 md:mb-4 leading-none strike">System Entry</h1>
+                <p class="text-xs md:text-xl font-bold uppercase text-black/60 tracking-widest">Protocol: Direct Communication</p>
             </div>
 
             <!-- Subject Toggle -->
             <div class="grid grid-cols-2 gap-4 mb-4 md:mb-12">
-                <button id="btn-query" onclick="setMode('query')" class="toggle-btn active p-6 border-4 border-black text-xl font-black uppercase tracking-tighter transition-all">
+                <button id="btn-query" onclick="setMode('query')" class="toggle-btn active p-3 md:p-6 border-2 md:border-4 border-black text-sm md:text-xl font-black uppercase tracking-tighter transition-all">
                     Query or Booking
                 </button>
-                <button id="btn-issue" onclick="setMode('issue')" class="toggle-btn p-6 border-4 border-black text-xl font-black uppercase tracking-tighter transition-all">
+                <button id="btn-issue" onclick="setMode('issue')" class="toggle-btn p-3 md:p-6 border-2 md:border-4 border-black text-sm md:text-xl font-black uppercase tracking-tighter transition-all">
                     Issue Discussion
                 </button>
             </div>
 
             <form id="contact-form" class="space-y-4 md:space-y-8" onsubmit="return validateForm(event)">
-                <div class="p-4 bg-black text-[#B19CD9] border-2 border-black font-black uppercase text-sm tracking-widest text-center">
+                <div class="p-2 md:p-4 bg-black text-[#B19CD9] border-2 border-black font-black uppercase text-[10px] md:text-sm tracking-widest text-center">
                     Note: At least one contact method (Email or Number) is COMPULSORY to send request.
                 </div>
 
@@ -133,13 +159,13 @@
                 <div class="space-y-3 md:space-y-6">
                     <div>
                         <label class="block text-sm font-black uppercase tracking-widest mb-2">Primary Email</label>
-                        <input id="email-field" type="email" placeholder="admin@system.io" class="w-full p-4 border-4 border-black font-bold text-xl focus:outline-none focus:bg-[#B19CD9]/10">
+                        <input id="email-field" type="email" placeholder="admin@system.io" class="w-full p-3 md:p-4 border-2 md:border-4 border-black font-bold text-base md:text-xl focus:outline-none focus:bg-[#B19CD9]/10">
                     </div>
 
                     <div>
                         <label class="block text-sm font-black uppercase tracking-widest mb-2">Mobile / Region (Numeric Only)</label>
-                        <div class="flex border-4 border-black items-stretch">
-                            <select id="region-field" class="bg-black text-white px-6 py-4 font-black border-r-4 border-black focus:outline-none appearance-none cursor-pointer">
+                        <div class="flex border-2 md:border-4 border-black items-stretch">
+                            <select id="region-field" class="bg-black text-white px-3 py-3 md:px-6 md:py-4 font-black text-sm md:text-base border-r-4 border-black focus:outline-none appearance-none cursor-pointer">
                                 <option>US</option>
                                 <option>UK</option>
                                 <option>CA</option>
@@ -152,7 +178,7 @@
                                 <option>JP</option>
                                 <option>OTHER</option>
                             </select>
-                            <input id="mobile-field" type="tel" oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="NUMBER ONLY" class="flex-1 p-4 font-bold text-xl focus:outline-none focus:bg-[#B19CD9]/10">
+                            <input id="mobile-field" type="tel" oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="NUMBER ONLY" class="flex-1 p-3 md:p-4 font-bold text-base md:text-xl focus:outline-none focus:bg-[#B19CD9]/10">
                         </div>
                     </div>
                 </div>
@@ -160,32 +186,32 @@
                 <!-- Conditional Inbox -->
                 <div id="inbox-section" class="hidden animate-in fade-in slide-in-from-top-4 duration-300">
                     <label class="block text-sm font-black uppercase tracking-widest mb-2">System Inbox (Max 500 characters)</label>
-                    <textarea id="message-field" rows="4" maxlength="500" placeholder="Describe the issue in detail..." class="w-full p-4 border-4 border-black font-bold text-xl focus:outline-none focus:bg-[#B19CD9]/10 resize-none"></textarea>
+                    <textarea id="message-field" rows="4" maxlength="500" placeholder="Describe the issue in detail..." class="w-full p-3 md:p-4 border-2 md:border-4 border-black font-bold text-base md:text-xl focus:outline-none focus:bg-[#B19CD9]/10 resize-none"></textarea>
                 </div>
 
                 <div id="error-message" class="hidden p-4 bg-red-600 text-white font-black uppercase text-sm text-center border-4 border-black">
                     ERROR: CONNECTION FAILED. At least one contact method is required.
                 </div>
 
-                <button type="submit" class="w-full bg-black text-white p-8 text-3xl font-black uppercase tracking-[0.2em] neo-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all active:bg-[#38BDF8] active:text-black">
+                <button type="submit" class="w-full bg-black text-white p-4 md:p-8 text-base md:text-3xl font-black uppercase tracking-wider md:tracking-[0.2em] neo-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all active:bg-[#38BDF8] active:text-black">
                     Execute Signal
                 </button>
             </form>
         </div>
 
-        <div class="mt-16 text-center max-w-xl">
+        <div class="mt-6 md:mt-16 text-center max-w-xl">
             <p class="text-sm font-black uppercase text-white bg-black p-2 inline-block shadow-lg">Warning: All transmissions are logged by Central Command.</p>
         </div>
     </section>
 
     <!-- Success Modal -->
     <div id="success-popup" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
-        <div class="glass-panel bg-[#FFF9E6] p-12 max-w-xl w-full text-center neo-shadow animate-spring">
+        <div class="glass-panel bg-[#FFF9E6] p-6 md:p-12 max-w-xl w-full text-center neo-shadow animate-spring">
             <div class="w-24 h-24 bg-[#38BDF8] rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse-glow border-4 border-black">
                 <span class="material-symbols-outlined text-5xl text-black font-black">check_circle</span>
             </div>
-            <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4">Transmission Success</h2>
-            <p class="text-2xl font-black uppercase text-black/60 mb-4 md:mb-8">We'll be right back with your request.</p>
+            <h2 class="text-xl md:text-5xl font-black uppercase tracking-tighter mb-2 md:mb-4">Transmission Success</h2>
+            <p class="text-base md:text-2xl font-black uppercase text-black/60 mb-4 md:mb-8">We'll be right back with your request.</p>
             <div class="h-4 bg-black/10 border-2 border-black w-full overflow-hidden">
                 <div class="h-full bg-[#38BDF8] transition-all duration-[3000ms] ease-linear w-0" id="progress-bar"></div>
             </div>
