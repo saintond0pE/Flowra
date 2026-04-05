@@ -99,8 +99,8 @@
 <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">local_florist</span>
 <span class="text-2xl md:text-4xl font-black text-black tracking-tighter uppercase font-['Inter']">FLOWRA</span>
 </div>
-<div class="flex flex-wrap items-center gap-4 md:gap-8 ml-auto justify-end py-2 md:py-0">
-<div class="flex gap-6 items-center">
+<div class="hidden md:flex items-center gap-4 lg:gap-8 ml-auto">
+<div class="flex gap-2 lg:gap-4 items-center flex-wrap">
 <a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#B19CD9] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/pricing.html">Pricing</a>
 <a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#B19CD9] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/case-study.html">Case Study</a>
 <a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#B19CD9] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/validation.html">Customer Validation</a>
@@ -113,7 +113,19 @@
         Contact &amp; Get Started
     </button>
 </div>
+<button class="md:hidden ml-auto border-2 border-black p-2 bg-[#B19CD9]" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" aria-label="Menu">
+<span class="material-symbols-outlined text-2xl text-black">menu</span>
+</button>
 </nav>
+<!-- Mobile Dropdown Menu -->
+<div id="mobile-menu" class="hidden md:hidden bg-[#FFF9E6] border-b-2 border-black px-4 py-3 flex flex-col gap-2 sticky top-[60px] z-50">
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-sm text-black/70 py-2 border-b border-black/20" href="/pages/pricing.html">Pricing</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-sm text-black/70 py-2 border-b border-black/20" href="/pages/case-study.html">Case Study</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-sm text-black/70 py-2 border-b border-black/20" href="/pages/validation.html">Validation</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-sm text-black/70 py-2 border-b border-black/20" href="/pages/resources.html">Resources</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-sm text-black/70 py-2 border-b border-black/20" href="/pages/everything-we-offer.html">Everything We Built</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-xs bg-[#B19CD9] text-black border-2 border-black p-2 text-center" href="/pages/contact.html">Contact & Get Started</a>
+</div>
 <!-- TopNavBar -->
 <!-- Hero Section -->
 <!-- Transformation Engine -->
@@ -208,16 +220,16 @@
 </div>
 </section>
 <!-- Footer -->
-<footer class="bg-black text-white px-4 md:px-8 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-12 mt-32">
+<footer class="bg-black text-white px-4 md:px-8 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-12 mt-0">
 <div class="lg:col-span-3 mb-12">
-<h2 class="text-5xl md:text-7xl font-black uppercase tracking-tighter text-white mb-8">No fluff. Just systems that work.</h2>
+<h2 class="text-2xl md:text-5xl lg:text-7xl font-black uppercase tracking-tighter text-white mb-4 md:mb-8">No fluff. Just systems that work.</h2>
 </div>
 <div class="lg:col-span-2">
 <div class="flex items-center gap-3 mb-8">
 <span class="material-symbols-outlined text-4xl md:text-6xl text-white">local_florist</span>
 <span class="text-4xl md:text-6xl font-black text-white tracking-tighter font-['Inter'] uppercase">FLOWRA</span>
 </div>
-<p class="font-['Inter'] font-bold uppercase text-xl text-white/80 max-w-md">NO NONSENSE. NO FLUFF. JUST SCALE.</p>
+<p class="font-['Inter'] font-bold uppercase text-sm md:text-xl text-white/80 max-w-md">NO NONSENSE. NO FLUFF. JUST SCALE.</p>
 </div>
 <div>
 <h4 class="text-xl font-black uppercase mb-8 text-[#B19CD9]">Company</h4>
