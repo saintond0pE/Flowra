@@ -85,15 +85,15 @@
 </div>
 <div class="hidden xl:flex items-center gap-8 ml-auto">
 <div class="flex gap-6 items-center">
-<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#4338CA] hover:text-white transition-all duration-100 px-2 py-1" href="/pages/pricing.html">Pricing</a>
-<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#4338CA] hover:text-white transition-all duration-100 px-2 py-1" href="/pages/case-study.html">Case Study</a>
-<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#4338CA] hover:text-white transition-all duration-100 px-2 py-1" href="/pages/validation.html">Customer Validation</a>
-<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#4338CA] hover:text-white transition-all duration-100 px-2 py-1" href="/pages/resources.html">Resources</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/pricing.html">Pricing</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/case-study.html">Case Study</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/validation.html">Customer Validation</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#FFC837] hover:text-black transition-all duration-100 px-2 py-1" href="/pages/resources.html">Resources</a>
 </div>
-<button class="font-['Inter'] font-black uppercase tracking-tighter bg-[#0F172A] text-white border-2 border-black px-4 py-2 neo-shadow hover:bg-black hover:text-[#4338CA] transition-all text-sm" onclick="window.location.href='/pages/everything-we-offer.html'">
+<button class="font-['Inter'] font-black uppercase tracking-tighter bg-[#10B981] text-black border-2 border-black px-4 py-2 neo-shadow hover:bg-black hover:text-[#10B981] transition-all text-sm" onclick="window.location.href='/pages/everything-we-offer.html'">
         Everything We Built
     </button>
-<button class="bg-[#4338CA] text-white border-2 border-black px-6 py-2 font-black uppercase tracking-tighter neo-shadow neo-shadow-hover neo-shadow-active transition-all text-sm" onclick="window.location.href='/pages/contact.html'">
+<button class="bg-[#FFC837] text-black border-2 border-black px-6 py-2 font-black uppercase tracking-tighter neo-shadow neo-shadow-hover neo-shadow-active transition-all text-sm" onclick="window.location.href='/pages/contact.html'">
         Contact &amp; Get Started
     </button>
 </div>
@@ -119,7 +119,7 @@
             </div>
 
             <form id="contact-form" class="space-y-8" onsubmit="return validateForm(event)">
-                <div class="p-4 bg-black text-[#4338CA] border-2 border-black font-black uppercase text-sm tracking-widest text-center">
+                <div class="p-4 bg-black text-[#FFC837] border-2 border-black font-black uppercase text-sm tracking-widest text-center">
                     Note: At least one contact method (Email or Number) is COMPULSORY to send request.
                 </div>
 
@@ -127,7 +127,7 @@
                 <div class="space-y-6">
                     <div>
                         <label class="block text-sm font-black uppercase tracking-widest mb-2">Primary Email</label>
-                        <input id="email-field" type="email" placeholder="admin@system.io" class="w-full p-4 border-4 border-black font-bold text-xl focus:outline-none focus:bg-[#F1F5F9]/10">
+                        <input id="email-field" type="email" placeholder="admin@system.io" class="w-full p-4 border-4 border-black font-bold text-xl focus:outline-none focus:bg-[#FFC837]/10">
                     </div>
 
                     <div>
@@ -146,7 +146,7 @@
                                 <option>JP</option>
                                 <option>OTHER</option>
                             </select>
-                            <input id="mobile-field" type="tel" oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="NUMBER ONLY" class="flex-1 p-4 font-bold text-xl focus:outline-none focus:bg-[#F1F5F9]/10">
+                            <input id="mobile-field" type="tel" oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="NUMBER ONLY" class="flex-1 p-4 font-bold text-xl focus:outline-none focus:bg-[#FFC837]/10">
                         </div>
                     </div>
                 </div>
@@ -154,14 +154,14 @@
                 <!-- Conditional Inbox -->
                 <div id="inbox-section" class="hidden animate-in fade-in slide-in-from-top-4 duration-300">
                     <label class="block text-sm font-black uppercase tracking-widest mb-2">System Inbox (Max 500 characters)</label>
-                    <textarea id="message-field" rows="4" maxlength="500" placeholder="Describe the issue in detail..." class="w-full p-4 border-4 border-black font-bold text-xl focus:outline-none focus:bg-[#F1F5F9]/10 resize-none"></textarea>
+                    <textarea id="message-field" rows="4" maxlength="500" placeholder="Describe the issue in detail..." class="w-full p-4 border-4 border-black font-bold text-xl focus:outline-none focus:bg-[#FFC837]/10 resize-none"></textarea>
                 </div>
 
                 <div id="error-message" class="hidden p-4 bg-red-600 text-white font-black uppercase text-sm text-center border-4 border-black">
                     ERROR: CONNECTION FAILED. At least one contact method is required.
                 </div>
 
-                <button type="submit" class="w-full bg-black text-white p-8 text-3xl font-black uppercase tracking-[0.2em] neo-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all active:bg-[#E2E8F0] active:text-black">
+                <button type="submit" class="w-full bg-black text-white p-8 text-3xl font-black uppercase tracking-[0.2em] neo-shadow hover:translate-x-1 hover:translate-y-1 hover:shadow-none transition-all active:bg-[#10B981] active:text-black">
                     Execute Signal
                 </button>
             </form>
@@ -175,15 +175,15 @@
     <!-- Success Modal -->
     <div id="success-popup" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
         <div class="glass-panel bg-white p-12 max-w-xl w-full text-center neo-shadow animate-spring">
-            <div class="w-24 h-24 bg-[#E2E8F0] rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse-glow border-4 border-black">
+            <div class="w-24 h-24 bg-[#10B981] rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse-glow border-4 border-black">
                 <span class="material-symbols-outlined text-5xl text-black font-black">check_circle</span>
             </div>
             <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4">Transmission Success</h2>
             <p class="text-2xl font-black uppercase text-black/60 mb-8">We'll be right back with your request.</p>
             <div class="h-4 bg-black/10 border-2 border-black w-full overflow-hidden">
-                <div class="h-full bg-[#E2E8F0] transition-all duration-[3000ms] ease-linear w-0" id="progress-bar"></div>
+                <div class="h-full bg-[#10B981] transition-all duration-[3000ms] ease-linear w-0" id="progress-bar"></div>
             </div>
-            <p class="mt-4 text-sm font-black uppercase tracking-widest text-[#4338CA]">Central Command Synced</p>
+            <p class="mt-4 text-sm font-black uppercase tracking-widest text-[#10B981]">Central Command Synced</p>
         </div>
     </div>
 
@@ -200,11 +200,11 @@
             <p class="font-['Inter'] font-bold uppercase text-xl text-white/80 max-w-md">NO NONSENSE. NO FLUFF. JUST SCALE.</p>
         </div>
         <div>
-            <h4 class="text-xl font-black uppercase mb-8 text-[#4338CA]">Company</h4>
+            <h4 class="text-xl font-black uppercase mb-8 text-[#FFC837]">Company</h4>
             <ul class="space-y-4 font-['Inter'] font-bold uppercase">
-                <li><a class="text-white hover:text-[#4338CA] transition-colors" href="/pages/under-construction.html">Twitter</a></li>
-                <li><a class="text-white hover:text-[#4338CA] transition-colors" href="/pages/under-construction.html">LinkedIn</a></li>
-                <li><a class="text-white hover:text-[#4338CA] transition-colors" href="/pages/privacy.html">Privacy</a></li>
+                <li><a class="text-white hover:text-[#10B981] transition-colors" href="/pages/under-construction.html">Twitter</a></li>
+                <li><a class="text-white hover:text-[#10B981] transition-colors" href="/pages/under-construction.html">LinkedIn</a></li>
+                <li><a class="text-white hover:text-[#10B981] transition-colors" href="/pages/privacy.html">Privacy</a></li>
             </ul>
         </div>
         <div class="lg:col-span-3 pt-16 border-t border-white/20 flex flex-col md:flex-row justify-between items-center gap-8">
