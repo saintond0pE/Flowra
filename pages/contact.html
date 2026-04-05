@@ -105,7 +105,7 @@
 </div>
 </nav>
 
-    <section class="system-bg min-h-screen py-12 md:py-10 md:py-24 px-6 flex flex-col items-center justify-center relative">
+    <section class="system-bg min-h-screen py-8 md:py-24 px-6 flex flex-col items-center justify-center relative">
         <div class="absolute inset-0 bg-black/10 pointer-events-none"></div>
         
         <div class="glass-panel neo-shadow w-full max-w-3xl p-8 md:p-12 relative z-10">
@@ -115,7 +115,7 @@
             </div>
 
             <!-- Subject Toggle -->
-            <div class="grid grid-cols-2 gap-4 mb-12">
+            <div class="grid grid-cols-2 gap-4 mb-4 md:mb-12">
                 <button id="btn-query" onclick="setMode('query')" class="toggle-btn active p-6 border-4 border-black text-xl font-black uppercase tracking-tighter transition-all">
                     Query or Booking
                 </button>
@@ -124,7 +124,7 @@
                 </button>
             </div>
 
-            <form id="contact-form" class="space-y-8" onsubmit="return validateForm(event)">
+            <form id="contact-form" class="space-y-4 md:space-y-8" onsubmit="return validateForm(event)">
                 <div class="p-4 bg-black text-[#B19CD9] border-2 border-black font-black uppercase text-sm tracking-widest text-center">
                     Note: At least one contact method (Email or Number) is COMPULSORY to send request.
                 </div>
@@ -185,7 +185,7 @@
                 <span class="material-symbols-outlined text-5xl text-black font-black">check_circle</span>
             </div>
             <h2 class="text-4xl md:text-5xl font-black uppercase tracking-tighter mb-4">Transmission Success</h2>
-            <p class="text-2xl font-black uppercase text-black/60 mb-8">We'll be right back with your request.</p>
+            <p class="text-2xl font-black uppercase text-black/60 mb-4 md:mb-8">We'll be right back with your request.</p>
             <div class="h-4 bg-black/10 border-2 border-black w-full overflow-hidden">
                 <div class="h-full bg-[#38BDF8] transition-all duration-[3000ms] ease-linear w-0" id="progress-bar"></div>
             </div>
@@ -194,12 +194,12 @@
     </div>
 
     <!-- Footer -->
-    <footer class="bg-black text-white px-4 md:px-8 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-12 mt-0">
-        <div class="lg:col-span-3 mb-12">
-            <h2 class="text-2xl md:text-5xl lg:text-7xl font-black uppercase tracking-tighter text-white mb-4 md:mb-8">No fluff. Just systems that work.</h2>
+    <footer class="bg-black text-white px-4 md:px-8 py-8 md:py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-12 mt-0">
+        <div class="lg:col-span-3 mb-4 md:mb-12">
+            <h2 class="text-2xl md:text-5xl lg:text-7xl font-black uppercase tracking-tighter text-white mb-4 md:mb-4 md:mb-8">No fluff. Just systems that work.</h2>
         </div>
         <div class="lg:col-span-2">
-            <div class="flex items-center gap-3 mb-8">
+            <div class="flex items-center gap-3 mb-4 md:mb-8">
                 <span class="material-symbols-outlined text-4xl md:text-6xl text-white">local_florist</span>
                 <span class="text-4xl md:text-6xl font-black text-white tracking-tighter font-['Inter'] uppercase">FLOWRA</span>
             </div>
@@ -213,7 +213,7 @@
                 <li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/privacy.html">Privacy</a></li>
             </ul>
         </div>
-        <div class="lg:col-span-3 pt-16 border-t border-white/20 flex flex-col md:flex-row justify-between items-center gap-8">
+        <div class="lg:col-span-3 pt-8 md:pt-16 border-t border-white/20 flex flex-col md:flex-row justify-between items-center gap-8">
             <p class="font-['Inter'] font-bold uppercase text-sm">© 2024 FLOWRA. NO NONSENSE.</p>
             <div class="flex gap-8">
                 <span class="material-symbols-outlined">eco</span>
