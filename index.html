@@ -208,7 +208,7 @@
 </div>
 </div>
 <div class="bg-[#FF8A65] flex items-center justify-center p-4 md:p-8 overflow-hidden relative">
-<img alt="Neo-brutalist character holding interface" class="w-full h-auto max-w-2xl max-h-[300px] md:max-h-none object-contain transform hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVlD7ABCUDqQT7uFyHN3mdrkME0_IUc-nYw6VEk7_wYHA6mo8GzgEWmryWZHFqI7qODbhoJuEGs300QDthHOl0l677FLGd2iSprr-kv4ep18TIzSoraAvtejeq9mlItttnG2cMOHJXJwGFExJ5NqCVdBTkMzz5CMiMe0kPVUlsuANrFABMWOTD_BJZxSw4l_y1cR1qfV9oaXXnCiDy1fFB9sRzILoSkgSCeAP7X8SZYlBzdjFHssw7myZlMcEvyYAGPuWeHKyWtmId"/>
+<img alt="Neo-brutalist character holding interface" class="w-full h-auto max-w-2xl max-h-[300px] md:max-h-none object-contain transform md:hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVlD7ABCUDqQT7uFyHN3mdrkME0_IUc-nYw6VEk7_wYHA6mo8GzgEWmryWZHFqI7qODbhoJuEGs300QDthHOl0l677FLGd2iSprr-kv4ep18TIzSoraAvtejeq9mlItttnG2cMOHJXJwGFExJ5NqCVdBTkMzz5CMiMe0kPVUlsuANrFABMWOTD_BJZxSw4l_y1cR1qfV9oaXXnCiDy1fFB9sRzILoSkgSCeAP7X8SZYlBzdjFHssw7myZlMcEvyYAGPuWeHKyWtmId"/>
 </div>
 </section>
 <!-- THE INFINITE MARQUEE -->
@@ -494,8 +494,8 @@
         <!-- Chat Footer (Input) -->
         <div class="bg-[#FF8A65] border-t-4 border-black p-4 flex gap-3 items-end">
             <textarea id="chat-input" rows="1" placeholder="Type a message..." class="flex-1 border-4 border-black p-3 font-bold focus:outline-none focus:ring-0 text-base placeholder-black/40 resize-none overflow-hidden" onkeypress="handleChatEnter(event)" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
-            <button onclick="sendChatMessage()" class="bg-black text-white border-4 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[2px] transition-all font-black flex items-center justify-center group h-auto">
-                <span class="material-symbols-outlined group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform">send</span>
+            <button onclick="sendChatMessage()" class="bg-black text-white border-4 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] md:hover:translate-y-[2px] transition-all font-black flex items-center justify-center group h-auto">
+                <span class="material-symbols-outlined group-md:hover:translate-x-1 group-hover:-translate-y-1 transition-transform">send</span>
             </button>
         </div>
     </div>
@@ -503,11 +503,11 @@
     <!-- Toggle Button -->
     <div class="relative pointer-events-auto group">
         <!-- Tooltip -->
-        <div class="absolute -top-14 right-0 bg-black text-white px-5 py-2 font-black uppercase text-sm border-2 border-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none transform -translate-y-2 group-hover:translate-y-0">
+        <div class="absolute -top-14 right-0 bg-black text-white px-5 py-2 font-black uppercase text-sm border-2 border-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none transform -translate-y-2 group-md:hover:translate-y-0">
             Let's automate it ⚡
             <div class="absolute -bottom-2 right-8 w-4 h-4 bg-black transform rotate-45 border-r-2 border-b-2 border-black"></div>
         </div>
-        <button id="chat-toggle" onclick="toggleChat()" class="bg-[#B19CD9] border-4 border-black w-20 h-20 rounded-full shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[3px] transition-all flex items-center justify-center relative">
+        <button id="chat-toggle" onclick="toggleChat()" class="bg-[#B19CD9] border-4 border-black w-20 h-20 rounded-full shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] md:hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] md:hover:translate-y-[3px] transition-all flex items-center justify-center relative">
             <span class="material-symbols-outlined text-4xl font-black text-black absolute transition-all duration-300" id="chat-icon-open">forum</span>
             <span class="material-symbols-outlined text-4xl font-black text-black absolute transition-all duration-300 opacity-0 transform rotate-90 scale-50" id="chat-icon-close">close</span>
             <!-- Notification dot -->
