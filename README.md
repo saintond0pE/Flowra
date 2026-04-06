@@ -1,4 +1,4 @@
-# FLOWRA: The Kinetic Manifesto 🦾🌹
+# FLOWRA 1.2: The Kinetic Manifesto 🦾🌹
 
 ### No-Fluff. No-Nonsense. High-Performance Automation.
 
