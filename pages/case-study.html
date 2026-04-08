@@ -1,154 +1,115 @@
 <!DOCTYPE html>
-
 <html lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>FLOWRA | Case Study: Acme Corp Transformation</title>
+<title>FLOWRA | Case Study</title>
+<meta name="description" content="How Flowra fixed a business drowning in manual operations."/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
-        tailwind.config = {
-            darkMode: "class",
-            theme: {
-                extend: {
-                    "colors": {
-                        "secondary-dim": "#654c00",
-                        "surface-container-high": "#e1e3e3",
-                        "on-surface": "#2d2f2f",
-                        "tertiary": "#10B981", // Overridden per prompt instructions for Mint Green
-                        "secondary-container": "#ffca44",
-                        "on-tertiary-fixed": "#00452d",
-                        "outline": "#757777",
-                        "background": "#ffffff",
-                        "on-tertiary-fixed-variant": "#006544",
-                        "outline-variant": "#acadad",
-                        "tertiary-dim": "#005c3d",
-                        "tertiary-fixed": "#69f6b8",
-                        "on-surface-variant": "#5a5c5c",
-                        "on-primary-container": "#575757",
-                        "surface-bright": "#f6f6f6",
-                        "on-secondary-container": "#5b4400",
-                        "surface-container-low": "#f0f1f1",
-                        "primary": "#5b5b5b",
-                        "on-primary": "#f3f3f3",
-                        "on-error-container": "#510017",
-                        "surface-variant": "#dbdddd",
-                        "surface-dim": "#d2d5d5",
-                        "error": "#b41340",
-                        "on-secondary-fixed": "#443100",
-                        "secondary-fixed": "#ffca44",
-                        "surface-container": "#e7e8e8",
-                        "error-container": "#FFB7B2", // Overridden per prompt instructions for Pink
-                        "primary-container": "#ebebeb",
-                        "tertiary-container": "#69f6b8",
-                        "surface": "#ffffff",
-                        "surface-tint": "#5b5b5b",
-                        "secondary": "#FFC837", // Overridden per prompt instructions for Mustard Yellow
-                        "primary-fixed-dim": "#dddddd",
-                        "primary-dim": "#4f4f4f",
-                        "inverse-primary": "#ffffff",
-                        "error-dim": "#a70138",
-                        "inverse-on-surface": "#9c9d9d",
-                        "inverse-surface": "#0c0f0f",
-                        "on-tertiary-container": "#005a3c",
-                        "on-error": "#ffefef",
-                        "on-secondary-fixed-variant": "#674d00",
-                        "on-primary-fixed": "#444444",
-                        "surface-container-lowest": "#ffffff",
-                        "on-tertiary": "#c8ffe0",
-                        "on-secondary": "#fff1da",
-                        "on-primary-fixed-variant": "#616161",
-                        "tertiary-fixed-dim": "#58e7ab",
-                        "primary-fixed": "#ebebeb",
-                        "surface-container-highest": "#dbdddd",
-                        "secondary-fixed-dim": "#f2bc2a",
-                        "on-background": "#2d2f2f"
-                    },
-                    "borderRadius": {
-                        "none": "0px"
-                    },
-                    "fontFamily": {
-                        "headline": ["Inter"],
-                        "body": ["Inter"],
-                        "label": ["Inter"]
-                    }
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "outline": "#757777",
+                    "secondary-container": "#ffca44",
+                    "surface-container-highest": "#dbdddd",
+                    "secondary-fixed-dim": "#f2bc2a",
+                    "error": "#b41340",
+                    "on-secondary-container": "#5b4400",
+                    "surface-variant": "#dbdddd",
+                    "tertiary-container": "#69f6b8",
+                    "on-primary-fixed-variant": "#616161",
+                    "primary": "#5b5b5b",
+                    "primary-fixed": "#ebebeb",
+                    "on-tertiary-container": "#005a3c",
+                    "tertiary-fixed-dim": "#58e7ab",
+                    "on-error-container": "#510017",
+                    "on-tertiary": "#c8ffe0",
+                    "tertiary-dim": "#005c3d",
+                    "error-dim": "#a70138",
+                    "on-error": "#ffefef",
+                    "on-secondary": "#fff1da",
+                    "primary-container": "#ebebeb",
+                    "background": "#f6f6f6",
+                    "primary-dim": "#4f4f4f",
+                    "tertiary-fixed": "#69f6b8",
+                    "on-primary": "#f3f3f3",
+                    "on-background": "#2d2f2f",
+                    "surface-container-high": "#e1e3e3",
+                    "on-tertiary-fixed": "#00452d",
+                    "outline-variant": "#acadad",
+                    "inverse-on-surface": "#9c9d9d",
+                    "on-primary-fixed": "#444444",
+                    "secondary": "#FFC837",
+                    "tertiary": "#10B981",
+                    "error-container": "#FFB7B2",
+                    "on-surface-variant": "#5a5c5c",
+                    "inverse-surface": "#0c0f0f",
+                    "on-secondary-fixed": "#443100",
+                    "on-secondary-fixed-variant": "#674d00",
+                    "primary-fixed-dim": "#dddddd",
+                    "inverse-primary": "#ffffff",
+                    "surface-bright": "#f6f6f6",
+                    "on-primary-container": "#575757",
+                    "surface-container-low": "#f0f1f1",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-dim": "#d2d5d5",
+                    "surface": "#f6f6f6",
+                    "surface-tint": "#5b5b5b",
+                    "secondary-dim": "#654c00",
+                    "secondary-fixed": "#ffca44",
+                    "on-surface": "#2d2f2f",
+                    "on-tertiary-fixed-variant": "#006544",
+                    "surface-container": "#e7e8e8"
                 },
+                borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px" },
+                fontFamily: { "headline": ["Inter"], "body": ["Inter"], "label": ["Inter"] }
             },
-        }
-    </script>
+        },
+    }
+</script>
 <style>
-        /* DESKTOP ZOOM - only on screens wider than 768px */
-        @media (min-width: 768px) {
-            html {
-                zoom: 0.70;
-            }
-        }
+    @media (min-width: 768px) { html { zoom: 0.75; } }
+    html { overflow-x: hidden; }
+    body { overflow-x: hidden; width: 100%; margin: 0; padding: 0; font-family: 'Inter', sans-serif; background-color: #FFF9E6; }
+    .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: middle; }
+    .neo-shadow { box-shadow: 6px 6px 0px 0px rgba(0,0,0,1); }
+    .neo-shadow-hover:hover { box-shadow: 3px 3px 0px 0px rgba(0,0,0,1); transform: translate(3px, 3px); }
+    .neo-shadow-active:active { box-shadow: 0px 0px 0px 0px rgba(0,0,0,1); transform: translate(6px, 6px); }
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .animate-marquee { display: flex; width: max-content; animation: marquee 20s linear infinite; }
+    .outline-text { -webkit-text-stroke: 2px #FFC837; color: transparent; }
 
-        /* ZOOM-OUT-FIX */
-        html {
-            overflow-x: hidden;
-        }
-        body {
-            overflow-x: hidden;
-            width: 100%;
-            margin: 0;
-            padding: 0;
-        }
-        body { font-family: 'Inter', sans-serif; background-color: #ffffff; }
-        .neo-shadow { shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] }
-        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 700, 'GRAD' 0, 'opsz' 48; }
-    
-        /* DISABLE HOVER ANIMATIONS ON MOBILE (touch devices) */
-        @media (max-width: 767px) {
-            .service-card-pop:hover,
-            .neo-shadow-hover:hover,
-            [class*="hover\:translate"],
-            [class*="hover\:shadow"] {
-                transform: none !important;
-                box-shadow: none !important;
-            }
-            .neo-shadow {
-                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
-            }
-            .neo-shadow-hover:hover {
-                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
-                transform: none !important;
-            }
-            .neo-shadow-active:active {
-                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
-                transform: none !important;
-            }
-            .service-card-pop:hover {
-                transform: none !important;
-                box-shadow: 4px 4px 0px 0px rgba(0,0,0,1) !important;
-            }
-        }
-    </style>
+    .step-row { transition: all 0.15s ease; }
+    .step-row:hover { transform: translateX(8px); }
+
+    @media (max-width: 767px) {
+        .step-row:hover { transform: none !important; }
+        .neo-shadow { box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important; }
+        .neo-shadow-hover:hover { box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important; transform: none !important; }
+    }
+</style>
 </head>
 <body class="text-on-surface">
+
+<!-- NAV -->
 <nav class="bg-[#FFF9E6] border-b-2 border-black w-full px-4 md:px-8 py-4 sticky top-0 z-50">
     <div class="max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-3 items-center">
-        <!-- Left: Logo -->
         <div class="flex justify-start items-center gap-2 cursor-pointer" onclick="window.location.href='/'">
             <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">local_florist</span>
             <span class="text-2xl md:text-3xl font-black text-black tracking-tighter uppercase font-['Inter']">FLOWRA</span>
         </div>
-
-        <!-- Center: Symmetrical Navigation (Desktop Only) -->
         <div class="hidden md:flex justify-center items-center gap-10">
             <a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#B19CD9] hover:text-black transition-all px-4 py-1" href="/pages/validation.html">Validation</a>
             <a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#B19CD9] hover:text-black transition-all px-4 py-1" href="/pages/resources.html">Resources</a>
         </div>
-
-        <!-- Right: Actions (Desktop Only) -->
         <div class="hidden md:flex justify-end items-center gap-4">
-            <button class="font-['Inter'] font-black uppercase tracking-tighter bg-[#38BDF8] text-black border-2 border-black px-4 py-2 neo-shadow hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none transition-all text-sm" onclick="window.location.href='/pages/everything-we-offer.html'">Everything We Built</button>
+            <button class="font-['Inter'] font-black uppercase tracking-tighter bg-[#38BDF8] text-black border-2 border-black px-4 py-2 neo-shadow hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none transition-all text-sm" onclick="window.location.href='/pages/case-study.html'">Case Study</button>
             <button class="bg-[#B19CD9] text-black border-2 border-black px-6 py-2 font-black uppercase tracking-tighter neo-shadow hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none transition-all text-sm" onclick="window.location.href='/pages/contact.html'">Contact Us</button>
         </div>
-
-        <!-- Mobile Toggle (Right aligned in 2nd col on mobile) -->
         <div class="md:hidden flex justify-end">
             <button class="border-2 border-black p-2 bg-[#B19CD9]" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" aria-label="Menu">
                 <span class="material-symbols-outlined text-2xl text-black">menu</span>
@@ -156,109 +117,250 @@
         </div>
     </div>
 </nav>
-<!-- Mobile Dropdown Menu -->
 <div id="mobile-menu" class="hidden md:hidden bg-[#FFF9E6] border-b-2 border-black px-4 py-3 flex flex-col gap-2 sticky top-[60px] z-[60]">
     <a class="font-['Inter'] font-black uppercase tracking-tighter text-sm text-black/70 py-2 border-b border-black/20" href="/pages/validation.html">Validation</a>
     <a class="font-['Inter'] font-black uppercase tracking-tighter text-sm text-black/70 py-2 border-b border-black/20" href="/pages/resources.html">Resources</a>
+    <a class="font-['Inter'] font-black uppercase tracking-tighter text-sm bg-[#38BDF8] text-black py-2 border-b border-black/20 px-2" href="/pages/case-study.html">Case Study</a>
     <a class="font-['Inter'] font-black uppercase tracking-tighter text-xs bg-[#B19CD9] text-black border-2 border-black p-2 text-center" href="/pages/contact.html">Contact Us</a>
 </div>
-<!-- TopNavBar -->
-<!-- Hero Section -->
-<!-- Transformation Engine -->
-<section class="flex flex-col md:flex-row w-full border-b-2 border-black">
-<!-- LEFT SIDE: BEFORE -->
-<div class="flex-1 bg-black text-white p-12 md:p-24 flex flex-col justify-start relative overflow-hidden">
-<div class="absolute top-0 right-0 opacity-20 pointer-events-none p-4">
-<span class="material-symbols-outlined text-[300px] text-red-600">warning</span>
-</div>
-<h2 class="text-4xl md:text-6xl font-black uppercase italic mb-12 tracking-tighter text-white">The Chaos</h2>
-<ul class="space-y-4 md:space-y-8 relative z-10">
-<li class="flex items-start gap-4">
-<span class="material-symbols-outlined text-4xl text-red-500">close</span>
-<p class="text-3xl font-extrabold uppercase leading-none">Dropped leads everywhere</p>
-</li>
-<li class="flex items-start gap-4">
-<span class="material-symbols-outlined text-4xl text-red-500">close</span>
-<p class="text-3xl font-extrabold uppercase leading-none">Visibly angry customers</p>
-</li>
-<li class="flex items-start gap-4">
-<span class="material-symbols-outlined text-4xl text-red-500">close</span>
-<p class="text-3xl font-extrabold uppercase leading-none">24-hour average response time</p>
-</li>
-<li class="flex items-start gap-4">
-<span class="material-symbols-outlined text-4xl text-red-500">close</span>
-<p class="text-3xl font-extrabold uppercase leading-none">Manual CSV hell</p>
-</li>
-</ul>
-<div class="mt-20 border-4 border-white p-8 bg-zinc-900 shadow-[10px_10px_0px_0px_rgba(255,255,255,1)]">
-<p class="font-bold text-xl uppercase italic">"It was like trying to steer a ship with a broken rudder in a hurricane." — Acme CTO</p>
-</div>
-</div>
-<!-- RIGHT SIDE: AFTER -->
-<div class="flex-1 bg-[#38BDF8] text-black p-12 md:p-24 flex flex-col justify-start border-t-2 md:border-t-0 md:border-l-2 border-black relative overflow-hidden">
-<div class="absolute bottom-0 right-0 opacity-10 pointer-events-none p-4 translate-y-1/4">
-<span class="material-symbols-outlined text-[400px]">settings_suggest</span>
-</div>
-<h2 class="text-4xl md:text-6xl font-black uppercase italic mb-12 tracking-tighter">The Machine</h2>
-<ul class="space-y-4 md:space-y-8 relative z-10">
-<li class="flex items-start gap-4">
-<span class="material-symbols-outlined text-4xl bg-black text-[#38BDF8]">check</span>
-<p class="text-3xl font-extrabold uppercase leading-none">Instant neural lead routing</p>
-</li>
-<li class="flex items-start gap-4">
-<span class="material-symbols-outlined text-4xl bg-black text-[#38BDF8]">check</span>
-<p class="text-3xl font-extrabold uppercase leading-none">Zero-touch automated CRM entry</p>
-</li>
-<li class="flex items-start gap-4">
-<span class="material-symbols-outlined text-4xl bg-black text-[#38BDF8]">check</span>
-<p class="text-3xl font-extrabold uppercase leading-none">3-minute response times</p>
-</li>
-<li class="flex items-start gap-4">
-<span class="material-symbols-outlined text-4xl bg-black text-[#38BDF8]">check</span>
-<p class="text-3xl font-extrabold uppercase leading-none">Kinetic data sync every 60s</p>
-</li>
-</ul>
-<div class="mt-20 border-4 border-black p-4 md:p-8 bg-[#FFF9E6] shadow-[10px_10px_0px_0px_rgba(0,0,0,1)]">
-<p class="font-bold text-xl uppercase italic">"FLOWRA didn't just fix the flow; they weaponized it for our growth." — Acme CEO</p>
-</div>
-</div>
+
+<!-- ██ HERO ██ -->
+<section class="grid grid-cols-1 md:grid-cols-2 border-b-4 border-black min-h-0 md:min-h-[600px] bg-[#FFF9E6]">
+    <div class="p-6 md:p-16 flex flex-col justify-center border-b-4 md:border-b-0 md:border-r-4 border-black relative overflow-hidden">
+        <!-- Subtle Pattern Overlay -->
+        <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(#000 1px, transparent 1px); background-size: 20px 20px;"></div>
+        
+        <div class="flex items-center gap-4 mb-6 md:mb-10">
+            <div class="bg-black text-[#FFC837] px-3 py-1 font-black uppercase text-[10px] md:text-xs tracking-widest transform -rotate-1">Case Study</div>
+            <div class="border border-black/20 px-2 py-1 font-mono text-[10px] text-black/40 uppercase">Ref: #FLW-042</div>
+        </div>
+        
+        <h1 class="text-4xl md:text-[64px] font-black leading-[0.9] tracking-tighter text-black mb-8 md:mb-12 uppercase">
+            How we fixed a business running on <span class="outline-text">manual</span> operations
+        </h1>
+        
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+            <button class="bg-[#B19CD9] text-black border-4 border-black px-8 py-4 md:px-12 md:py-6 text-base md:text-2xl font-black uppercase tracking-tighter neo-shadow neo-shadow-hover neo-shadow-active transition-all" onclick="window.location.href='/pages/contact.html'">Book a Call</button>
+            <div class="hidden md:block">
+                <p class="font-black uppercase text-xs tracking-widest text-black/30 leading-none">Status: Resolved</p>
+                <p class="font-black uppercase text-xs tracking-widest text-black/30">Efficiency: +94%</p>
+            </div>
+        </div>
+    </div>
+    <div class="bg-black p-0 flex items-center justify-center overflow-hidden border-t-4 md:border-t-0 border-black">
+        <img src="/assets/images/case-study-hero.png" alt="Industrial Schematic" class="w-full h-full object-cover grayscale brightness-125 contrast-125 hover:grayscale-0 transition-all duration-500">
+    </div>
 </section>
-<!-- Impact Stats -->
-<section class="bg-[#FFF9E6] py-16 md:py-12 px-4">
-<div class="max-w-7xl mx-auto">
-<h3 class="text-5xl font-black uppercase tracking-tighter mb-8 md:mb-20 text-center">Quantifiable Impact</h3>
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-<!-- Stat 1 -->
-<div class="bg-[#B19CD9] border-2 border-black p-5 md:p-10 flex flex-col items-center justify-center text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] md:hover:translate-x-[3px] md:hover:translate-y-[3px] md:hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all">
-<p class="text-[72px] font-black leading-none mb-4 tracking-tighter">94%</p>
-<p class="text-2xl font-extrabold uppercase tracking-tight">Manual task reduction</p>
-</div>
-<!-- Stat 2 -->
-<div class="bg-[#38BDF8] border-2 border-black p-5 md:p-10 flex flex-col items-center justify-center text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] md:hover:translate-x-[3px] md:hover:translate-y-[3px] md:hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all">
-<p class="text-[72px] font-black leading-none mb-4 tracking-tighter">$2.4M</p>
-<p class="text-2xl font-extrabold uppercase tracking-tight">Retained revenue</p>
-</div>
-<!-- Stat 3 -->
-<div class="bg-[#FF8A65] border-2 border-black p-5 md:p-10 flex flex-col items-center justify-center text-center shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] md:hover:translate-x-[3px] md:hover:translate-y-[3px] md:hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all">
-<p class="text-[72px] font-black leading-none mb-4 tracking-tighter">0.5s</p>
-<p class="text-2xl font-extrabold uppercase tracking-tight">Sync latency</p>
-</div>
-</div>
-</div>
+<!-- ██ THE BUSINESS ██ -->
+<section class="border-b-4 border-black py-12 md:py-20 px-4 md:px-8 bg-[#FFF9E6]">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row gap-8 md:gap-16">
+        <div class="md:w-1/3">
+            <div class="bg-black text-white p-6 md:p-10 neo-shadow transform -rotate-1">
+                <h2 class="text-2xl md:text-3xl font-black uppercase tracking-tighter mb-6">Subject: <br/>The Client</h2>
+                <div class="space-y-4 font-black uppercase text-[10px] md:text-xs">
+                    <div class="flex justify-between border-b border-white/20 pb-2"><span>Industry</span><span class="text-[#38BDF8]">Services</span></div>
+                    <div class="flex justify-between border-b border-white/20 pb-2"><span>Team Size</span><span class="text-[#38BDF8]">15 Headcount</span></div>
+                    <div class="flex justify-between border-b border-white/20 pb-2"><span>Inbound Vol</span><span class="text-[#38BDF8]">~40 Req/Day</span></div>
+                    <div class="flex justify-between"><span>Latency</span><span class="text-red-500">CRITICAL</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="md:w-2/3 flex flex-col justify-center">
+            <p class="text-xl md:text-3xl font-black uppercase tracking-tighter mb-6 leading-tight">Growth was outstripping the systems.</p>
+            <p class="text-sm md:text-xl font-bold text-black/70 leading-relaxed italic">"Every single request—WhatsApp, call, or email—had to pass through the owner before a technician was even notified. One bottleneck holding back a $2M operation."</p>
+        </div>
+    </div>
 </section>
-<!-- Imagery / Divider Section -->
-<section class="w-full h-[600px] bg-[#FFF9E6] border-y-2 border-black relative">
-<img class="w-full h-full object-cover grayscale contrast-125" data-alt="Abstract neo-brutalist artwork of massive geometric gears and floral silhouettes in mustard yellow and black against white" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBpmklUw6gIiB4I4DEvojOS1RxW7TH64vDNlmo3C1X8mjdCkRJhjIkQOsdkUWhf1m8NYRR36jZO-eLZWqpfJ9eeAWDfUUfsSrhxofOrKUBpFpCAg_8jwZjlbpEJqT8op53GbFCjEtlssf0kDx0XBf9gneK7vsZPDPmxunjhvTEo07XkXeWjVYKm7b1UQhkxW4XBMfHkUnFFYQf9MfurOZ68S6ZcXWjw3E3yBUOBpjwYcas8p2UnF6blqYtfXGXGAYT0XPfUmn5vTEHf"/>
-<div class="absolute inset-0 bg-[#B19CD9]/30 mix-blend-multiply"></div>
-<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-[#FFF9E6] border-4 border-black p-12 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-xl text-center">
-<h4 class="text-4xl font-black uppercase mb-6 leading-none tracking-tighter">Ready to automate your chaos?</h4>
-<button class="bg-black text-white px-10 py-4 font-black uppercase tracking-tighter text-2xl hover:bg-[#38BDF8] hover:text-black transition-colors" onclick="window.location.href='/pages/contact.html'">Start Discovery</button>
-</div>
+
+<!-- ██ WHAT WAS HAPPENING ██ -->
+<section class="bg-black text-white border-b-4 border-black py-16 md:py-24 px-4 md:px-8 relative overflow-hidden">
+    <!-- Kinetic Marquee Accent (Stationary but bold) -->
+    <div class="absolute top-0 right-0 p-4 opacity-10 select-none">
+        <span class="text-[120px] font-black uppercase leading-none tracking-tighter">DATA LOSS</span>
+    </div>
+
+    <div class="max-w-6xl mx-auto relative z-10">
+        <h2 class="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-12 md:mb-20">The <span class="text-red-500">Failure</span> Log</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+            <div class="bg-white/5 border-2 border-white/10 p-6 md:p-8 neo-shadow group hover:border-red-500 transition-colors">
+                <div class="flex justify-between items-start mb-6">
+                    <span class="font-mono text-xs text-red-500">ERR_LATENCY_MAX</span>
+                    <span class="bg-red-500 text-white px-2 py-0.5 text-[10px] font-black uppercase">CRITICAL</span>
+                </div>
+                <h3 class="font-black uppercase text-lg md:text-xl mb-3">3-hour average reply time</h3>
+                <p class="text-sm md:text-base font-bold text-white/50 leading-relaxed">Customers would reach out and simply wait. By the time the owner could process the request, the lead had already signed with a competitor.</p>
+            </div>
+            <div class="bg-white/5 border-2 border-white/10 p-6 md:p-8 neo-shadow group hover:border-red-500 transition-colors">
+                <div class="flex justify-between items-start mb-6">
+                    <span class="font-mono text-xs text-red-500">ERR_LEAD_LEAK</span>
+                    <span class="bg-red-500 text-white px-2 py-0.5 text-[10px] font-black uppercase">CRITICAL</span>
+                </div>
+                <h3 class="font-black uppercase text-lg md:text-xl mb-3">Leads lost after first contact</h3>
+                <p class="text-sm md:text-base font-bold text-white/50 leading-relaxed">No tracking. No CRM entry. If they didn't buy on the first call, they were forgotten. 70% of potential revenue was leaking out of the pipeline.</p>
+            </div>
+            <div class="bg-white/5 border-2 border-white/10 p-6 md:p-8 neo-shadow group hover:border-red-500 transition-colors">
+                <div class="flex justify-between items-start mb-6">
+                    <span class="font-mono text-xs text-red-500">ERR_SYNC_FAIL</span>
+                    <span class="bg-red-500 text-white px-2 py-0.5 text-[10px] font-black uppercase">CRITICAL</span>
+                </div>
+                <h3 class="font-black uppercase text-lg md:text-xl mb-3">Scheduling through WhatsApp Notes</h3>
+                <p class="text-sm md:text-base font-bold text-white/50 leading-relaxed">Technicians were double-booked or sent to the wrong address because info lived in personal chat history and sticky notes.</p>
+            </div>
+            <div class="bg-white/5 border-2 border-white/10 p-6 md:p-8 neo-shadow group hover:border-red-500 transition-colors">
+                <div class="flex justify-between items-start mb-6">
+                    <span class="font-mono text-xs text-red-500">ERR_STACK_BLOAT</span>
+                    <span class="bg-red-500 text-white px-2 py-0.5 text-[10px] font-black uppercase">CRITICAL</span>
+                </div>
+                <h3 class="font-black uppercase text-lg md:text-xl mb-3">Team using 5 different apps</h3>
+                <p class="text-sm md:text-base font-bold text-white/50 leading-relaxed">Updates were fragmented across personal chats, spreadsheets, and verbal cues. Zero source of truth for the company's ops.</p>
+            </div>
+        </div>
+    </div>
 </section>
-<!-- Footer -->
+
+<!-- ██ WHAT WE IDENTIFIED ██ -->
+<section class="bg-[#38BDF8] border-b-2 border-black py-8 md:py-14 px-4 md:px-8">
+    <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 items-center">
+        <div>
+            <h2 class="text-xl md:text-4xl font-black uppercase tracking-tighter mb-4 md:mb-6 text-black">What we identified</h2>
+            <p class="text-sm md:text-lg font-bold text-black/70 mb-2 md:mb-3">They had the tools. CRM, calendar, email — all of it was there.</p>
+            <p class="text-base md:text-2xl font-black text-black">The problem was that nothing was connected. Every step required a human to remember, copy, paste, and follow up.</p>
+        </div>
+        <div class="bg-[#FFF9E6] border-4 border-black p-5 md:p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <div class="flex items-center gap-3 mb-3">
+                <span class="material-symbols-outlined text-[#38BDF8] text-3xl bg-black p-1">lightbulb</span>
+                <span class="font-black uppercase text-sm md:text-base">Root Cause</span>
+            </div>
+            <p class="text-xs md:text-sm font-bold text-black/60">Customer → Team → Job → Follow-up: each step was disconnected. A customer inquiry had to pass through 4 people before it became a booking. That's where things broke.</p>
+        </div>
+    </div>
+</section>
+
+<!-- ██ WHAT WE FIXED ██ -->
+<section class="bg-[#FFF9E6] border-b-4 border-black py-16 md:py-24 px-4 md:px-8">
+    <div class="max-w-6xl mx-auto">
+        <h2 class="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-12 md:mb-20">The Deployment</h2>
+        <div class="space-y-4 md:space-y-6">
+
+            <div class="step-row grid grid-cols-[60px_1fr_120px] md:grid-cols-[100px_1fr_200px] items-center border-4 border-black bg-white neo-shadow group cursor-default">
+                <div class="bg-[#B19CD9] border-r-4 border-black h-full flex items-center justify-center p-2 md:p-6"><span class="text-2xl md:text-4xl font-black">01</span></div>
+                <div class="p-4 md:p-8 border-r-4 border-black">
+                    <h3 class="font-black uppercase text-sm md:text-2xl tracking-tighter mb-1">Single Intake point</h3>
+                    <p class="text-[10px] md:text-sm font-bold text-black/40 uppercase hidden md:block tracking-widest">Unified queue for all lead sources</p>
+                </div>
+                <div class="p-4 md:p-8 bg-[#B19CD9]/10 flex items-center justify-center group-hover:bg-[#B19CD9]/20 transition-colors">
+                    <span class="material-symbols-outlined text-3xl md:text-5xl">inbox</span>
+                </div>
+            </div>
+
+            <div class="step-row grid grid-cols-[60px_1fr_120px] md:grid-cols-[100px_1fr_200px] items-center border-4 border-black bg-white neo-shadow group cursor-default">
+                <div class="bg-[#38BDF8] border-r-4 border-black h-full flex items-center justify-center p-2 md:p-6"><span class="text-2xl md:text-4xl font-black">02</span></div>
+                <div class="p-4 md:p-8 border-r-4 border-black">
+                    <h3 class="font-black uppercase text-sm md:text-2xl tracking-tighter mb-1">Automated follow-ups</h3>
+                    <p class="text-[10px] md:text-sm font-bold text-black/40 uppercase hidden md:block tracking-widest">24h auto-ping for unreplied leads</p>
+                </div>
+                <div class="p-4 md:p-8 bg-[#38BDF8]/10 flex items-center justify-center group-hover:bg-[#38BDF8]/20 transition-colors">
+                    <span class="material-symbols-outlined text-3xl md:text-5xl">bolt</span>
+                </div>
+            </div>
+
+            <div class="step-row grid grid-cols-[60px_1fr_120px] md:grid-cols-[100px_1fr_200px] items-center border-4 border-black bg-white neo-shadow group cursor-default">
+                <div class="bg-[#FF8A65] border-r-4 border-black h-full flex items-center justify-center p-2 md:p-6"><span class="text-2xl md:text-4xl font-black">03</span></div>
+                <div class="p-4 md:p-8 border-r-4 border-black">
+                    <h3 class="font-black uppercase text-sm md:text-2xl tracking-tighter mb-1">Smart Booking Engine</h3>
+                    <p class="text-[10px] md:text-sm font-bold text-black/40 uppercase hidden md:block tracking-widest">Real-time scheduling with map validation</p>
+                </div>
+                <div class="p-4 md:p-8 bg-[#FF8A65]/10 flex items-center justify-center group-hover:bg-[#FF8A65]/20 transition-colors">
+                    <span class="material-symbols-outlined text-3xl md:text-5xl">calendar_month</span>
+                </div>
+            </div>
+
+            <div class="step-row grid grid-cols-[60px_1fr_120px] md:grid-cols-[100px_1fr_200px] items-center border-4 border-black bg-white neo-shadow group cursor-default">
+                <div class="bg-[#FFC837] border-r-4 border-black h-full flex items-center justify-center p-2 md:p-6"><span class="text-2xl md:text-4xl font-black">04</span></div>
+                <div class="p-4 md:p-8 border-r-4 border-black">
+                    <h3 class="font-black uppercase text-sm md:text-2xl tracking-tighter mb-1">Central Team Dashboard</h3>
+                    <p class="text-[10px] md:text-sm font-bold text-black/40 uppercase hidden md:block tracking-widest">Unified view for techs and dispatch</p>
+                </div>
+                <div class="p-4 md:p-8 bg-[#FFC837]/10 flex items-center justify-center group-hover:bg-[#FFC837]/20 transition-colors">
+                    <span class="material-symbols-outlined text-3xl md:text-5xl">dashboard</span>
+                </div>
+            </div>
+
+            <div class="step-row grid grid-cols-[60px_1fr_120px] md:grid-cols-[100px_1fr_200px] items-center border-4 border-black bg-white neo-shadow group cursor-default">
+                <div class="bg-[#10B981] border-r-4 border-black h-full flex items-center justify-center p-2 md:p-6"><span class="text-2xl md:text-4xl font-black text-white">05</span></div>
+                <div class="p-4 md:p-8 border-r-4 border-black">
+                    <h3 class="font-black uppercase text-sm md:text-2xl tracking-tighter mb-1">Auto-Admin Pipeline</h3>
+                    <p class="text-[10px] md:text-sm font-bold text-black/40 uppercase hidden md:block tracking-widest">Invoices and updates on autopilot</p>
+                </div>
+                <div class="p-4 md:p-8 bg-[#10B981]/10 flex items-center justify-center group-hover:bg-[#10B981]/20 transition-colors">
+                    <span class="material-symbols-outlined text-3xl md:text-5xl">sync_alt</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- ██ THE OUTCOME ██ -->
+<section class="border-b-4 border-black grid grid-cols-1 md:grid-cols-2">
+    <!-- Left: What Changed -->
+    <div class="bg-[#B19CD9] p-8 md:p-20 border-b-4 md:border-b-0 md:border-r-4 border-black relative overflow-hidden">
+        <div class="relative z-10">
+            <h2 class="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-10 md:mb-16">Metrics Shift</h2>
+            <div class="space-y-6 md:space-y-8">
+                <div class="flex items-center gap-4">
+                    <span class="material-symbols-outlined text-3xl bg-black text-[#B19CD9] p-1">speed</span>
+                    <div>
+                        <p class="font-black uppercase text-sm text-black/40 leading-none">Response Time</p>
+                        <p class="font-black uppercase text-xl md:text-3xl tracking-tighter">3 hours → 8 mins</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="material-symbols-outlined text-3xl bg-black text-[#B19CD9] p-1">track_changes</span>
+                    <div>
+                        <p class="font-black uppercase text-sm text-black/40 leading-none">Lead Capture</p>
+                        <p class="font-black uppercase text-xl md:text-3xl tracking-tighter">30% → 100% Tracking</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="material-symbols-outlined text-3xl bg-black text-[#B19CD9] p-1">timer</span>
+                    <div>
+                        <p class="font-black uppercase text-sm text-black/40 leading-none">Daily Admin Saved</p>
+                        <p class="font-black uppercase text-xl md:text-3xl tracking-tighter">3.5 Hours / Tech</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Right: The Real Change -->
+    <div class="bg-[#FFF9E6] p-8 md:p-20 flex flex-col justify-center">
+        <h2 class="text-3xl md:text-5xl font-black uppercase tracking-tighter mb-6 md:mb-10">Systems > Effort</h2>
+        <p class="text-sm md:text-xl font-bold text-black/60 mb-4 leading-relaxed">We didn't just add software. We built a machine that runs whether the owner is there or not.</p>
+        <p class="text-xl md:text-3xl font-black text-black mb-10 md:mb-16 leading-tight uppercase">The business shifted from "Holding it together" to "Scaling the fixed engine."</p>
+        <div class="flex items-center gap-3 md:gap-6">
+            <div class="bg-black text-white px-4 py-3 md:px-8 md:py-4 text-xs md:text-base font-black uppercase">Fragile Ops</div>
+            <span class="material-symbols-outlined text-3xl md:text-5xl text-[#B19CD9]">double_arrow</span>
+            <div class="bg-[#38BDF8] text-black px-4 py-3 md:px-8 md:py-4 border-4 border-black text-xs md:text-base font-black uppercase shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">Flowra Engine</div>
+        </div>
+    </div>
+</section>
+
+<!-- ██ CTA ██ -->
+<section class="bg-[#FF8A65] border-b-4 border-black py-20 md:py-32 px-4 md:px-8 text-center flex flex-col items-center relative overflow-hidden">
+    <!-- Kinetic Background Accent -->
+    <div class="absolute inset-0 opacity-5 pointer-events-none" style="background-image: repeating-linear-gradient(45deg, #000 0, #000 1px, transparent 0, transparent 50%); background-size: 10px 10px;"></div>
+    
+    <div class="relative z-10 max-w-4xl">
+        <h2 class="text-4xl md:text-[80px] font-black uppercase tracking-tighter leading-[0.85] mb-8 md:mb-12 text-black">Still running everything <span class="outline-text">manually</span>?</h2>
+        <p class="text-sm md:text-2xl font-bold text-black/80 mb-10 md:mb-16 max-w-2xl mx-auto">We don't do fluff. We map the fix and install the engine. No guesswork. Just operations that scale.</p>
+        <button class="bg-black text-white px-10 py-5 md:px-20 md:py-8 text-xl md:text-3xl font-black uppercase tracking-tighter neo-shadow neo-shadow-hover neo-shadow-active transition-all" onclick="window.location.href='/pages/contact.html'">Fix My Systems</button>
+    </div>
+</section>
+
+<!-- FOOTER -->
 <footer class="bg-black text-white px-4 md:px-8 py-8 md:py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mt-0">
 <div class="lg:col-span-3 mb-4 md:mb-12">
-<h2 class="text-2xl md:text-5xl lg:text-7xl font-black uppercase tracking-tighter text-white mb-4 md:mb-4 md:mb-8">No fluff. Just systems that work.</h2>
+<h2 class="text-2xl md:text-5xl lg:text-7xl font-black uppercase tracking-tighter text-white mb-4 md:mb-8">No fluff. Just systems that work.</h2>
 </div>
 <div class="lg:col-span-2">
 <div class="flex items-center gap-3 mb-4 md:mb-8">
@@ -284,4 +386,5 @@
 </div>
 </div>
 </footer>
+
 </body></html>
