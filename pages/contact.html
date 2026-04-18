@@ -260,7 +260,12 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        const SUPABASE_URL = "https://zdaylulmyejoswxoqedi.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_7if5Jz2oEMWY9W9ofy0kQw_HQjCJIae";
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         function setMode(mode) {
             const queryBtn = document.getElementById('btn-query');
             const issueBtn = document.getElementById('btn-issue');
@@ -277,35 +282,56 @@
             }
         }
 
-        function validateForm(event) {
+        async function validateForm(event) {
+            event.preventDefault();
+            const name = document.getElementById('name-field').value.trim();
             const email = document.getElementById('email-field').value.trim();
             const mobile = document.getElementById('mobile-field').value.trim();
+            const message = document.getElementById('message-field').value.trim();
             const errorMsg = document.getElementById('error-message');
             const successPopup = document.getElementById('success-popup');
             const progressBar = document.getElementById('progress-bar');
 
             if (!email && !mobile) {
-                event.preventDefault();
                 errorMsg.classList.remove('hidden');
                 return false;
             }
             
             errorMsg.classList.add('hidden');
             
-            // SHOW THE POPUP
-            successPopup.classList.remove('hidden');
-            
-            // Start the bar animation
-            setTimeout(() => {
-                progressBar.style.width = '100%';
-            }, 50);
+            try {
+                // Insert into Supabase leads table
+                const { error } = await sb.from('leads').insert([
+                    { 
+                        name: name || 'Anonymous', 
+                        email: email || '', 
+                        mobile: mobile || '', 
+                        message: message || (document.getElementById('inbox-section').classList.contains('hidden') ? 'Query/Booking' : 'Issue Discussion'),
+                        status: 'new'
+                    }
+                ]);
+                
+                if (error) throw error;
 
-            // Redirect after 3s
-            setTimeout(() => {
-                window.location.href = '/';
-            }, 3050);
+                // SHOW THE POPUP
+                successPopup.classList.remove('hidden');
+                
+                // Start the bar animation
+                setTimeout(() => {
+                    progressBar.style.width = '100%';
+                }, 50);
 
-            return false; // prevent actual form submit
+                // Redirect after 3s
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 3050);
+            } catch (err) {
+                console.error('Submission error:', err);
+                errorMsg.innerText = "ERROR: TABLE CONNECTION FAILED.";
+                errorMsg.classList.remove('hidden');
+            }
+
+            return false;
         }
     </script>
 </body>
