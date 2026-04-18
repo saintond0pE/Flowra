@@ -331,7 +331,7 @@
                 }, 3050);
             } catch (err) {
                 console.error('Submission error:', err);
-                errorMsg.innerText = "ERROR: TABLE CONNECTION FAILED.";
+                errorMsg.innerText = "ERROR: " + (err.message || "CONNECTION FAILED");
                 errorMsg.classList.remove('hidden');
             }
 
