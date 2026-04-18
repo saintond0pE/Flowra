@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flowra OS Dashboard</title>
+    <style>
+        /* CSS reset & variables */
+        :root {
+            --bg-color: #f4f4f4;
+            --surface-color: #ffffff;
+            --border-color: #111111;
+            --text-color: #111111;
+            --accent-color: #ff3c00;
+            --font-family: 'Inter', -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
+        body { background-color: var(--bg-color); color: var(--text-color); display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 250px; background: var(--surface-color); border-right: 3px solid var(--border-color); display: flex; flex-direction: column; z-index: 10; padding-bottom: 20px;}
+        .brand { padding: 24px; font-size: 24px; font-weight: 900; border-bottom: 3px solid var(--border-color); text-transform: uppercase; letter-spacing: -1px; background: var(--accent-color); color: #fff; }
+        .nav-menu { flex: 1; padding: 16px 0; overflow-y: auto; }
+        .nav-item { padding: 14px 24px; font-weight: 700; font-size: 13px; cursor: pointer; text-transform: uppercase; border-bottom: 1px solid rgba(0,0,0,0.1); transition: all 0.1s; }
+        .nav-item:hover { background: rgba(0,0,0,0.05); padding-left: 28px; }
+        .nav-item.active { background: var(--text-color); color: var(--surface-color); padding-left: 28px; }
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-color); position: relative; }
+        .topbar { height: 75px; border-bottom: 3px solid var(--border-color); background: var(--surface-color); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; z-index: 8; }
+        .topbar h1 { font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: -0.5px; }
+        .content-wrap { flex: 1; padding: 32px; overflow-y: auto; }
+        .view-section { display: none; max-width: 1200px; margin: 0 auto; }
+        .view-section.active { display: block; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        h2 { font-size: 24px; font-weight: 800; margin-bottom: 16px; text-transform: uppercase; border-bottom: 3px solid var(--border-color); padding-bottom: 8px;}
+        h3 { font-size: 18px; font-weight: 800; margin-bottom: 12px;}
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(minmax(200px, 1fr)); gap: 24px; margin-bottom: 24px; }
+        .card { background: var(--surface-color); border: 3px solid var(--border-color); padding: 24px; box-shadow: 4px 4px 0 var(--border-color); margin-bottom: 24px; transition: transform 0.1s; display: flex; flex-direction: column; }
+        .card:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--border-color); }
+        .stat-card { text-align: center; padding: 32px 16px; justify-content: center; align-items: center;}
+        .stat-value { font-size: 42px; font-weight: 900; color: var(--accent-color); display: block; margin-bottom: 8px; letter-spacing: -1px; }
+        .stat-label { font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        .btn { background: var(--surface-color); border: 3px solid var(--border-color); padding: 10px 16px; font-family: var(--font-family); font-weight: 800; text-transform: uppercase; font-size: 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--border-color); transition: transform 0.1s, box-shadow 0.1s; }
+        .btn:active { transform: translate(3px, 3px); box-shadow: 0px 0px 0 var(--border-color); }
+        .btn-primary { background: var(--accent-color); color: #fff; border-color: var(--border-color); }
+        .btn-large { padding: 24px; font-size: 16px; width: 100%; display: block; margin-bottom: 16px; }
+        table { width: 100%; border-collapse: collapse; border: 3px solid var(--border-color); background: var(--surface-color); box-shadow: 4px 4px 0 var(--border-color); margin-bottom: 24px; }
+        th, td { padding: 14px 16px; text-align: left; border-bottom: 2px solid var(--border-color); font-size: 14px; vertical-align: top;}
+        th { background: #eee; color: var(--border-color); font-weight: 800; text-transform: uppercase; font-size: 12px; }
+        .badge { display: inline-block; padding: 4px 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 2px solid var(--border-color); background: #fff; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-weight: 800; font-size: 12px; text-transform: uppercase; margin-bottom: 8px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 3px solid var(--border-color); font-family: var(--font-family); font-size: 14px; background: var(--bg-color); transition: background 0.2s; }
+        input:focus, select:focus, textarea:focus { outline: none; background: var(--surface-color); border-color: var(--accent-color); }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        
+        /* Modals */
+        #customModal, #projectGeneratorModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
+        .modal-content { background: var(--surface-color); border: 4px solid var(--border-color); padding: 32px; box-shadow: 8px 8px 0 var(--accent-color); width: 450px; max-width: 90%; animation: slideUp 0.2s ease-out; max-height: 90vh; overflow-y: auto;}
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Generic Single Input Modal -->
+    <div id="customModal">
+        <div class="modal-content">
+            <div class="flex-between" style="border-bottom: 3px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px;">
+                <h2 style="margin: 0; border: none; padding: 0;" id="modalTitle">TITLE</h2>
+                <button class="btn" onclick="closeModal()" style="padding: 4px 8px;">X</button>
+            </div>
+            <div id="modalBody"></div>
+            <div class="flex-between" style="margin-top:24px; margin-bottom:0;">
+                <button class="btn" onclick="closeModal()">CANCEL</button>
+                <button class="btn btn-primary" id="modalSubmit">SAVE TO SYSTEM</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mega Project Generator Modal -->
+    <div id="projectGeneratorModal">
+        <div class="modal-content" style="width: 800px; max-width: 95%;">
+            <div class="flex-between" style="border-bottom: 3px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px;">
+                <h2 style="margin: 0; border: none; padding: 0;">WORKSPACE GENERATOR</h2>
+                <button class="btn" onclick="document.getElementById('projectGeneratorModal').style.display='none'" style="padding: 4px 8px;">X</button>
+            </div>
+            
+            <div class="grid-2">
+                <div class="form-group"><label>Client Name & Details</label><input type="text" id="gen-client" placeholder="e.g. Acme Corp"></div>
+                <div class="form-group"><label>Project Target / Goal</label><input type="text" id="gen-title" placeholder="e.g. Voice Agent 1.0"></div>
+            </div>
+
+            <label style="margin-bottom:12px; font-size:14px;">1. Select Modules to Auto-Generate Checklists:</label>
+            <div id="category-module-picker" style="background:#fff; border: 3px solid var(--border-color); max-height: 300px; overflow-y: auto; padding: 16px; margin-bottom: 24px;">
+                <!-- Generated dynamically -->
+            </div>
+
+            <div class="form-group">
+                <label>2. Additional Custom Notes / Exceptions</label>
+                <textarea id="gen-notes" rows="3" placeholder="Paste any specific meeting notes, custom deliverables, or anomalies here to automatically add them to the checklist project board..."></textarea>
+            </div>
+
+            <div class="flex-between" style="margin-top:24px; margin-bottom:0;">
+                <button class="btn" onclick="document.getElementById('projectGeneratorModal').style.display='none'">CANCEL</button>
+                <button class="btn btn-primary" onclick="submitProjectGeneration()">✔ GENERATE CHECKLISTS</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP STRUCTURE -->
+    <div class="sidebar">
+        <div class="brand">Flowra OS</div>
+        <div class="nav-menu">
+            <div class="nav-item active" onclick="switchView('home')">Command Center</div>
+            <div class="nav-item" onclick="switchView('projects')">Active Projects</div>
+            <div class="nav-item" onclick="switchView('leads')">Leads & Clients</div>
+            <div class="nav-item" onclick="switchView('team')">Team Ops</div>
+            <div class="nav-item" onclick="switchView('automation')">n8n Automation</div>
+            <div class="nav-item" onclick="switchView('knowledge')">Knowledge Base</div>
+            <div class="nav-item" onclick="switchView('feedback')">Feedback & Ideas</div>
+        </div>
+        <div style="padding: 20px;">
+            <button class="btn" style="width:100%" onclick="renderAll()">↺ REFRESH</button>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <h1 id="page-title">Command Center</h1>
+            <div>
+                <span id="sync-status" style="font-weight:800; font-size:11px; margin-right:16px;"></span>
+                <span id="admin-email" style="font-weight:800; font-size:12px; margin-right:16px;">LOCAL_MODE</span>
+                <button class="btn btn-primary" onclick="openProjectGenerator()">+ DEV PROJECT</button>
+                <button class="btn" style="margin-left: 8px;" onclick="if(window.logout) window.logout()">LOGOUT</button>
+            </div>
+        </div>
+
+        <div class="content-wrap">
+            <!-- 1. Command Center -->
+            <div id="view-home" class="view-section active">
+                <div class="grid-4" style="grid-template-columns: repeat(4, 1fr);">
+                    <div class="card stat-card"><span class="stat-value" id="metric-leads-count">0</span><span class="stat-label">Total Leads</span></div>
+                    <div class="card stat-card"><span class="stat-value" id="metric-pending-count">0</span><span class="stat-label">Pending Tasks</span></div>
+                    <div class="card stat-card"><span class="stat-value" id="metric-completed-count">0</span><span class="stat-label">Completed Tasks</span></div>
+                    <div class="card stat-card"><span class="stat-value" id="metric-tasks-today">0</span><span class="stat-label">Active Workspaces</span></div>
+                </div>
+                
+                <div class="flex-between">
+                    <h2>Recent Actionable Tasks</h2>
+                </div>
+                <table>
+                    <thead><tr><th>Project</th><th>Category / Module</th><th>Task Detail</th><th>Status</th></tr></thead>
+                    <tbody id="home-recent-tasks-body"></tbody>
+                </table>
+            </div>
+
+            <!-- 2. Leads -->
+            <div id="view-leads" class="view-section">
+                <div class="flex-between">
+                    <h2>Leads Repository</h2>
+                    <button class="btn btn-primary" onclick="createNewLead()">+ ADD LEAD</button>
+                </div>
+                <table>
+                    <thead><tr><th>Name</th><th>Email</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="leads-table-body"></tbody>
+                </table>
+            </div>
+
+            <!-- 3. Projects -->
+            <div id="view-projects" class="view-section">
+                <div class="flex-between">
+                    <h2>Client Project Workspaces</h2>
+                    <button class="btn btn-primary" onclick="openProjectGenerator()">+ NEW PROJECT</button>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 24px;" id="projects-grid"></div>
+            </div>
+
+            <!-- 4. Tasks Pipeline removed as per user spec -->
+
+            <!-- 5. Team Ops Leaderboard -->
+            <div id="view-team" class="view-section">
+                <h2>Team Leaderboard</h2>
+                <div class="card" style="background: var(--accent-color); color: var(--bg-color);">
+                    <div style="font-weight: 800;">Top performers are automatically ranked based on project task completion.</div>
+                </div>
+                <table>
+                    <thead><tr><th>Rank</th><th>Agent / Member</th><th>Tasks Completed</th><th>Status</th></tr></thead>
+                    <tbody id="team-table-body"></tbody>
+                </table>
+            </div>
+
+            <!-- 6. Automation Hub -->
+            <div id="view-automation" class="view-section">
+                <h2>Automation Playbooks (n8n Webhook Overrides)</h2>
+                <div class="grid-4">
+                    <button class="btn btn-large" onclick="triggerAutomation('Send Proposal')">📄 SEND PROPOSAL</button>
+                    <button class="btn btn-large" onclick="triggerAutomation('Send Follow-Up')">🔔 SEND FOLLOW-UP</button>
+                    <button class="btn btn-large" onclick="triggerAutomation('Sync DB')">💾 SYNC DATABASE</button>
+                    <button class="btn btn-large btn-primary" onclick="triggerAutomation('Trigger Onboarding')">🚀 TRIGGER ONBOARDING</button>
+                </div>
+            </div>
+
+            <!-- 7. Knowledge Base -->
+            <div id="view-knowledge" class="view-section">
+                <div class="flex-between">
+                    <h2>Knowledge Base</h2>
+                    <button class="btn btn-primary" onclick="addKnowledgeDoc()">+ ADD DOC</button>
+                </div>
+                <div class="grid-3" id="knowledge-grid"></div>
+            </div>
+            
+            <!-- 8. Feedback -->
+            <div id="view-feedback" class="view-section">
+                <h2>System Registry</h2>
+                <div class="card">
+                    <div class="form-group">
+                        <textarea id="feedback-input" rows="3" placeholder="Add idea..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="submitFeedback()">SUBMIT TO DB</button>
+                </div>
+                <table>
+                    <thead><tr><th>Type</th><th>Description</th></tr></thead>
+                    <tbody id="feedback-table-body"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- UI Logic Engine -->
+    <script>
+        /* ======================================
+           SUPABASE CLIENT
+           ====================================== */
+        const SUPABASE_URL = "https://zdaylulmyejoswxoqedi.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_7if5Jz2oEMWY9W9ofy0kQw_HQjCJIae";
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        /* Push entire local DB state to Supabase (upsert-based) */
+        async function syncToSupabase() {
+            try {
+                setSyncStatus('syncing');
+                // Upsert projects
+                if (DB.tables.projects.length > 0) {
+                    const projRows = DB.tables.projects.map(p => ({
+                        id: p.id, client_name: p.client_name, project_name: p.project_name
+                    }));
+                    const { error: pe } = await sb.from('projects').upsert(projRows, { onConflict: 'id' });
+                    if (pe) throw pe;
+
+                    // Upsert all tasks
+                    let allTasks = [];
+                    DB.tables.projects.forEach(p => {
+                        (p.tasks || []).forEach(t => {
+                            allTasks.push({ id: t.id, project_id: p.id, category: t.category, module: t.module, name: t.name, notes: t.notes || '', done: t.done, updated_at: new Date().toISOString() });
+                        });
+                    });
+                    if (allTasks.length > 0) {
+                        const { error: te } = await sb.from('tasks').upsert(allTasks, { onConflict: 'id' });
+                        if (te) throw te;
+                    }
+                }
+
+                // Upsert leads
+                if (DB.tables.leads.length > 0) {
+                    const leadRows = DB.tables.leads.map(l => ({
+                        id: l.id, name: l.name, email: l.email, message: l.message || '', status: l.status
+                    }));
+                    const { error: le } = await sb.from('leads').upsert(leadRows, { onConflict: 'id' });
+                    if (le) throw le;
+                }
+                setSyncStatus('ok');
+            } catch(err) {
+                console.error('[Flowra] Supabase sync error:', err);
+                setSyncStatus('error', err.message || JSON.stringify(err));
+            }
+        }
+
+        /* Sync a single task toggle immediately */
+        async function syncTaskToggle(taskId, done) {
+            try {
+                const { error } = await sb.from('tasks').upsert({ id: taskId, done: done, updated_at: new Date().toISOString() }, { onConflict: 'id' });
+                if (error) throw error;
+                setSyncStatus('ok');
+            } catch(err) {
+                console.error('[Flowra] Task sync error:', err);
+                setSyncStatus('error', err.message || JSON.stringify(err));
+            }
+        }
+
+        function setSyncStatus(state, msg) {
+            let el = document.getElementById('sync-status');
+            if (!el) return;
+            if (state === 'syncing') { el.innerText = '⟳ SYNCING...'; el.style.color = '#888'; }
+            else if (state === 'ok') { el.innerText = '✅ SYNCED'; el.style.color = 'green'; }
+            else { el.innerText = '❌ SYNC ERROR: ' + msg; el.style.color = 'red'; }
+        }
+
+        /* Load data from Supabase on startup — SAFE VERSION
+           Rule: localStorage is the source of truth.
+           We only pull from Supabase if localStorage has NO projects.
+           We always push localStorage → Supabase on startup to keep cloud in sync. */
+        async function loadFromSupabase() {
+            try {
+                // Always load localStorage first
+                DB.load();
+                const hasLocalData = DB.tables.projects && DB.tables.projects.length > 0;
+
+                if (hasLocalData) {
+                    // Push local state up to Supabase in background — never overwrite local with cloud
+                    syncToSupabase();
+                    return true;
+                }
+
+                // Only pull from Supabase if local is empty
+                const { data: projects, error: pe } = await sb.from('projects').select('*');
+                const { data: tasks, error: te } = await sb.from('tasks').select('*');
+                const { data: leads, error: le } = await sb.from('leads').select('*');
+
+                if (pe || te || le) throw new Error('Query error');
+
+                // Only accept cloud data if it actually has tasks — never accept empty cloud
+                if (projects && projects.length > 0 && tasks && tasks.length > 0) {
+                    const projMap = {};
+                    projects.forEach(p => { projMap[p.id] = { ...p, tasks: [] }; });
+                    tasks.forEach(t => { if (projMap[t.project_id]) projMap[t.project_id].tasks.push(t); });
+                    DB.tables.projects = Object.values(projMap);
+                    DB.tables.leads = leads || [];
+                    DB.save();
+                    return true;
+                }
+            } catch(err) {
+                console.warn('[Flowra] Supabase sync failed, using localStorage only.', err.message);
+                DB.load();
+            }
+            return false;
+        }
+
+        /* Generate safe unique string IDs to avoid Number precision bugs in inline HTML handlers */
+        function generateId() { return 'id_' + Math.random().toString(36).substr(2, 9); }
+
+        /* UI Switching */
+        function switchView(viewId) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if (event && event.currentTarget.classList) event.currentTarget.classList.add('active');
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            const targetSection = document.getElementById('view-' + viewId);
+            if (targetSection) targetSection.classList.add('active');
+            
+            if(event && event.currentTarget.innerText) { document.getElementById('page-title').innerText = event.currentTarget.innerText; }
+        }
+
+        /* MODAL ENGINE */
+        function openModal(title, fields, onSubmit) {
+            document.getElementById('modalTitle').innerText = title;
+            const body = document.getElementById('modalBody');
+            body.innerHTML = fields.map(f => `
+                <div class="form-group">
+                    <label>${f.label}</label>
+                    ${f.type === 'textarea' ? `<textarea id="mod_${f.id}" rows="4">${f.val || ''}</textarea>` : f.type === 'select' ? `<select id="mod_${f.id}">${f.options.map(o => `<option value="${o}" ${f.val===o?'selected':''}>${o.toUpperCase()}</option>`).join('')}</select>` : `<input type="${f.type || 'text'}" id="mod_${f.id}" value="${f.val || ''}">`}
+                </div>
+            `).join('');
+            document.getElementById('customModal').style.display = 'flex';
+            document.getElementById('modalSubmit').onclick = () => {
+                const results = {}; fields.forEach(f => results[f.id] = document.getElementById('mod_' + f.id).value);
+                onSubmit(results); 
+            };
+        }
+        function closeModal() { document.getElementById('customModal').style.display = 'none'; }
+
+
+        /* DB MOCKING SYSTEM (Local Storage) */
+        const DB = {
+            tables: { leads: [], projects: [], team: [], docs: [], feedback: [] },
+            load: () => { const saved = localStorage.getItem('flowra_mock_db'); if (saved) { DB.tables = JSON.parse(saved); } else { DB.seed(); } },
+            save: () => { localStorage.setItem('flowra_mock_db', JSON.stringify(DB.tables)); },
+            seed: () => {
+                DB.tables = {
+                    leads: [],
+                    projects: [],
+                    team: [],
+                    docs: [],
+                    feedback: []
+                };
+                DB.save();
+            }
+        };
+
+        window.resetDemoData = function() { DB.seed(); renderAll(); closeModal(); document.getElementById('projectGeneratorModal').style.display='none';}
+
+        /* HARDCODED MODULE & TASK HIERARCHY */
+        const TASK_STRUCTURE = {
+            "🟪 CUSTOMER AUTOMATION": {
+                "Website Chatbot": ["Setup chatbot", "Train on company data", "Connect to website"],
+                "WhatsApp / Call Handling": ["Setup WhatsApp flow", "Setup auto-reply"],
+                "Lead Capture System": ["Setup lead capture"],
+                "Missed Call Recovery": ["Setup fallback flow"]
+            },
+            "🟦 INTERNAL OPERATIONS": {
+                "Team Dashboard": ["Build dashboard UI"],
+                "Task Automation": ["Create task system", "Automate repetitive actions"],
+                "Workflow Automation": ["Connect database", "Setup internal tools"]
+            },
+            "🟧 SALES & FOLLOW-UP": {
+                "Lead Management": ["Setup lead tracking"],
+                "Follow-up Automation": ["Auto follow-up system"],
+                "Email Automation": ["Email templates", "CRM logic"]
+            },
+            "🟩 SCHEDULING & BOOKINGS": {
+                "Booking System": ["Create booking flow"],
+                "Slot Management": ["Assign slots"],
+                "Agent Assignment": ["Connect calendar", "Auto-confirm bookings"]
+            },
+            "🟥 OPERATIONS & DELIVERY": {
+                "Task Execution System": ["Assign delivery tasks"],
+                "Agent Flow": ["Setup notifications"],
+                "Notifications": ["Track completion"]
+            },
+            "🟨 INTELLIGENCE & ALERTS": {
+                "Predictive Alerts": ["Setup alerts"],
+                "Inventory Monitoring": ["Define triggers"],
+                "Usage Tracking": ["Connect data sources"]
+            }
+        };
+
+        /* --------------------------------------
+           PROJECT GENERATION ENGINE 
+           -------------------------------------- */
+
+        window.openProjectGenerator = function() {
+            document.getElementById('gen-client').value = '';
+            document.getElementById('gen-title').value = '';
+            document.getElementById('gen-notes').value = '';
+            
+            let html = '';
+            Object.keys(TASK_STRUCTURE).forEach((cat) => {
+                html += `<div style="margin-bottom: 24px;">`;
+                html += `  <h3 style="background:#eee; padding:8px; border:2px solid #111; font-size:14px; margin-bottom:12px;">${cat}</h3>`;
+                html += `  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; padding-left:12px;">`;
+                
+                Object.keys(TASK_STRUCTURE[cat]).forEach((mod) => {
+                    // Unique string val.
+                    const valStr = `${cat}|||${mod}`;
+                    html += `
+                        <label style="display:flex; align-items:center; cursor:pointer; font-size:13px; font-weight:700;">
+                            <input type="checkbox" class="proj-mod-checkbox" value="${valStr}" style="width:16px; height:16px; margin-right:8px; border:2px solid #000;">
+                            ${mod}
+                        </label>
+                    `;
+                });
+                html += `  </div>`;
+                html += `</div>`;
+            });
+
+            document.getElementById('category-module-picker').innerHTML = html;
+            document.getElementById('projectGeneratorModal').style.display = 'flex';
+        }
+
+        window.submitProjectGeneration = function() {
+            const client = document.getElementById('gen-client').value || 'Unknown Client';
+            const title = document.getElementById('gen-title').value || 'Custom Workspace';
+            const globalNotes = document.getElementById('gen-notes').value;
+
+            let combinedTasks = [];
+            
+            // Generate tasks from checked modules
+            const checkboxes = document.querySelectorAll('.proj-mod-checkbox');
+            checkboxes.forEach(chk => {
+                if(chk.checked) {
+                    const parts = chk.value.split("|||");
+                    const cat = parts[0];
+                    const mod = parts[1];
+                    const defaultTasks = TASK_STRUCTURE[cat][mod];
+                    
+                    defaultTasks.forEach(taskName => {
+                        combinedTasks.push({
+                            id: generateId(),
+                            category: cat,
+                            module: mod,
+                            name: taskName,
+                            notes: '',
+                            done: false
+                        });
+                    });
+                }
+            });
+
+            // Handle additional notes provided during generation
+            if(globalNotes.trim() !== "") {
+                combinedTasks.push({
+                    id: generateId(),
+                    category: "⬜ CUSTOM REQUEST",
+                    module: "Client Notes & Additions",
+                    name: "Execute Custom Scope given by Client",
+                    notes: globalNotes,
+                    done: false
+                });
+            }
+
+            // Fallback if absolutely nothing is selected
+            if(combinedTasks.length === 0) {
+                combinedTasks.push({ id: generateId(), category: "⬜ CUSTOM", module: "General Setup", name: "Configure Project", notes: '', done: false });
+            }
+
+            DB.tables.projects.unshift({
+                id: generateId(),
+                client_name: client,
+                project_name: title,
+                tasks: combinedTasks
+            });
+
+            DB.save(); syncToSupabase(); renderAll();
+            document.getElementById('projectGeneratorModal').style.display = 'none';
+        }
+
+        /* --------------------------------------
+           PROJECT CHECKLIST UI
+           -------------------------------------- */
+
+        function renderProjects() {
+            document.getElementById('projects-grid').innerHTML = DB.tables.projects.map(proj => {
+                let tasks = proj.tasks || [];
+                let total = tasks.length;
+                let done = tasks.filter(t => t.done).length;
+                let progress = total > 0 ? Math.round((done / total) * 100) : 0;
+
+                return `
+                <div class="card" style="position: relative;">
+                    <div class="flex-between" style="padding-right: 80px;">
+                        <div>
+                            <span style="font-weight:900; text-transform:uppercase; font-size:12px;">CLIENT: ${proj.client_name}</span>
+                            <h3 style="margin-bottom:0; font-size: 24px;">${proj.project_name}</h3>
+                        </div>
+                        <span style="font-weight:900; font-size:32px; color: ${progress===100?'#ff3c00':'var(--text-color)'}">${progress}%</span>
+                    </div>
+                    
+                    <div style="border: 4px solid var(--border-color); height: 28px; width: 100%; margin: 16px 0 24px 0; background: var(--bg-color); position: relative;">
+                        <div style="background: var(--accent-color); width: ${progress}%; height: 100%; border-right: ${progress > 0 && progress < 100 ? '4px solid var(--border-color)' : 'none'}; transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+                    </div>
+                    
+                    <div style="background:#fffebc; border: 3px solid var(--border-color); padding: 16px;">
+                        <div class="flex-between" style="border-bottom: 2px solid rgba(0,0,0,0.1); padding-bottom: 8px; margin-bottom:16px;">
+                            <h4 style="font-size:13px; text-transform:uppercase;">Execution Checklist:</h4>
+                            <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px;" onclick="addCustomTask('${proj.id}')">+ ADD AD-HOC TASK</button>
+                        </div>
+                        
+                        <div style="display:flex; flex-direction:column; gap:12px;">
+                            ${(proj.tasks || []).map((t) => `
+                                <div style="display:flex; flex-direction:column; padding-bottom:12px; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                                    <div style="font-weight:900; font-size:10px; margin-bottom:4px; opacity:0.8;">[${t.category}] ➡ ${t.module}</div>
+                                    <label style="display:flex; align-items:flex-start; cursor:pointer; font-weight: 700; font-size:14px; text-decoration: ${t.done?'line-through':'none'}; opacity: ${t.done?0.5:1}">
+                                        <input type="checkbox" ${t.done?'checked':''} onchange="toggleProjectTask('${proj.id}', '${t.id}')" style="width:18px; height:18px; margin-top:2px; margin-right:12px; cursor:pointer; border: 2px solid #000;">
+                                        <span>${t.name}</span>
+                                    </label>
+                                    ${t.notes ? `<div style="font-size:11px; font-weight:700; color:var(--accent-color); margin-left:30px; margin-top:4px; white-space: pre-wrap;">NOTES: ${t.notes}</div>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        window.addCustomTask = function(projId) {
+            const proj = DB.tables.projects.find(p => p.id === projId);
+            if(!proj) return;
+
+            openModal("ADD AD-HOC TASK", [
+                {id: 'name', label: 'Actionable Task Name'},
+                {id: 'notes', label: 'Notes (e.g. from client meeting)', type: 'textarea'}
+            ], (res) => {
+                // Ensure name isn't blank
+                if(res.name && res.name.trim() !== '') {
+                    if(!proj.tasks) proj.tasks = [];
+                    proj.tasks.push({
+                        id: generateId(),
+                        category: '⬜ CUSTOM ADDITION',
+                        module: 'Ad-hoc Task',
+                        name: res.name,
+                        notes: res.notes,
+                        done: false
+                    });
+                    DB.save(); syncToSupabase(); renderAll(); closeModal();
+                } else {
+                    alert('Task Name cannot be blank.');
+                }
+            });
+        }
+
+        window.toggleProjectTask = function(projId, taskId) {
+            const proj = DB.tables.projects.find(p => p.id === projId);
+            if(proj) {
+                if(!proj.tasks) proj.tasks = [];
+                const t = proj.tasks.find(x => x.id === taskId);
+                if(t) { 
+                    t.done = !t.done; 
+                    
+                    // Leaderboard Tracking: Record WHO completed this task
+                    if (t.done) {
+                        try {
+                            const session = JSON.parse(localStorage.getItem('flowra_session') || '{}');
+                            t.completed_by = session.email || 'Unknown Agent';
+                        } catch(e) { t.completed_by = 'Unknown Agent'; }
+                    } else {
+                        t.completed_by = null;
+                    }
+                    
+                    DB.save(); 
+                    syncTaskToggle(t.id, t.done); 
+                    renderAll(); 
+                }
+            }
+        }
+
+        /* --------------------------------------
+           OTHER DASHBOARD LOGIC
+           -------------------------------------- */
+
+        function renderAll() {
+            DB.load(); renderHomeMetrics(); renderLeads(); renderProjects(); renderTeam(); renderKnowledge(); renderFeedback();
+        }
+
+        function renderHomeMetrics() {
+            const leads = DB.tables.leads; 
+            document.getElementById('metric-leads-count').innerText = leads.length;
+            document.getElementById('metric-tasks-today').innerText = DB.tables.projects.length;
+
+            // Compute task completion across ALL projects
+            let totalTasks = 0, doneTasks = 0;
+            DB.tables.projects.forEach(p => {
+                (p.tasks || []).forEach(t => {
+                    totalTasks++;
+                    if (t.done) doneTasks++;
+                });
+            });
+            const pendingTasks = totalTasks - doneTasks;
+
+            document.getElementById('metric-pending-count').innerText = pendingTasks;
+            document.getElementById('metric-completed-count').innerText = doneTasks;
+
+            let allPendingTasks = [];
+            DB.tables.projects.forEach(p => { (p.tasks || []).forEach(t => { if(!t.done) allPendingTasks.push({proj: p.project_name, ...t}); }) });
+            
+            document.getElementById('home-recent-tasks-body').innerHTML = allPendingTasks.slice().reverse().slice(0, 5).map(task => `
+                <tr>
+                    <td><strong>${task.proj}</strong></td>
+                    <td><div style="font-weight:800; font-size:11px;">${task.category}</div></td>
+                    <td>
+                        <div style="font-weight:700">${task.name}</div>
+                        ${task.notes ? `<div style="font-size:10px; font-weight:700; color:var(--accent-color); white-space:pre-wrap;">NOTE: ${task.notes}</div>` : ''}
+                    </td>
+                    <td><span class="badge" style="background:#fffebc">PENDING</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // LEADS 
+        function renderLeads() { document.getElementById('leads-table-body').innerHTML = DB.tables.leads.map(lead => `<tr><td><strong>${lead.name}</strong></td><td>${lead.email}</td><td><span class="badge" style="white-space:pre-wrap">${lead.message.substring(0,30)}</span></td><td><span class="badge" style="background:${lead.status==='new'?'#ffdd00': lead.status==='closed'?'#ccffcc':'#ddddff'}">${lead.status}</span></td><td><button class="btn" onclick="updateLeadStatus(${lead.id})">Edit</button></td></tr>`).join(''); }
+        window.createNewLead = function() { openModal("ADD NEW LEAD", [{id: 'name', label: 'Full Name'}, {id: 'email', label: 'Email Address'}, {id: 'status', label: 'Initial Status', type: 'select', options: ['new', 'contacted', 'closed']}], (res) => { if(res.name) { DB.tables.leads.push({ id: generateId(), name: res.name, email: res.email, message: "", status: res.status }); DB.save(); renderAll(); closeModal(); }}); }
+        window.updateLeadStatus = function(id) { const lead = DB.tables.leads.find(l => l.id === id); if(lead) { openModal("UPDATE LEAD", [{id: 'name', label: 'Name', val: lead.name}, {id: 'status', label: 'Status', type: 'select', options: ['new', 'contacted', 'closed'], val: lead.status}], (res) => { Object.assign(lead, {name: res.name, status: res.status}); DB.save(); renderAll(); closeModal(); }); } }
+
+        // TEAM LEADERBOARD & KNOWLEDGE
+        function renderTeam() { 
+            let scores = {};
+            DB.tables.projects.forEach(p => {
+                (p.tasks || []).forEach(t => {
+                    if (t.done && t.completed_by) {
+                        scores[t.completed_by] = (scores[t.completed_by] || 0) + 1;
+                    }
+                });
+            });
+
+            // Convert to array and sort
+            let sortedBoard = Object.keys(scores).map(member => ({ member, score: scores[member] }));
+            sortedBoard.sort((a, b) => b.score - a.score);
+
+            if (sortedBoard.length === 0) {
+                document.getElementById('team-table-body').innerHTML = `<tr><td colspan="4" style="text-align:center;font-weight:700;padding:24px;">No tasks completed yet. Start checking boxes!</td></tr>`;
+                return;
+            }
+
+            document.getElementById('team-table-body').innerHTML = sortedBoard.map((u, i) => `
+                <tr>
+                    <td><strong>#${i + 1}</strong></td>
+                    <td><strong>${u.member}</strong></td>
+                    <td><span class="badge" style="background:#000; color:#fff; font-size:14px;">${u.score} pts</span></td>
+                    <td><span class="badge" style="background:#ccffcc">Active</span></td>
+                </tr>
+            `).join(''); 
+        }
+        function renderKnowledge() { document.getElementById('knowledge-grid').innerHTML = DB.tables.docs.map(doc => `<div class="card"><h3>${doc.title}</h3><p style="font-size:13px; border-left: 3px solid var(--accent-color); padding-left: 12px; background: #fff8f5">${doc.content.substring(0,60)}...</p></div>`).join(''); }
+        function renderFeedback() { document.getElementById('feedback-table-body').innerHTML = DB.tables.feedback.slice().reverse().map(f => `<tr><td><span class="badge">${f.type}</span></td><td>${f.description}</td></tr>`).join(''); }
+        window.triggerAutomation = function(action) { alert(`Webhook Payload ready for: ${action}`); }
+        
+        window.onload = async () => {
+            const sessionData = localStorage.getItem('flowra_session');
+            if (sessionData) {
+                try {
+                    const session = JSON.parse(sessionData);
+                    let roleStr = session.email;
+                    if (session.email === "iblamechira@gmail.com") roleStr = "CHIRA (FOUNDER)";
+                    else if (session.email === "rudraprakash18@outlook.com") roleStr = "RUDRA (CO-FOUNDER)";
+                    const adminLabel = document.getElementById('admin-email');
+                    if (adminLabel) adminLabel.innerText = roleStr;
+                } catch(e) {}
+            }
+            // Attempt Supabase load first; fall back to localStorage
+            const fromCloud = await loadFromSupabase();
+            if (!fromCloud) DB.load();
+            renderAll();
+        };
+        window.logout = function() { localStorage.removeItem('flowra_session'); window.location.href = '/login.html'; }
+    </script>
+</body>
+</html>
