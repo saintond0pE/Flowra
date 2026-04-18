@@ -306,8 +306,12 @@
                 const mobilePrefix = mobile ? `[MOBILE: ${mobile}] ` : '';
                 const finalMessage = `${mobilePrefix}[${currentMode.toUpperCase()}] ${message || 'System Notification'}`;
                 
+                // Manual ID generation to satisfy NOT NULL constraint
+                const newId = 'id_' + Math.random().toString(36).substr(2, 9);
+
                 const { error } = await sb.from('leads').insert([
                     { 
+                        id: newId,
                         name: name || 'Anonymous',
                         email: email || '', 
                         message: finalMessage,
