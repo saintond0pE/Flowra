@@ -373,7 +373,7 @@
                 // Only pull from Supabase if local is empty
                 const { data: projects, error: pe } = await sb.from('projects').select('*');
                 const { data: tasks, error: te } = await sb.from('tasks').select('*');
-                const { data: leads, error: le } = await sb.from('leads').select('*');
+                const { data: leads, error: le } = await sb.from('leads').select('*').order('id', { ascending: false });
 
                 if (pe || te || le) throw new Error('Query error');
 
@@ -713,7 +713,10 @@
         }
 
         // LEADS 
-        function renderLeads() { document.getElementById('leads-table-body').innerHTML = DB.tables.leads.map(lead => `<tr><td><strong>${lead.name}</strong></td><td>${lead.email}</td><td>${lead.mobile || '---'}</td><td><span class="badge" style="white-space:pre-wrap">${lead.message.substring(0,30)}</span></td><td><span class="badge" style="background:${lead.status==='new'?'#ffdd00': lead.status==='closed'?'#ccffcc':'#ddddff'}">${lead.status}</span></td><td><button class="btn" onclick="updateLeadStatus(${lead.id})">Edit</button></td></tr>`).join(''); }
+        function renderLeads() { 
+            const leadsToShow = DB.tables.leads.slice(0, 15);
+            document.getElementById('leads-table-body').innerHTML = leadsToShow.map(lead => `<tr><td><strong>${lead.name}</strong></td><td>${lead.email}</td><td>${lead.mobile || '---'}</td><td><span class="badge" style="white-space:pre-wrap">${lead.message.substring(0,30)}</span></td><td><span class="badge" style="background:${lead.status==='new'?'#ffdd00': lead.status==='closed'?'#ccffcc':'#ddddff'}">${lead.status}</span></td><td><button class="btn" onclick="updateLeadStatus(${lead.id})">Edit</button></td></tr>`).join(''); 
+        }
         window.createNewLead = function() { openModal("ADD NEW LEAD", [{id: 'name', label: 'Full Name'}, {id: 'email', label: 'Email Address'}, {id: 'mobile', label: 'Mobile Number'}, {id: 'status', label: 'Initial Status', type: 'select', options: ['new', 'contacted', 'closed']}], (res) => { if(res.name) { DB.tables.leads.push({ id: generateId(), name: res.name, email: res.email, mobile: res.mobile, message: "", status: res.status }); DB.save(); renderAll(); closeModal(); }}); }
         window.updateLeadStatus = function(id) { const lead = DB.tables.leads.find(l => l.id === id); if(lead) { openModal("UPDATE LEAD", [{id: 'name', label: 'Name', val: lead.name}, {id: 'mobile', label: 'Mobile Number', val: lead.mobile}, {id: 'status', label: 'Status', type: 'select', options: ['new', 'contacted', 'closed'], val: lead.status}], (res) => { Object.assign(lead, {name: res.name, mobile: res.mobile, status: res.status}); DB.save(); renderAll(); closeModal(); }); } }
 
