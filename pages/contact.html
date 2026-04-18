@@ -302,9 +302,9 @@
             errorMsg.classList.add('hidden');
             
             try {
-                // Build robust message with mobile data Prepended (Schema-safe)
-                const mobilePrefix = mobile ? `[MOBILE: ${mobile}] ` : '';
-                const finalMessage = `${mobilePrefix}[${currentMode.toUpperCase()}] ${message || 'System Notification'}`;
+                // Map to the correct Supabase column 'number' and use refined prefixes
+                const refinedPrefix = currentMode === 'query' ? '[CALL BOOKED]' : '[ISSUE DISCUSSION]';
+                const finalMessage = `${refinedPrefix} ${message || 'System Notification'}`;
                 
                 // Manual ID generation to satisfy NOT NULL constraint
                 const newId = 'id_' + Math.random().toString(36).substr(2, 9);
@@ -314,6 +314,7 @@
                         id: newId,
                         name: name || 'Anonymous',
                         email: email || '', 
+                        number: mobile || '', 
                         message: finalMessage,
                         status: 'new'
                     }

@@ -175,7 +175,7 @@
                     <button class="btn btn-primary" onclick="createNewLead()">+ ADD LEAD</button>
                 </div>
                 <table>
-                    <thead><tr><th>Category</th><th>Name</th><th>Email</th><th>Mobile</th><th>Message Snippet</th><th>Status</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Category</th><th>Name</th><th>Email</th><th>Number</th><th>Message Snippet</th><th>Status</th><th>Actions</th></tr></thead>
                     <tbody id="leads-table-body"></tbody>
                 </table>
             </div>
@@ -322,7 +322,7 @@
                 // Upsert leads
                 if (DB.tables.leads.length > 0) {
                     const leadRows = DB.tables.leads.map(l => ({
-                        id: l.id, name: l.name, email: l.email, message: l.message || '', status: l.status
+                        id: l.id, name: l.name, email: l.email, message: l.message || '', status: l.status, number: l.number || l.mobile || ''
                     }));
                     const { error: le } = await sb.from('leads').upsert(leadRows, { onConflict: 'id' });
                     if (le) throw le;
@@ -731,21 +731,29 @@
 
         // LEADS 
         function renderLeads() { 
-            const leadsToShow = DB.tables.leads.slice(0, 15);
+            const leadsToShow = (DB.tables.leads || []).slice(0, 15);
             document.getElementById('leads-table-body').innerHTML = leadsToShow.map(lead => {
                 const msg = lead.message || '';
                 let category = 'QUERY';
                 let displayMsg = msg;
                 let badgeColor = '#38BDF8'; // Blue for Query
 
-                if (msg.startsWith('[ISSUE]')) {
+                if (msg.includes('[ISSUE DISCUSSION]')) {
+                    category = 'ISSUE';
+                    displayMsg = msg.replace('[ISSUE DISCUSSION]', '').trim();
+                    badgeColor = '#ff3c00'; // Red for Issue
+                } else if (msg.includes('[CALL BOOKED]')) {
+                    category = 'BOOKING';
+                    displayMsg = msg.replace('[CALL BOOKED]', '').trim();
+                    badgeColor = '#10B981'; // Green for Booking
+                } else if (msg.startsWith('[ISSUE]')) {
                     category = 'ISSUE';
                     displayMsg = msg.replace('[ISSUE]', '').trim();
-                    badgeColor = '#ff3c00'; // Red for Issue
+                    badgeColor = '#ff3c00'; 
                 } else if (msg.startsWith('[QUERY]')) {
                     category = 'QUERY';
                     displayMsg = msg.replace('[QUERY]', '').trim();
-                    badgeColor = '#10B981'; // Green for Query
+                    badgeColor = '#10B981';
                 }
 
                 return `
@@ -753,16 +761,31 @@
                         <td><span class="badge" style="background:${badgeColor}; color:#fff; border:none;">${category}</span></td>
                         <td><strong>${lead.name}</strong></td>
                         <td>${lead.email}</td>
-                        <td>${lead.mobile || '---'}</td>
+                        <td>${lead.number || lead.mobile || '---'}</td>
                         <td><span style="font-size:12px; font-weight:700;">${displayMsg.substring(0,40)}${displayMsg.length > 40 ? '...' : ''}</span></td>
                         <td><span class="badge" style="background:${lead.status==='new'?'#ffdd00': lead.status==='closed'?'#ccffcc':'#ddddff'}">${lead.status}</span></td>
-                        <td><button class="btn" onclick="updateLeadStatus(${lead.id})">Edit</button></td>
+                        <td><button class="btn" onclick="updateLeadStatus('${lead.id}')">Edit</button></td>
                     </tr>
                 `;
             }).join(''); 
         }
-        window.createNewLead = function() { openModal("ADD NEW LEAD", [{id: 'name', label: 'Full Name'}, {id: 'email', label: 'Email Address'}, {id: 'mobile', label: 'Mobile Number'}, {id: 'status', label: 'Initial Status', type: 'select', options: ['new', 'contacted', 'closed']}], (res) => { if(res.name) { DB.tables.leads.push({ id: generateId(), name: res.name, email: res.email, mobile: res.mobile, message: "", status: res.status }); DB.save(); renderAll(); closeModal(); }}); }
-        window.updateLeadStatus = function(id) { const lead = DB.tables.leads.find(l => l.id === id); if(lead) { openModal("UPDATE LEAD", [{id: 'name', label: 'Name', val: lead.name}, {id: 'mobile', label: 'Mobile Number', val: lead.mobile}, {id: 'status', label: 'Status', type: 'select', options: ['new', 'contacted', 'closed'], val: lead.status}], (res) => { Object.assign(lead, {name: res.name, mobile: res.mobile, status: res.status}); DB.save(); renderAll(); closeModal(); }); } }
+        window.createNewLead = function() { 
+            openModal("ADD NEW LEAD", [{id: 'name', label: 'Full Name'}, {id: 'email', label: 'Email Address'}, {id: 'number', label: 'Mobile Number'}, {id: 'status', label: 'Initial Status', type: 'select', options: ['new', 'contacted', 'closed']}], (res) => { 
+                if(res.name) { 
+                    DB.tables.leads.push({ id: generateId(), name: res.name, email: res.email, number: res.number, message: "", status: res.status }); 
+                    DB.save(); renderAll(); syncToSupabase(); closeModal(); 
+                }
+            }); 
+        }
+        window.updateLeadStatus = function(id) { 
+            const lead = DB.tables.leads.find(l => l.id === id); 
+            if(lead) { 
+                openModal("UPDATE LEAD", [{id: 'name', label: 'Name', val: lead.name}, {id: 'number', label: 'Number', val: lead.number || lead.mobile}, {id: 'status', label: 'Status', type: 'select', options: ['new', 'contacted', 'closed'], val: lead.status}], (res) => { 
+                    Object.assign(lead, {name: res.name, number: res.number, status: res.status}); 
+                    DB.save(); renderAll(); syncToSupabase(); closeModal(); 
+                }); 
+            } 
+        }
 
         // TEAM LEADERBOARD & KNOWLEDGE
         function renderTeam() { 
