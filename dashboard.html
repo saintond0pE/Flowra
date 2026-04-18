@@ -174,7 +174,7 @@
                     <button class="btn btn-primary" onclick="createNewLead()">+ ADD LEAD</button>
                 </div>
                 <table>
-                    <thead><tr><th>Name</th><th>Email</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead>
+                    <thead><tr><th>Name</th><th>Email</th><th>Mobile</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead>
                     <tbody id="leads-table-body"></tbody>
                 </table>
             </div>
@@ -277,7 +277,7 @@
                 // Upsert leads
                 if (DB.tables.leads.length > 0) {
                     const leadRows = DB.tables.leads.map(l => ({
-                        id: l.id, name: l.name, email: l.email, message: l.message || '', status: l.status
+                        id: l.id, name: l.name, email: l.email, message: l.message || '', status: l.status, mobile: l.mobile || ''
                     }));
                     const { error: le } = await sb.from('leads').upsert(leadRows, { onConflict: 'id' });
                     if (le) throw le;
@@ -668,9 +668,9 @@
         }
 
         // LEADS 
-        function renderLeads() { document.getElementById('leads-table-body').innerHTML = DB.tables.leads.map(lead => `<tr><td><strong>${lead.name}</strong></td><td>${lead.email}</td><td><span class="badge" style="white-space:pre-wrap">${lead.message.substring(0,30)}</span></td><td><span class="badge" style="background:${lead.status==='new'?'#ffdd00': lead.status==='closed'?'#ccffcc':'#ddddff'}">${lead.status}</span></td><td><button class="btn" onclick="updateLeadStatus(${lead.id})">Edit</button></td></tr>`).join(''); }
-        window.createNewLead = function() { openModal("ADD NEW LEAD", [{id: 'name', label: 'Full Name'}, {id: 'email', label: 'Email Address'}, {id: 'status', label: 'Initial Status', type: 'select', options: ['new', 'contacted', 'closed']}], (res) => { if(res.name) { DB.tables.leads.push({ id: generateId(), name: res.name, email: res.email, message: "", status: res.status }); DB.save(); renderAll(); closeModal(); }}); }
-        window.updateLeadStatus = function(id) { const lead = DB.tables.leads.find(l => l.id === id); if(lead) { openModal("UPDATE LEAD", [{id: 'name', label: 'Name', val: lead.name}, {id: 'status', label: 'Status', type: 'select', options: ['new', 'contacted', 'closed'], val: lead.status}], (res) => { Object.assign(lead, {name: res.name, status: res.status}); DB.save(); renderAll(); closeModal(); }); } }
+        function renderLeads() { document.getElementById('leads-table-body').innerHTML = DB.tables.leads.map(lead => `<tr><td><strong>${lead.name}</strong></td><td>${lead.email}</td><td>${lead.mobile || '---'}</td><td><span class="badge" style="white-space:pre-wrap">${lead.message.substring(0,30)}</span></td><td><span class="badge" style="background:${lead.status==='new'?'#ffdd00': lead.status==='closed'?'#ccffcc':'#ddddff'}">${lead.status}</span></td><td><button class="btn" onclick="updateLeadStatus(${lead.id})">Edit</button></td></tr>`).join(''); }
+        window.createNewLead = function() { openModal("ADD NEW LEAD", [{id: 'name', label: 'Full Name'}, {id: 'email', label: 'Email Address'}, {id: 'mobile', label: 'Mobile Number'}, {id: 'status', label: 'Initial Status', type: 'select', options: ['new', 'contacted', 'closed']}], (res) => { if(res.name) { DB.tables.leads.push({ id: generateId(), name: res.name, email: res.email, mobile: res.mobile, message: "", status: res.status }); DB.save(); renderAll(); closeModal(); }}); }
+        window.updateLeadStatus = function(id) { const lead = DB.tables.leads.find(l => l.id === id); if(lead) { openModal("UPDATE LEAD", [{id: 'name', label: 'Name', val: lead.name}, {id: 'mobile', label: 'Mobile Number', val: lead.mobile}, {id: 'status', label: 'Status', type: 'select', options: ['new', 'contacted', 'closed'], val: lead.status}], (res) => { Object.assign(lead, {name: res.name, mobile: res.mobile, status: res.status}); DB.save(); renderAll(); closeModal(); }); } }
 
         // TEAM LEADERBOARD & KNOWLEDGE
         function renderTeam() { 
