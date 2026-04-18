@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FLOWRA | PRICING MATRIX</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#5b5b5b",
+                        "on-tertiary-fixed": "#00452d",
+                        "on-primary-fixed-variant": "#616161",
+                        "on-secondary-fixed": "#443100",
+                        "background": "#f6f6f6",
+                        "on-surface": "#2d2f2f",
+                        "on-error-container": "#510017",
+                        "error": "#b41340",
+                        "error-container": "#f74b6d",
+                        "on-primary-fixed": "#444444",
+                        "surface-container-highest": "#dbdddd",
+                        "on-secondary-fixed-variant": "#674d00",
+                        "tertiary-container": "#69f6b8",
+                        "primary-container": "#ebebeb",
+                        "on-primary": "#f3f3f3",
+                        "on-error": "#ffefef",
+                        "inverse-primary": "#ffffff",
+                        "primary": "#5b5b5b",
+                        "outline-variant": "#acadad",
+                        "on-primary-container": "#575757",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#d2d5d5",
+                        "primary-fixed": "#ebebeb",
+                        "primary-fixed-dim": "#dddddd",
+                        "inverse-on-surface": "#9c9d9d",
+                        "surface-container": "#e7e8e8",
+                        "secondary-dim": "#654c00",
+                        "surface": "#f6f6f6",
+                        "outline": "#757777",
+                        "inverse-surface": "#0c0f0f",
+                        "surface-variant": "#dbdddd",
+                        "tertiary": "#006947",
+                        "surface-container-high": "#e1e3e3",
+                        "surface-bright": "#f6f6f6",
+                        "tertiary-dim": "#005c3d",
+                        "secondary-fixed": "#ffca44",
+                        "secondary-container": "#ffca44",
+                        "on-secondary-container": "#5b4400",
+                        "on-tertiary-fixed-variant": "#006544",
+                        "on-surface-variant": "#5a5c5c",
+                        "on-tertiary": "#c8ffe0",
+                        "on-tertiary-container": "#005a3c",
+                        "on-secondary": "#fff1da",
+                        "tertiary-fixed-dim": "#58e7ab",
+                        "tertiary-fixed": "#69f6b8",
+                        "secondary-fixed-dim": "#f2bc2a",
+                        "primary-dim": "#4f4f4f",
+                        "on-background": "#2d2f2f",
+                        "surface-container-low": "#f0f1f1",
+                        "secondary": "#745700",
+                        "error-dim": "#a70138",
+                        "brand-mustard": "#FFC837",
+                        "brand-mint": "#10B981",
+                        "brand-pink": "#FFB7B2"
+                    },
+                    "borderRadius": {
+                        "none": "0px",
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Inter", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* DESKTOP ZOOM - only on screens wider than 768px */
+        @media (min-width: 768px) {
+            html {
+                zoom: 0.70;
+            }
+        }
+
+        /* ZOOM-OUT-FIX */
+        html {
+            overflow-x: hidden;
+        }
+        body {
+            overflow-x: hidden;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 700, 'GRAD' 0, 'opsz' 48;
+        }
+        body { font-family: 'Inter', sans-serif; }
+        .neo-shadow { box-shadow: 6px 6px 0px 0px rgba(0,0,0,1); }
+        .neo-shadow-large { box-shadow: 12px 12px 0px 0px rgba(0,0,0,1); }
+    
+        /* DISABLE HOVER ANIMATIONS ON MOBILE (touch devices) */
+        @media (max-width: 767px) {
+            .service-card-pop:hover,
+            .neo-shadow-hover:hover,
+            [class*="hover\:translate"],
+            [class*="hover\:shadow"] {
+                transform: none !important;
+                box-shadow: none !important;
+            }
+            .neo-shadow {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+            }
+            .neo-shadow-hover:hover {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+                transform: none !important;
+            }
+            .neo-shadow-active:active {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+                transform: none !important;
+            }
+            .service-card-pop:hover {
+                transform: none !important;
+                box-shadow: 4px 4px 0px 0px rgba(0,0,0,1) !important;
+            }
+        }
+    </style>
+</head>
+<body class="text-on-surface">
+<nav class="bg-[#FFF9E6] border-b-2 border-black w-full px-4 md:px-8 py-4 sticky top-0 z-50">
+    <div class="max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-3 items-center">
+        <!-- Left: Logo -->
+        <div class="flex justify-start items-center gap-2 cursor-pointer" onclick="window.location.href='/'">
+            <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">local_florist</span>
+            <span class="text-2xl md:text-3xl font-black text-black tracking-tighter uppercase font-['Inter']">FLOWRA</span>
+        </div>
+
+        <!-- Center: Symmetrical Navigation (Desktop Only) -->
+        <div class="hidden md:flex justify-center items-center gap-10">
+            <a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#B19CD9] hover:text-black transition-all px-4 py-1" href="/pages/validation.html">Validation</a>
+            <a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#B19CD9] hover:text-black transition-all px-4 py-1" href="/pages/resources.html">Resources</a>
+        </div>
+
+        <!-- Right: Actions (Desktop Only) -->
+        <div class="hidden md:flex justify-end items-center gap-4">
+            <button class="font-['Inter'] font-black uppercase tracking-tighter bg-[#38BDF8] text-black border-2 border-black px-4 py-2 neo-shadow hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none transition-all text-sm" onclick="window.location.href='/pages/case-study.html'">Case Study</button>
+            <button class="bg-[#B19CD9] text-black border-2 border-black px-6 py-2 font-black uppercase tracking-tighter neo-shadow hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none transition-all text-sm" onclick="window.location.href='/pages/contact.html'">Contact Us</button>
+        </div>
+
+        <!-- Mobile Toggle (Right aligned in 2nd col on mobile) -->
+        <div class="md:hidden flex justify-end">
+            <button class="border-2 border-black p-2 bg-[#B19CD9]" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" aria-label="Menu">
+                <span class="material-symbols-outlined text-2xl text-black">menu</span>
+            </button>
+        </div>
+    </div>
+</nav>
+<!-- Mobile Dropdown Menu -->
+<div id="mobile-menu" class="hidden md:hidden bg-[#FFF9E6] border-b-2 border-black px-4 py-3 flex flex-col gap-2 sticky top-[60px] z-[60]">
+    <a class="font-['Inter'] font-black uppercase tracking-tighter text-sm text-black/70 py-2 border-b border-black/20" href="/pages/validation.html">Validation</a>
+    <a class="font-['Inter'] font-black uppercase tracking-tighter text-sm text-black/70 py-2 border-b border-black/20" href="/pages/resources.html">Resources</a>
+    <a class="font-['Inter'] font-black uppercase tracking-tighter text-sm bg-[#38BDF8] text-black py-2 border-b border-black/20 px-2" href="/pages/case-study.html">Case Study</a>
+    <a class="font-['Inter'] font-black uppercase tracking-tighter text-xs bg-[#B19CD9] text-black border-2 border-black p-2 text-center" href="/pages/contact.html">Contact Us</a>
+</div>
+<!-- TopNavBar -->
+<!-- HERO SECTION -->
+<section class="bg-[#B19CD9] border-b-2 border-black py-8 md:py-16 px-4 md:px-8">
+<div class="max-w-7xl mx-auto">
+<h1 class="text-3xl md:text-[60px] font-black leading-[0.9] tracking-tighter text-black uppercase mb-4 md:mb-8">
+                DON'T BUY SOFTWARE.<br/>BUY OUTCOMES.
+            </h1>
+<p class="text-sm md:text-2xl font-bold uppercase tracking-tight text-black max-w-2xl">
+                Legacy systems are a tax on your potential. We build the architecture of pure efficiency.
+            </p>
+</div>
+</section>
+<!-- PRICING COLUMNS -->
+<section class="bg-[#FFF9E6] py-8 md:py-16 px-4 md:px-8 overflow-hidden">
+<div class="max-w-7xl mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+<!-- CARD 1: THE AUDIT -->
+<div class="border-2 border-black p-4 md:p-8 bg-[#FFF9E6] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] flex flex-col h-full md:hover:translate-x-[4px] md:hover:translate-y-[4px] md:hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all">
+<div class="mb-4 md:mb-10">
+<h3 class="text-lg md:text-3xl font-black uppercase tracking-tighter mb-2">THE AUDIT</h3>
+<div class="text-2xl md:text-5xl font-black mb-3 md:mb-4">Fixed Discovery</div>
+<p class="text-sm md:text-lg font-bold uppercase leading-tight">We rip apart your current workflow.</p>
+</div>
+<ul class="space-y-3 md:space-y-6 mb-6 md:mb-12 flex-grow">
+<li class="flex items-center gap-4">
+<span class="material-symbols-outlined font-black bg-[#FF8A65] border-2 border-black p-1 text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+<span class="font-bold uppercase text-sm md:text-lg">Full analysis</span>
+</li>
+<li class="flex items-center gap-4">
+<span class="material-symbols-outlined font-black bg-[#FF8A65] border-2 border-black p-1 text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+<span class="font-bold uppercase text-sm md:text-lg">Waste identification</span>
+</li>
+<li class="flex items-center gap-4">
+<span class="material-symbols-outlined font-black bg-[#FF8A65] border-2 border-black p-1 text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+<span class="font-bold uppercase text-sm md:text-lg">ROI projection</span>
+</li>
+<li class="flex items-center gap-4">
+<span class="material-symbols-outlined font-black bg-[#FF8A65] border-2 border-black p-1 text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+<span class="font-bold uppercase text-sm md:text-lg">Strategy map</span>
+</li>
+<li class="flex items-center gap-4">
+<span class="material-symbols-outlined font-black bg-[#FF8A65] border-2 border-black p-1 text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+<span class="font-bold uppercase text-sm md:text-lg">24h turnaround</span>
+</li>
+</ul>
+<button class="w-full border-2 border-black bg-[#FFF9E6] py-4 font-black uppercase text-sm md:text-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] md:hover:translate-x-[3px] md:hover:translate-y-[3px] md:hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all" onclick="window.location.href='/pages/contact.html'">
+                        SELECT AUDIT
+                    </button>
+</div>
+<!-- CARD 2: THE BUILD -->
+<div class="border-2 border-black bg-[#FFF9E6] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] flex flex-col h-full relative md:hover:translate-x-[4px] md:hover:translate-y-[4px] md:hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all">
+<div class="h-10 bg-[#38BDF8] border-b-2 border-black w-full flex items-center px-4 font-black uppercase text-xs tracking-widest text-white">MOST POPULAR</div>
+<div class="p-8 flex flex-col h-full">
+<div class="mb-4 md:mb-10">
+<h3 class="text-lg md:text-3xl font-black uppercase tracking-tighter mb-2">THE BUILD</h3>
+<div class="text-xl md:text-4xl font-black mb-3 md:mb-4">Scaled to Complexity</div>
+<p class="text-sm md:text-lg font-bold uppercase leading-tight">We build the core AI system and automate your primary channels.</p>
+</div>
+<ul class="space-y-3 md:space-y-6 mb-6 md:mb-12 flex-grow">
+<li class="flex items-center gap-4">
+<span class="material-symbols-outlined font-black bg-[#38BDF8] border-2 border-black p-1 text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+<span class="font-bold uppercase text-sm md:text-lg">Custom AI architecture</span>
+</li>
+<li class="flex items-center gap-4">
+<span class="material-symbols-outlined font-black bg-[#38BDF8] border-2 border-black p-1 text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+<span class="font-bold uppercase text-sm md:text-lg">3 API integrations</span>
+</li>
+<li class="flex items-center gap-4">
+<span class="material-symbols-outlined font-black bg-[#38BDF8] border-2 border-black p-1 text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+<span class="font-bold uppercase text-sm md:text-lg">Live dashboard</span>
+</li>
+<li class="flex items-center gap-4">
+<span class="material-symbols-outlined font-black bg-[#38BDF8] border-2 border-black p-1 text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+<span class="font-bold uppercase text-sm md:text-lg">Full training</span>
+</li>
+<li class="flex items-center gap-4">
+<span class="material-symbols-outlined font-black bg-[#38BDF8] border-2 border-black p-1 text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+<span class="font-bold uppercase text-sm md:text-lg">3 months support</span>
+</li>
+</ul>
+<button class="w-full border-2 border-black bg-[#B19CD9] py-4 font-black uppercase text-sm md:text-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] md:hover:translate-x-[3px] md:hover:translate-y-[3px] md:hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] transition-all" onclick="window.location.href='/pages/contact.html'">
+                            SELECT BUILD
+                        </button>
+</div>
+</div>
+<!-- CARD 3: ENTERPRISE -->
+<div class="border-2 border-black p-4 md:p-8 bg-[#FFF9E6] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] flex flex-col h-full md:hover:translate-x-[4px] md:hover:translate-y-[4px] md:hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all">
+<div class="mb-4 md:mb-10">
+<h3 class="text-lg md:text-3xl font-black uppercase tracking-tighter mb-2">ENTERPRISE</h3>
+<div class="text-2xl md:text-5xl font-black mb-3 md:mb-4">LET'S TALK</div>
+<p class="text-sm md:text-lg font-bold uppercase leading-tight">Full internal wiring and absolute zero-touch ops.</p>
+</div>
+<ul class="space-y-3 md:space-y-6 mb-6 md:mb-12 flex-grow">
+<li class="flex items-center gap-4">
+<span class="material-symbols-outlined font-black bg-[#B19CD9] border-2 border-black p-1 text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+<span class="font-bold uppercase text-sm md:text-lg">Unlimited scale</span>
+</li>
+<li class="flex items-center gap-4">
+<span class="material-symbols-outlined font-black bg-[#B19CD9] border-2 border-black p-1 text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+<span class="font-bold uppercase text-sm md:text-lg">Full source code</span>
+</li>
+<li class="flex items-center gap-4">
+<span class="material-symbols-outlined font-black bg-[#B19CD9] border-2 border-black p-1 text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+<span class="font-bold uppercase text-sm md:text-lg">Hardware integration</span>
+</li>
+<li class="flex items-center gap-4">
+<span class="material-symbols-outlined font-black bg-[#B19CD9] border-2 border-black p-1 text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+<span class="font-bold uppercase text-sm md:text-lg">White-glove support</span>
+</li>
+<li class="flex items-center gap-4">
+<span class="material-symbols-outlined font-black bg-[#B19CD9] border-2 border-black p-1 text-black" style="font-variation-settings: 'FILL' 1;">check</span>
+<span class="font-bold uppercase text-sm md:text-lg">Global deployment</span>
+</li>
+</ul>
+<button class="w-full border-2 border-black bg-black text-white py-4 font-black uppercase text-sm md:text-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:shadow-[6px_6px_0px_0px_rgba(100,100,100,1)] md:hover:translate-x-[3px] md:hover:translate-y-[3px] md:hover:shadow-[3px_3px_0px_0px_rgba(100,100,100,1)] transition-all" onclick="window.location.href='/pages/contact.html'">
+                        CONTACT SALES
+                    </button>
+</div>
+</div>
+</div>
+</section>
+<!-- FAQ SECTION -->
+<section class="bg-[#FF8A65] border-t-2 border-black py-8 md:py-16 px-4 md:px-8">
+<div class="max-w-4xl mx-auto">
+<h2 class="text-3xl md:text-6xl font-black uppercase tracking-tighter mb-8 md:mb-16 text-black">FAQ.</h2>
+<div class="space-y-4 md:space-y-8">
+<!-- Q1 -->
+<div class="bg-[#FFF9E6] border-2 border-black p-4 md:p-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+<h4 class="text-base md:text-2xl font-black uppercase mb-2 md:mb-4 tracking-tight">HOW FAST IS THE SETUP?</h4>
+<p class="text-sm md:text-xl font-bold uppercase text-zinc-700">Audit in 48h. Build in 4 weeks.</p>
+</div>
+<!-- Q2 -->
+<div class="bg-[#FFF9E6] border-2 border-black p-4 md:p-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+<h4 class="text-base md:text-2xl font-black uppercase mb-2 md:mb-4 tracking-tight">DO YOU OFFER CUSTOM PRICING?</h4>
+<p class="text-sm md:text-xl font-bold uppercase text-zinc-700">Yes, every build is unique.</p>
+</div>
+<!-- Q3 -->
+<div class="bg-[#FFF9E6] border-2 border-black p-4 md:p-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+<h4 class="text-base md:text-2xl font-black uppercase mb-2 md:mb-4 tracking-tight">WHAT ABOUT SUPPORT?</h4>
+<p class="text-sm md:text-xl font-bold uppercase text-zinc-700">We stay until it works. Forever.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- ASYMMETRIC ILLUSTRATION SECTION -->
+<section class="bg-[#FFF9E6] py-8 md:py-16 px-4 md:px-8 overflow-hidden">
+<div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-16 items-center">
+<div class="relative">
+<div class="absolute -top-3 -left-5 md:-top-5 md:-left-10 w-16 h-16 md:w-32 md:h-32 bg-[#38BDF8] border-2 border-black z-0"></div>
+<div class="bg-[#FFF9E6] border-4 border-black p-2 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] relative z-10">
+<img class="w-full max-h-[250px] md:max-h-[500px] object-cover grayscale border-2 border-black" data-alt="abstract high-contrast black and white data visualization charts on a large digital screen in a minimalist industrial office" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6utFv7nHr1JAACgPQfY3BbD07Z9ORGM5dhRTdmLwWMfZ_Dmmh9pzUnEFC8DFl-paWvu5tNdd6VDmfeM_gKAatptJl6WS1gmKo6y7tFWSXVrIdeKD3px5wMZSSH0Lq2Ao_YjeABDap7lAdY0QtmJmS7yEag5UlspQ0YuRPDAuSxhXF0kDLUAsGt5y_vQmYOZz_Wb7uJXgtyQliE-TsRPcEWJvSidcD2UBmzy2au2cKtIy5hHFHTBJ6NsaHaH9ZL16ckaUTnMhkMCT-"/>
+</div>
+</div>
+<div>
+<h2 class="text-2xl md:text-5xl lg:text-7xl font-black uppercase tracking-tighter leading-none mb-4 md:mb-8">NO HIDDEN<br/>FEES. NO BS.</h2>
+<p class="text-sm md:text-xl font-bold uppercase mb-4 md:mb-4 md:mb-8">We don't charge per seat. We don't charge for data usage. We charge for the systems we build and the outcomes they generate.</p>
+<div class="inline-block bg-[#38BDF8] border-2 border-black px-4 md:px-8 py-4 font-black text-base md:text-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                    99.9% ROI GUARANTEED
+                </div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-black text-white px-4 md:px-8 py-8 md:py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mt-0">
+<div class="lg:col-span-3 mb-4 md:mb-12">
+<h2 class="text-2xl md:text-5xl lg:text-7xl font-black uppercase tracking-tighter text-white mb-4 md:mb-4 md:mb-8">No fluff. Just systems that work.</h2>
+</div>
+<div class="lg:col-span-2">
+<div class="flex items-center gap-3 mb-4 md:mb-8">
+<span class="material-symbols-outlined text-4xl md:text-6xl text-white">local_florist</span>
+<span class="text-4xl md:text-6xl font-black text-white tracking-tighter font-['Inter'] uppercase">FLOWRA</span>
+</div>
+<p class="font-['Inter'] font-bold uppercase text-sm md:text-xl text-white/80 max-w-md">NO NONSENSE. NO FLUFF. JUST SCALE.</p>
+</div>
+<div>
+<h4 class="text-xl font-black uppercase mb-8 text-[#B19CD9]">Company</h4>
+<ul class="space-y-4 font-['Inter'] font-bold uppercase">
+<li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/under-construction.html">Twitter</a></li>
+<li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/under-construction.html">LinkedIn</a></li>
+<li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/privacy.html">Privacy</a></li>
+</ul>
+</div>
+<div class="lg:col-span-3 pt-8 md:pt-16 border-t border-white/20 flex flex-col md:flex-row justify-between items-center gap-8">
+<p class="font-['Inter'] font-bold uppercase text-sm">© 2024 FLOWRA. NO NONSENSE.</p>
+<div class="flex gap-8">
+<span class="material-symbols-outlined">eco</span>
+<span class="material-symbols-outlined">bolt</span>
+<span class="material-symbols-outlined">public</span>
+</div>
+</div>
+</footer>
+</body></html>

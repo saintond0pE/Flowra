@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FLOWRA | AI Systems for Automation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "outline": "#757777",
+                        "secondary-container": "#ffca44",
+                        "surface-container-highest": "#dbdddd",
+                        "secondary-fixed-dim": "#f2bc2a",
+                        "error": "#b41340",
+                        "on-secondary-container": "#5b4400",
+                        "surface-variant": "#dbdddd",
+                        "tertiary-container": "#69f6b8",
+                        "on-primary-fixed-variant": "#616161",
+                        "primary": "#5b5b5b",
+                        "primary-fixed": "#ebebeb",
+                        "on-tertiary-container": "#005a3c",
+                        "tertiary-fixed-dim": "#58e7ab",
+                        "on-error-container": "#510017",
+                        "on-tertiary": "#c8ffe0",
+                        "tertiary-dim": "#005c3d",
+                        "error-dim": "#a70138",
+                        "on-error": "#ffefef",
+                        "on-secondary": "#fff1da",
+                        "primary-container": "#ebebeb",
+                        "background": "#f6f6f6",
+                        "primary-dim": "#4f4f4f",
+                        "tertiary-fixed": "#69f6b8",
+                        "on-primary": "#f3f3f3",
+                        "on-background": "#2d2f2f",
+                        "surface-container-high": "#e1e3e3",
+                        "on-tertiary-fixed": "#00452d",
+                        "outline-variant": "#acadad",
+                        "inverse-on-surface": "#9c9d9d",
+                        "on-primary-fixed": "#444444",
+                        "secondary": "#FFC837",
+                        "tertiary": "#10B981",
+                        "error-container": "#FFB7B2",
+                        "on-surface-variant": "#5a5c5c",
+                        "inverse-surface": "#0c0f0f",
+                        "on-secondary-fixed": "#443100",
+                        "on-secondary-fixed-variant": "#674d00",
+                        "primary-fixed-dim": "#dddddd",
+                        "inverse-primary": "#ffffff",
+                        "surface-bright": "#f6f6f6",
+                        "on-primary-container": "#575757",
+                        "surface-container-low": "#f0f1f1",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#d2d5d5",
+                        "surface": "#f6f6f6",
+                        "surface-tint": "#5b5b5b",
+                        "secondary-dim": "#654c00",
+                        "secondary-fixed": "#ffca44",
+                        "on-surface": "#2d2f2f",
+                        "on-tertiary-fixed-variant": "#006544",
+                        "surface-container": "#e7e8e8"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0px",
+                        "lg": "0px",
+                        "xl": "0px",
+                        "full": "9999px"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* DESKTOP ZOOM - only on screens wider than 768px */
+        @media (min-width: 768px) {
+            html {
+                zoom: 0.75;
+            }
+        }
+
+        /* ZOOM-OUT-FIX */
+        html {
+            overflow-x: hidden;
+        }
+        body {
+            overflow-x: hidden;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: #FFF9E6; }
+        .neo-shadow { box-shadow: 6px 6px 0px 0px rgba(0,0,0,1); }
+        .neo-shadow-hover:hover { box-shadow: 3px 3px 0px 0px rgba(0,0,0,1); transform: translate(3px, 3px); }
+        .neo-shadow-active:active { box-shadow: 0px 0px 0px 0px rgba(0,0,0,1); transform: translate(6px, 6px); }
+        
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            display: flex;
+            width: max-content;
+            animation: marquee 20s linear infinite;
+        }
+        .outline-text {
+            -webkit-text-stroke: 2px #FFC837;
+            color: transparent;
+        }
+        .service-card-pop {
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .service-card-pop:hover {
+            transform: translateY(-12px);
+            box-shadow: 12px 12px 0px 0px rgba(0,0,0,1);
+        }
+        .service-card-pop:hover .pop-icon {
+            transform: scale(1.1);
+        }
+    
+        /* DISABLE HOVER ANIMATIONS ON MOBILE (touch devices) */
+        @media (max-width: 767px) {
+            .service-card-pop:hover,
+            .neo-shadow-hover:hover,
+            [class*="hover\:translate"],
+            [class*="hover\:shadow"] {
+                transform: none !important;
+                box-shadow: none !important;
+            }
+            .neo-shadow {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+            }
+            .neo-shadow-hover:hover {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+                transform: none !important;
+            }
+            .neo-shadow-active:active {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+                transform: none !important;
+            }
+            .service-card-pop:hover {
+                transform: none !important;
+                box-shadow: 4px 4px 0px 0px rgba(0,0,0,1) !important;
+            }
+        }
+    </style>
+</head>
+<body class="text-on-surface">
+<nav class="bg-[#FFF9E6] border-b-2 border-black w-full px-4 md:px-8 py-4 sticky top-0 z-50">
+    <div class="max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-3 items-center">
+        <!-- Left: Logo -->
+        <div class="flex justify-start items-center gap-2 cursor-pointer" onclick="window.location.href='/'">
+            <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">local_florist</span>
+            <span class="text-2xl md:text-3xl font-black text-black tracking-tighter uppercase font-['Inter']">FLOWRA</span>
+        </div>
+
+        <!-- Center: Symmetrical Navigation (Desktop Only) -->
+        <div class="hidden md:flex justify-center items-center gap-10">
+            <a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#B19CD9] hover:text-black transition-all px-4 py-1" href="/pages/validation.html">Validation</a>
+            <a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#B19CD9] hover:text-black transition-all px-4 py-1" href="/pages/resources.html">Resources</a>
+        </div>
+
+        <!-- Right: Actions (Desktop Only) -->
+        <div class="hidden md:flex justify-end items-center gap-4">
+            <button class="font-['Inter'] font-black uppercase tracking-tighter bg-[#38BDF8] text-black border-2 border-black px-4 py-2 neo-shadow hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none transition-all text-sm" onclick="window.location.href='/pages/case-study.html'">Case Study</button>
+            <button class="bg-[#B19CD9] text-black border-2 border-black px-6 py-2 font-black uppercase tracking-tighter neo-shadow hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none transition-all text-sm" onclick="window.location.href='/pages/contact.html'">Contact Us</button>
+        </div>
+
+        <!-- Mobile Toggle (Right aligned in 2nd col on mobile) -->
+        <div class="md:hidden flex justify-end">
+            <button class="border-2 border-black p-2 bg-[#B19CD9]" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" aria-label="Menu">
+                <span class="material-symbols-outlined text-2xl text-black">menu</span>
+            </button>
+        </div>
+    </div>
+</nav>
+<!-- Mobile Dropdown Menu -->
+<div id="mobile-menu" class="hidden md:hidden bg-[#FFF9E6] border-b-2 border-black px-4 py-3 flex flex-col gap-2 sticky top-[60px] z-[60]">
+    <a class="font-['Inter'] font-black uppercase tracking-tighter text-sm text-black/70 py-2 border-b border-black/20" href="/pages/validation.html">Validation</a>
+    <a class="font-['Inter'] font-black uppercase tracking-tighter text-sm text-black/70 py-2 border-b border-black/20" href="/pages/resources.html">Resources</a>
+    <a class="font-['Inter'] font-black uppercase tracking-tighter text-sm bg-[#38BDF8] text-black py-2 border-b border-black/20 px-2" href="/pages/case-study.html">Case Study</a>
+    <a class="font-['Inter'] font-black uppercase tracking-tighter text-xs bg-[#B19CD9] text-black border-2 border-black p-2 text-center" href="/pages/contact.html">Contact Us</a>
+</div>
+<!-- TopNavBar -->
+<!-- Hero Section -->
+<section class="grid grid-cols-1 md:grid-cols-2 min-h-0 md:min-h-[600px] border-b-2 border-black">
+<div class="p-4 md:p-16 flex flex-col justify-center items-start border-r-0 md:border-r-2 border-black">
+<h1 class="text-2xl md:text-[60px] font-black leading-[0.95] tracking-tighter text-black mb-4 md:mb-8 uppercase">
+                We build AI systems that remove your manual work
+            </h1>
+<p class="text-sm md:text-[20px] font-medium text-black/70 mb-8 md:mb-12 max-w-xl">
+                We analyze your business, find what’s wasting time, and automate it using AI — so your team can focus on what actually matters.
+            </p>
+<div class="flex flex-col sm:flex-row gap-4 md:gap-6 mb-8 w-full sm:w-auto">
+<button class="bg-[#B19CD9] text-black border-2 border-black px-4 py-2 md:px-12 md:py-6 text-sm md:text-2xl font-black uppercase tracking-tighter neo-shadow neo-shadow-hover neo-shadow-active transition-all" onclick="window.location.href='/pages/contact.html'">
+                    Book a Call
+                </button>
+</div>
+</div>
+<div class="bg-[#FF8A65] flex items-center justify-center p-4 md:p-8 overflow-hidden relative">
+<img alt="Neo-brutalist character holding interface" class="w-full h-auto max-w-2xl max-h-[300px] md:max-h-[500px] object-contain transform md:hover:scale-105 transition-transform duration-500" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVlD7ABCUDqQT7uFyHN3mdrkME0_IUc-nYw6VEk7_wYHA6mo8GzgEWmryWZHFqI7qODbhoJuEGs300QDthHOl0l677FLGd2iSprr-kv4ep18TIzSoraAvtejeq9mlItttnG2cMOHJXJwGFExJ5NqCVdBTkMzz5CMiMe0kPVUlsuANrFABMWOTD_BJZxSw4l_y1cR1qfV9oaXXnCiDy1fFB9sRzILoSkgSCeAP7X8SZYlBzdjFHssw7myZlMcEvyYAGPuWeHKyWtmId"/>
+</div>
+</section>
+<!-- THE INFINITE MARQUEE -->
+<div class="bg-black py-2 md:py-8 border-b-2 border-black overflow-hidden select-none">
+<div class="animate-marquee whitespace-nowrap">
+<span class="text-2xl lg:text-8xl font-black uppercase outline-text tracking-tighter px-4">AUTOMATE EVERYTHING • ZERO MANUAL WORK • RUN FASTER • </span>
+<span class="text-2xl lg:text-8xl font-black uppercase outline-text tracking-tighter px-4">AUTOMATE EVERYTHING • ZERO MANUAL WORK • RUN FASTER • </span>
+</div>
+</div>
+<!-- Trust Strip -->
+<section class="bg-[#FFF9E6] border-b-2 border-black py-6 md:py-12 px-4 md:px-8">
+<div class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+<div class="flex items-center gap-3 bg-[#FFF9E6] border-2 border-black p-4 neo-shadow">
+<span class="material-symbols-outlined font-black text-black">check_circle</span>
+<span class="font-black uppercase text-sm">Custom-built for your business</span>
+</div>
+<div class="flex items-center gap-3 bg-[#FFF9E6] border-2 border-black p-4 neo-shadow">
+<span class="material-symbols-outlined font-black text-black">check_circle</span>
+<span class="font-black uppercase text-sm">Works with your current tools</span>
+</div>
+<div class="flex items-center gap-3 bg-[#FFF9E6] border-2 border-black p-4 neo-shadow">
+<span class="material-symbols-outlined font-black text-black">check_circle</span>
+<span class="font-black uppercase text-sm">No technical knowledge needed</span>
+</div>
+<div class="flex items-center gap-3 bg-[#FFF9E6] border-2 border-black p-4 neo-shadow">
+<span class="material-symbols-outlined font-black text-black">check_circle</span>
+<span class="font-black uppercase text-sm">Setup + support included</span>
+</div>
+</div>
+</section>
+<!-- Services Section -->
+<section class="py-10 md:py-8 md:py-16 px-4 md:px-8 max-w-full bg-surface-container-low border-b-2 border-black">
+<h2 class="text-2xl md:text-[56px] font-black text-center mb-8 md:mb-20 uppercase tracking-tighter">What we can automate for you</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 max-w-7xl mx-auto">
+<!-- Card 1 -->
+<div class="bg-[#FFF9E6] border-2 border-black neo-shadow flex flex-col service-card-pop">
+<div class="h-20 md:h-28 bg-[#B19CD9] border-b-2 border-black flex items-center px-4 md:px-8">
+<span class="material-symbols-outlined text-4xl md:text-6xl font-black pop-icon transition-transform">chat</span>
+</div>
+<div class="p-4 md:p-10">
+<h3 class="text-base md:text-3xl font-black mb-3 md:mb-6 uppercase tracking-tight">Customer Handling Automation</h3>
+<p class="text-xs md:text-xl font-bold text-on-surface-variant leading-snug">Automatically reply to customers, follow up, and capture leads across WhatsApp, website, and calls.</p>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-[#FFF9E6] border-2 border-black neo-shadow flex flex-col service-card-pop">
+<div class="h-20 md:h-28 bg-[#38BDF8] border-b-2 border-black flex items-center px-4 md:px-8">
+<span class="material-symbols-outlined text-4xl md:text-6xl font-black pop-icon transition-transform">dashboard</span>
+</div>
+<div class="p-5 md:p-10">
+<h3 class="text-lg md:text-3xl font-black mb-3 md:mb-6 uppercase tracking-tight">Team Dashboard (All-in-one control)</h3>
+<p class="text-sm md:text-xl font-bold text-on-surface-variant leading-snug">A simple dashboard where your team can manage tasks, send messages, track work, and run operations.</p>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-[#FFF9E6] border-2 border-black neo-shadow flex flex-col service-card-pop">
+<div class="h-20 md:h-28 bg-[#FF8A65] border-b-2 border-black flex items-center px-4 md:px-8">
+<span class="material-symbols-outlined text-4xl md:text-6xl font-black pop-icon transition-transform">cycle</span>
+</div>
+<div class="p-5 md:p-10">
+<h3 class="text-lg md:text-3xl font-black mb-3 md:mb-6 uppercase tracking-tight">Repetitive Task Automation</h3>
+<p class="text-sm md:text-xl font-bold text-on-surface-variant leading-snug">We remove manual work like follow-ups, data entry, scheduling, and routine processes.</p>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-[#FFF9E6] border-2 border-black neo-shadow flex flex-col service-card-pop">
+<div class="h-20 md:h-28 bg-[#B19CD9] border-b-2 border-black flex items-center px-4 md:px-8">
+<span class="material-symbols-outlined text-4xl md:text-6xl font-black pop-icon transition-transform">settings_input_component</span>
+</div>
+<div class="p-5 md:p-10">
+<h3 class="text-lg md:text-3xl font-black mb-3 md:mb-6 uppercase tracking-tight">Internal Workflow Automation</h3>
+<p class="text-sm md:text-xl font-bold text-on-surface-variant leading-snug">Connect your tools and automate your internal processes so everything runs smoothly without manual effort.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- BEFORE & AFTER TICKET -->
+<section class="py-10 md:py-8 md:py-16 px-4 md:px-8 border-b-2 border-black bg-[#FF8A65]">
+<div class="max-w-6xl mx-auto">
+<h2 class="text-2xl md:text-4xl md:text-[70px] font-black text-center mb-8 md:mb-16 uppercase tracking-tighter leading-none">Stop paying for manual labour.</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 bg-[#FFF9E6] border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
+    <div class="p-4 md:p-16 border-b-4 md:border-b-0 md:border-r-4 border-black flex flex-col justify-center">
+        <div class="inline-block bg-black text-white px-3 py-1.5 font-black uppercase text-xs md:text-xl mb-4 md:mb-8 self-start transform -rotate-2">Your Current Setup</div>
+        <ul class="space-y-3 md:space-y-6">
+            <li class="flex items-start gap-4">
+                <span class="material-symbols-outlined text-red-600 text-2xl md:text-3xl font-black">close</span>
+                <span class="text-xs md:text-xl font-bold uppercase leading-tight text-black">6+ manual steps per task</span>
+            </li>
+            <li class="flex items-start gap-4">
+                <span class="material-symbols-outlined text-red-600 text-2xl md:text-3xl font-black">close</span>
+                <span class="text-xs md:text-xl font-bold uppercase leading-tight text-black">Human error &amp; delayed responses</span>
+            </li>
+            <li class="flex items-start gap-4">
+                <span class="material-symbols-outlined text-red-600 text-2xl md:text-3xl font-black">close</span>
+                <span class="text-xs md:text-xl font-bold uppercase leading-tight text-black">Paying salaries for data entry</span>
+            </li>
+        </ul>
+    </div>
+    <div class="p-6 md:p-16 bg-[#38BDF8] flex flex-col justify-center relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 opacity-20 transform rotate-12">
+            <span class="material-symbols-outlined text-[200px] text-black">bolt</span>
+        </div>
+        <div class="inline-block bg-black text-[#38BDF8] px-4 py-2 font-black uppercase text-sm md:text-xl mb-4 md:mb-8 self-start transform rotate-2 relative z-10">Flowra's AI System</div>
+        <ul class="space-y-3 md:space-y-6 relative z-10">
+            <li class="flex items-start gap-4">
+                <span class="material-symbols-outlined text-black text-3xl font-black">check</span>
+                <span class="text-sm md:text-xl font-bold uppercase leading-tight text-black">1 unified automated flow</span>
+            </li>
+            <li class="flex items-start gap-4">
+                <span class="material-symbols-outlined text-black text-3xl font-black">check</span>
+                <span class="text-sm md:text-xl font-bold uppercase leading-tight text-black">Instant, zero-error execution</span>
+            </li>
+            <li class="flex items-start gap-4">
+                <span class="material-symbols-outlined text-black text-3xl font-black">check</span>
+                <span class="text-sm md:text-xl font-bold uppercase leading-tight text-black">100% automated scaling</span>
+            </li>
+        </ul>
+    </div>
+</div>
+</div>
+</section>
+<!-- How It Works Section -->
+<section class="py-10 md:py-8 md:py-16 px-4 md:px-8 border-b-2 border-black bg-[#FFF9E6]">
+<h2 class="text-2xl md:text-[56px] font-black text-center mb-8 md:mb-20 uppercase tracking-tighter">How we work</h2>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto">
+<div class="bg-[#FFF9E6] border-2 border-black p-4 md:p-10 neo-shadow flex flex-col gap-4 md:gap-6">
+<div class="text-2xl md:text-7xl font-black text-[#38BDF8]">STEP 1</div>
+<h3 class="text-sm md:text-2xl font-black uppercase">We understand your business</h3>
+<p class="text-[10px] md:text-xl font-bold uppercase leading-tight">We study your current workflow and identify what’s slowing you down.</p>
+</div>
+<div class="bg-[#FFF9E6] border-2 border-black p-5 md:p-10 neo-shadow flex flex-col gap-6">
+<div class="text-4xl md:text-7xl font-black text-[#B19CD9]">STEP 2</div>
+<h3 class="text-base md:text-2xl font-black uppercase">We build your system</h3>
+<p class="text-sm md:text-xl font-bold uppercase leading-tight">We create a custom AI solution tailored to your exact needs.</p>
+</div>
+<div class="bg-[#FFF9E6] border-2 border-black p-5 md:p-10 neo-shadow flex flex-col gap-6">
+<div class="text-4xl md:text-7xl font-black text-[#FF8A65]">STEP 3</div>
+<h3 class="text-base md:text-2xl font-black uppercase">We deploy &amp; support</h3>
+<p class="text-sm md:text-xl font-bold uppercase leading-tight">We set everything up and make sure it runs smoothly with ongoing support.</p>
+</div>
+</div>
+</section>
+<!-- Guarantee Section -->
+<section class="bg-[#38BDF8] py-16 md:py-12 px-4 md:px-8 border-b-2 border-black">
+<div class="max-w-7xl mx-auto">
+<h2 class="text-4xl md:text-[60px] font-black leading-[0.9] tracking-tighter text-black mb-8 md:mb-20 uppercase max-w-4xl">
+                We don’t just build and leave
+            </h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+<div class="bg-[#FFF9E6] border-2 border-black p-4 md:p-8 neo-shadow flex flex-col gap-2 md:gap-4">
+<span class="material-symbols-outlined text-3xl md:text-5xl font-black">check</span>
+<p class="text-sm md:text-xl font-black uppercase leading-tight">3–6 months free support</p>
+</div>
+<div class="bg-[#FFF9E6] border-2 border-black p-4 md:p-8 neo-shadow flex flex-col gap-2 md:gap-4">
+<span class="material-symbols-outlined text-3xl md:text-5xl font-black">check</span>
+<p class="text-sm md:text-xl font-black uppercase leading-tight">We fix issues if anything breaks</p>
+</div>
+<div class="bg-[#FFF9E6] border-2 border-black p-4 md:p-8 neo-shadow flex flex-col gap-2 md:gap-4">
+<span class="material-symbols-outlined text-3xl md:text-5xl font-black">check</span>
+<p class="text-sm md:text-xl font-black uppercase leading-tight">We help your team adapt</p>
+</div>
+<div class="bg-[#FFF9E6] border-2 border-black p-4 md:p-8 neo-shadow flex flex-col gap-2 md:gap-4">
+<span class="material-symbols-outlined text-3xl md:text-5xl font-black">check</span>
+<p class="text-sm md:text-xl font-black uppercase leading-tight">We stay until everything works properly</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- CTA Banner -->
+<section class="bg-[#B19CD9] py-16 md:py-12 px-4 md:px-8 flex flex-col items-center justify-center text-center border-b-2 border-black">
+<h2 class="text-4xl md:text-6xl md:text-5xl md:text-[60px] font-black uppercase tracking-tighter leading-none mb-6">
+            Let’s fix your workflow
+        </h2>
+<p class="text-base md:text-2xl font-black uppercase mb-6 md:mb-12 max-w-2xl">
+            Book a call and we’ll show you exactly what can be automated in your business.
+        </p>
+<button class="bg-black text-white px-4 md:px-8 py-4 md:px-16 md:py-8 text-lg md:text-3xl font-black uppercase tracking-tighter neo-shadow-hover neo-shadow-active transition-all" onclick="window.location.href='/pages/contact.html'">
+            Schedule a Call
+        </button>
+</section>
+<!-- Footer -->
+<footer class="bg-black text-white px-4 md:px-8 py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mt-0">
+<div class="lg:col-span-3 mb-12">
+<h2 class="text-2xl md:text-5xl lg:text-7xl font-black uppercase tracking-tighter text-white mb-4 md:mb-8">No fluff. Just systems that work.</h2>
+</div>
+<div class="lg:col-span-2">
+<div class="flex items-center gap-3 mb-8">
+<span class="material-symbols-outlined text-4xl md:text-6xl text-white">local_florist</span>
+<span class="text-4xl md:text-6xl font-black text-white tracking-tighter font-['Inter'] uppercase">FLOWRA</span>
+</div>
+<p class="font-['Inter'] font-bold uppercase text-sm md:text-xl text-white/80 max-w-md">NO NONSENSE. NO FLUFF. JUST SCALE.</p>
+</div>
+<div>
+<h4 class="text-xl font-black uppercase mb-8 text-[#B19CD9]">Company</h4>
+<ul class="space-y-4 font-['Inter'] font-bold uppercase">
+<li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/under-construction.html">Twitter</a></li>
+<li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/under-construction.html">LinkedIn</a></li>
+<li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/privacy.html">Privacy</a></li>
+</ul>
+</div>
+<div class="lg:col-span-3 pt-16 border-t border-white/20 flex flex-col md:flex-row justify-between items-center gap-8">
+<p class="font-['Inter'] font-bold uppercase text-sm">© 2024 FLOWRA. NO NONSENSE.</p>
+<div class="flex gap-8">
+<span class="material-symbols-outlined">eco</span>
+<span class="material-symbols-outlined">bolt</span>
+<span class="material-symbols-outlined">public</span>
+</div>
+</div>
+</footer>
+
+<!-- Neo-Brutalist Chatbot Inbox -->
+<div id="chatbot-widget" class="fixed bottom-8 right-8 z-[100] flex flex-col items-end pointer-events-none">
+    
+    <!-- Chat Window (hidden by default) -->
+    <div id="chat-window" class="neo-card flex flex-col w-[300px] sm:w-[350px] md:w-[380px] mb-6 transition-all duration-300 ease-out transform translate-y-4 opacity-0 pointer-events-auto border-4 border-black" style="display: none; box-shadow: 12px 12px 0px 0px rgba(0,0,0,1);">
+        <!-- Header -->
+        <div class="bg-[#38BDF8] border-b-4 border-black p-5 flex justify-between items-center cursor-pointer hover:bg-[#0ea573] transition-colors" onclick="toggleChat()">
+            <div class="flex items-center gap-3">
+                <span class="material-symbols-outlined text-black font-black text-3xl">support_agent</span>
+                <span class="font-black text-xl uppercase tracking-tighter text-black mt-1">Flowra Match</span>
+                <span class="relative flex h-3 w-3 ml-1 mb-1">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-black opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-3 w-3 bg-black"></span>
+                </span>
+            </div>
+            <span class="material-symbols-outlined text-black font-black hover:rotate-90 transition-transform duration-300 text-3xl">close</span>
+        </div>
+
+        <!-- Chat Body -->
+        <div id="chat-body" class="bg-[#FEF0E6] h-[300px] sm:h-[350px] md:h-[380px] p-6 overflow-y-auto flex flex-col gap-5" style="background-image: radial-gradient(#d2d5d5 2px, transparent 2px); background-size: 20px 20px;">
+            <!-- Mock Initial Message -->
+            <div class="chat-bubble bot shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] border-4 border-black bg-[#FFF9E6]">
+                <div class="font-black text-xs uppercase mb-1 text-black/50 tracking-widest">Flowra AI</div>
+                <div class="font-bold text-base leading-snug">Finding your match... How can we help you solve your manual work today?</div>
+            </div>
+        </div>
+
+        <!-- Chat Footer (Input) -->
+        <div class="bg-[#FF8A65] border-t-4 border-black p-4 flex gap-3 items-end">
+            <textarea id="chat-input" rows="1" placeholder="Type a message..." class="flex-1 border-4 border-black p-3 font-bold focus:outline-none focus:ring-0 text-base placeholder-black/40 resize-none overflow-hidden" onkeypress="handleChatEnter(event)" oninput="this.style.height = '';this.style.height = this.scrollHeight + 'px'"></textarea>
+            <button onclick="sendChatMessage()" class="bg-black text-white border-4 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] md:hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] md:hover:translate-y-[2px] transition-all font-black flex items-center justify-center group h-auto">
+                <span class="material-symbols-outlined group-md:hover:translate-x-1 group-hover:-translate-y-1 transition-transform">send</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Toggle Button -->
+    <div class="relative pointer-events-auto group">
+        <!-- Tooltip -->
+        <div class="hidden md:block absolute -top-14 right-0 bg-black text-white px-5 py-2 font-black uppercase text-sm border-2 border-black opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none transform -translate-y-2 group-md:hover:translate-y-0">
+            Let's automate it ⚡
+            <div class="absolute -bottom-2 right-8 w-4 h-4 bg-black transform rotate-45 border-r-2 border-b-2 border-black"></div>
+        </div>
+        <button id="chat-toggle" onclick="toggleChat()" class="bg-[#B19CD9] border-4 border-black w-20 h-20 rounded-full shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] md:hover:shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] md:hover:translate-y-[3px] transition-all flex items-center justify-center relative">
+            <span class="material-symbols-outlined text-4xl font-black text-black absolute transition-all duration-300" id="chat-icon-open">forum</span>
+            <span class="material-symbols-outlined text-4xl font-black text-black absolute transition-all duration-300 opacity-0 transform rotate-90 scale-50" id="chat-icon-close">close</span>
+            <!-- Notification dot -->
+            <span class="absolute top-0 right-0 w-6 h-6 bg-[#38BDF8] border-4 border-black rounded-full" id="chat-notif"></span>
+        </button>
+    </div>
+</div>
+
+<script>
+    let chatOpen = false;
+    
+    function toggleChat() {
+        chatOpen = !chatOpen;
+        const windowEl = document.getElementById('chat-window');
+        const iconOpen = document.getElementById('chat-icon-open');
+        const iconClose = document.getElementById('chat-icon-close');
+        const notif = document.getElementById('chat-notif');
+        
+        if(chatOpen) {
+            windowEl.style.display = 'flex';
+            // small timeout to allow display:flex to apply before transition
+            setTimeout(() => {
+                windowEl.classList.remove('translate-y-4', 'opacity-0');
+                windowEl.classList.add('translate-y-0', 'opacity-100');
+            }, 10);
+            
+            iconOpen.classList.add('opacity-0', 'rotate-[-90deg]', 'scale-50');
+            iconClose.classList.remove('opacity-0', 'rotate-90', 'scale-50');
+            if(notif) notif.style.display = 'none';
+        } else {
+            windowEl.classList.remove('translate-y-0', 'opacity-100');
+            windowEl.classList.add('translate-y-4', 'opacity-0');
+            
+            setTimeout(() => {
+                windowEl.style.display = 'none';
+            }, 300);
+            
+            iconOpen.classList.remove('opacity-0', 'rotate-[-90deg]', 'scale-50');
+            iconClose.classList.add('opacity-0', 'rotate-90', 'scale-50');
+        }
+    }
+
+    function handleChatEnter(e) {
+        if(e.key === 'Enter') sendChatMessage();
+    }
+
+    function sendChatMessage() {
+        const input = document.getElementById('chat-input');
+        const text = input.value.trim();
+        if(!text) return;
+        
+        const chatBody = document.getElementById('chat-body');
+        
+        // Add User Bubble
+        const userHtml = `
+            <div class="chat-bubble user shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] self-end bg-[#B19CD9] text-black border-4 border-black">
+                <div class="font-black text-xs uppercase mb-1 text-black/50 text-right tracking-widest">You</div>
+                <div class="font-bold text-base leading-snug">${text}</div>
+            </div>
+        `;
+        chatBody.insertAdjacentHTML('beforeend', userHtml);
+        input.value = '';
+        input.style.height = ''; // Reset textarea height
+        
+        // Scroll to bottom
+        chatBody.scrollTop = chatBody.scrollHeight;
+        
+        // Mock API Response pre-match loader
+        setTimeout(() => {
+            const typingHtml = `
+                <div id="bot-typing" class="chat-bubble bot shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] max-w-[60%] border-4 border-black bg-[#FFF9E6]">
+                    <div class="flex gap-2 py-2 px-1">
+                        <div class="w-3 h-3 bg-black rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                        <div class="w-3 h-3 bg-black rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                        <div class="w-3 h-3 bg-black rounded-full animate-bounce"></div>
+                    </div>
+                </div>
+            `;
+            chatBody.insertAdjacentHTML('beforeend', typingHtml);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            
+            setTimeout(() => {
+                const typingEl = document.getElementById('bot-typing');
+                if(typingEl) typingEl.remove();
+                const responseHtml = `
+                    <div class="chat-bubble bot shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#FFF9E6] text-black border-4 border-black">
+                        <div class="font-black text-xs uppercase mb-1 text-black/50 tracking-widest">Flowra AI</div>
+                        <div class="font-bold text-base leading-snug">We've received your request! We will connect this to the APIs as soon as they are ready.</div>
+                    </div>
+                `;
+                chatBody.insertAdjacentHTML('beforeend', responseHtml);
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }, 1000);
+        }, 500);
+    }
+</script>
+</body></html>

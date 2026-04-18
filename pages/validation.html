@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>FLOWRA | Customer Validation</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "surface-container-highest": "#dbdddd",
+                "on-secondary-container": "#5b4400",
+                "outline-variant": "#acadad",
+                "on-primary-container": "#575757",
+                "inverse-surface": "#0c0f0f",
+                "primary-dim": "#4f4f4f",
+                "on-tertiary-container": "#005a3c",
+                "tertiary": "#10B981",
+                "tertiary-container": "#69f6b8",
+                "primary-container": "#ebebeb",
+                "surface-container-high": "#e1e3e3",
+                "on-secondary": "#fff1da",
+                "on-primary-fixed": "#444444",
+                "on-error-container": "#510017",
+                "primary-fixed-dim": "#dddddd",
+                "tertiary-dim": "#005c3d",
+                "inverse-on-surface": "#9c9d9d",
+                "surface-dim": "#d2d5d5",
+                "surface-bright": "#f6f6f6",
+                "secondary-fixed-dim": "#f2bc2a",
+                "secondary": "#FFC837",
+                "surface-container-low": "#f0f1f1",
+                "error-dim": "#a70138",
+                "on-error": "#ffefef",
+                "primary-fixed": "#ebebeb",
+                "tertiary-fixed-dim": "#58e7ab",
+                "background": "#ffffff",
+                "on-secondary-fixed": "#443100",
+                "primary": "#000000",
+                "on-tertiary": "#c8ffe0",
+                "on-background": "#2d2f2f",
+                "secondary-fixed": "#ffca44",
+                "error-container": "#FFB7B2",
+                "on-primary-fixed-variant": "#616161",
+                "on-primary": "#f3f3f3",
+                "surface-container-lowest": "#ffffff",
+                "inverse-primary": "#ffffff",
+                "surface": "#ffffff",
+                "on-surface": "#000000",
+                "on-secondary-fixed-variant": "#674d00",
+                "tertiary-fixed": "#69f6b8",
+                "surface-variant": "#dbdddd",
+                "on-tertiary-fixed-variant": "#006544",
+                "on-tertiary-fixed": "#00452d",
+                "error": "#b41340",
+                "surface-tint": "#5b5b5b",
+                "outline": "#000000",
+                "surface-container": "#e7e8e8",
+                "on-surface-variant": "#5a5c5c",
+                "secondary-dim": "#654c00",
+                "secondary-container": "#ffca44"
+            },
+            "borderRadius": {
+                "none": "0px",
+                "DEFAULT": "0px",
+                "lg": "0px",
+                "xl": "0px",
+                "full": "9999px"
+            },
+            "fontFamily": {
+                "headline": ["Inter", "sans-serif"],
+                "body": ["Inter", "sans-serif"],
+                "label": ["Inter", "sans-serif"]
+            }
+          },
+        }
+      }
+    </script>
+<style>
+        /* DESKTOP ZOOM - only on screens wider than 768px */
+        @media (min-width: 768px) {
+            html {
+                zoom: 0.70;
+            }
+        }
+
+        /* ZOOM-OUT-FIX */
+        html {
+            overflow-x: hidden;
+        }
+        body {
+            overflow-x: hidden;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .kinetic-shadow {
+            box-shadow: 6px 6px 0px 0px rgba(0,0,0,1);
+        }
+        .kinetic-shadow-hover:hover {
+            box-shadow: 12px 12px 0px 0px rgba(0,0,0,1);
+            transform: translateY(-12px);
+        }
+        .kinetic-shadow-white {
+            box-shadow: 6px 6px 0px 0px rgba(255,255,255,1);
+        }
+    
+        /* DISABLE HOVER ANIMATIONS ON MOBILE (touch devices) */
+        @media (max-width: 767px) {
+            .service-card-pop:hover,
+            .neo-shadow-hover:hover,
+            [class*="hover\:translate"],
+            [class*="hover\:shadow"] {
+                transform: none !important;
+                box-shadow: none !important;
+            }
+            .neo-shadow {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+            }
+            .neo-shadow-hover:hover {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+                transform: none !important;
+            }
+            .neo-shadow-active:active {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+                transform: none !important;
+            }
+            .service-card-pop:hover {
+                transform: none !important;
+                box-shadow: 4px 4px 0px 0px rgba(0,0,0,1) !important;
+            }
+        }
+    </style>
+</head>
+<body class="text-on-surface">
+<nav class="bg-[#FFF9E6] border-b-2 border-black w-full px-4 md:px-8 py-4 sticky top-0 z-50">
+    <div class="max-w-[1400px] mx-auto grid grid-cols-2 md:grid-cols-3 items-center">
+        <!-- Left: Logo -->
+        <div class="flex justify-start items-center gap-2 cursor-pointer" onclick="window.location.href='/'">
+            <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">local_florist</span>
+            <span class="text-2xl md:text-3xl font-black text-black tracking-tighter uppercase font-['Inter']">FLOWRA</span>
+        </div>
+
+        <!-- Center: Symmetrical Navigation (Desktop Only) -->
+        <div class="hidden md:flex justify-center items-center gap-10">
+            <a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#B19CD9] hover:text-black transition-all px-4 py-1" href="/pages/validation.html">Validation</a>
+            <a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#B19CD9] hover:text-black transition-all px-4 py-1" href="/pages/resources.html">Resources</a>
+        </div>
+
+        <!-- Right: Actions (Desktop Only) -->
+        <div class="hidden md:flex justify-end items-center gap-4">
+            <button class="font-['Inter'] font-black uppercase tracking-tighter bg-[#38BDF8] text-black border-2 border-black px-4 py-2 neo-shadow hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none transition-all text-sm" onclick="window.location.href='/pages/case-study.html'">Case Study</button>
+            <button class="bg-[#B19CD9] text-black border-2 border-black px-6 py-2 font-black uppercase tracking-tighter neo-shadow hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none transition-all text-sm" onclick="window.location.href='/pages/contact.html'">Contact Us</button>
+        </div>
+
+        <!-- Mobile Toggle (Right aligned in 2nd col on mobile) -->
+        <div class="md:hidden flex justify-end">
+            <button class="border-2 border-black p-2 bg-[#B19CD9]" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" aria-label="Menu">
+                <span class="material-symbols-outlined text-2xl text-black">menu</span>
+            </button>
+        </div>
+    </div>
+</nav>
+<!-- Mobile Dropdown Menu -->
+<div id="mobile-menu" class="hidden md:hidden bg-[#FFF9E6] border-b-2 border-black px-4 py-3 flex flex-col gap-2 sticky top-[60px] z-[60]">
+    <a class="font-['Inter'] font-black uppercase tracking-tighter text-sm text-black/70 py-2 border-b border-black/20" href="/pages/validation.html">Validation</a>
+    <a class="font-['Inter'] font-black uppercase tracking-tighter text-sm text-black/70 py-2 border-b border-black/20" href="/pages/resources.html">Resources</a>
+    <a class="font-['Inter'] font-black uppercase tracking-tighter text-sm bg-[#38BDF8] text-black py-2 border-b border-black/20 px-2" href="/pages/case-study.html">Case Study</a>
+    <a class="font-['Inter'] font-black uppercase tracking-tighter text-xs bg-[#B19CD9] text-black border-2 border-black p-2 text-center" href="/pages/contact.html">Contact Us</a>
+</div>
+<!-- TopNavBar -->
+<!-- Hero Section -->
+<section class="bg-black py-6 md:py-16 px-4 md:px-8 md:px-16 flex flex-col md:flex-row items-center justify-between gap-4 md:gap-8 border-b-2 border-black overflow-hidden scale-x-[-1] md:scale-x-1">
+<div class="max-w-4xl z-10 scale-x-[-1] md:scale-x-1">
+<h1 class="text-2xl md:text-[56px] md:text-[60px] font-black text-white leading-[0.9] tracking-tighter uppercase mb-4 md:mb-6">
+                Don't trust us.<br/>Trust the math.
+            </h1>
+<p class="text-secondary text-lg md:text-4xl font-black uppercase tracking-tight">
+                Real companies eliminating manual work.
+            </p>
+</div>
+<div class="relative w-full md:w-1/2 flex justify-center scale-x-[-1] md:scale-x-1">
+<div class="w-full max-w-lg aspect-square bg-transparent relative">
+<img class="w-full h-auto max-h-[250px] md:max-h-none object-contain filter drop-shadow-[20px_20px_0px_#FFC837]" alt="Creative Neo-Brutalist illustration of a calculator exploding with data and receipts" src="../assets/math_hero.png"/>
+</div>
+</div>
+</section>
+<!-- Case Study Cards -->
+<section class="py-6 md:py-16 px-4 md:px-8 md:px-16 bg-[#FFF9E6]">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+<!-- Card 1 (Mustard) -->
+<div class="bg-[#FFF9E6] border-2 border-black kinetic-shadow kinetic-shadow-hover transition-all flex flex-col">
+<div class="bg-secondary p-4 md:p-8 border-b-2 border-black">
+<span class="material-symbols-outlined text-3xl md:text-6xl font-black">bolt</span>
+</div>
+<div class="p-4 md:p-8 flex-grow flex flex-col justify-between">
+<div>
+<h2 class="text-2xl md:text-6xl font-black mb-4 tracking-tighter uppercase leading-none">75% Faster Support</h2>
+<p class="text-sm md:text-xl font-bold uppercase mb-4 md:mb-4 md:mb-8">"We stopped typing and started solving. FLOWRA turned our ticket queue into a ghost town."</p>
+</div>
+<div class="border-t-2 border-black pt-4">
+<span class="font-black uppercase tracking-tighter">— LOGIC_SHIFT INC.</span>
+</div>
+</div>
+</div>
+<!-- Card 2 (Mint) -->
+<div class="bg-[#FFF9E6] border-2 border-black kinetic-shadow kinetic-shadow-hover transition-all flex flex-col">
+<div class="bg-tertiary p-4 md:p-8 border-b-2 border-black">
+<span class="material-symbols-outlined text-3xl md:text-6xl font-black text-white">dataset</span>
+</div>
+<div class="p-4 md:p-8 flex-grow flex flex-col justify-between">
+<div>
+<h2 class="text-2xl md:text-6xl font-black mb-4 tracking-tighter uppercase leading-none text-tertiary">0 Manual Entries</h2>
+<p class="text-sm md:text-xl font-bold uppercase mb-4 md:mb-4 md:mb-8">"Human error is a choice. We chose to delete it entirely using the Kinetic Engine."</p>
+</div>
+<div class="border-t-2 border-black pt-4">
+<span class="font-black uppercase tracking-tighter">— NEURAL_CORE</span>
+</div>
+</div>
+</div>
+<!-- Card 3 (Pink) -->
+<div class="bg-[#FFF9E6] border-2 border-black kinetic-shadow kinetic-shadow-hover transition-all flex flex-col">
+<div class="bg-error-container p-4 md:p-8 border-b-2 border-black">
+<span class="material-symbols-outlined text-3xl md:text-6xl font-black">flowsheet</span>
+</div>
+<div class="p-4 md:p-8 flex-grow flex flex-col justify-between">
+<div>
+<h2 class="text-2xl md:text-6xl font-black mb-4 tracking-tighter uppercase leading-none">400% Growth</h2>
+<p class="text-sm md:text-xl font-bold uppercase mb-4 md:mb-4 md:mb-8">"Our infrastructure finally caught up with our ambition. No more bottlenecks, just flow."</p>
+</div>
+<div class="border-t-2 border-black pt-4">
+<span class="font-black uppercase tracking-tighter">— VELOCITY LABS</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Impact Matrix -->
+<section class="bg-tertiary py-8 md:py-12 px-4 md:px-8 md:px-16 border-y-2 border-black">
+<h2 class="text-2xl md:text-6xl font-black uppercase text-black tracking-tighter mb-8 md:mb-16 leading-none">The Raw Data</h2>
+<div class="overflow-x-auto">
+<table class="w-full border-4 border-black bg-[#FFF9E6] kinetic-shadow">
+<thead>
+<tr class="bg-black text-white">
+<th class="border-4 border-black p-3 md:p-6 text-left text-sm md:text-2xl font-black uppercase tracking-widest">Company</th>
+<th class="border-4 border-black p-3 md:p-6 text-left text-sm md:text-2xl font-black uppercase tracking-widest">Before FLOWRA</th>
+<th class="border-4 border-black p-3 md:p-6 text-left text-sm md:text-2xl font-black uppercase tracking-widest">After FLOWRA</th>
+</tr>
+</thead>
+<tbody class="text-[10px] md:text-xl font-bold uppercase">
+<tr>
+<td class="border-4 border-black p-3 md:p-8 bg-surface-container-low">Global_Ops</td>
+<td class="border-4 border-black p-3 md:p-8">14 Days Latency</td>
+<td class="border-4 border-black p-3 md:p-8 bg-secondary">Real-time Sync</td>
+</tr>
+<tr>
+<td class="border-4 border-black p-3 md:p-8 bg-surface-container-low">FastTrack</td>
+<td class="border-4 border-black p-3 md:p-8">40 Admins</td>
+<td class="border-4 border-black p-3 md:p-8 bg-secondary">2 Automated Flows</td>
+</tr>
+<tr>
+<td class="border-4 border-black p-3 md:p-8 bg-surface-container-low">StreamLine</td>
+<td class="border-4 border-black p-3 md:p-8">85% Error Rate</td>
+<td class="border-4 border-black p-3 md:p-8 bg-secondary">&lt;0.01% Errors</td>
+</tr>
+<tr>
+<td class="border-4 border-black p-3 md:p-8 bg-surface-container-low">Apex_Scale</td>
+<td class="border-4 border-black p-3 md:p-8">$1.2M Waste</td>
+<td class="border-4 border-black p-3 md:p-8 bg-secondary">$94K Efficiency</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- Heavy CTA Banner -->
+<section class="bg-secondary py-12 md:py-12 px-4 md:px-8 md:px-16 flex flex-col items-center text-center">
+<h2 class="text-2xl md:text-6xl md:text-5xl md:text-[60px] font-black uppercase text-black tracking-tighter leading-none mb-12 max-w-5xl">
+            Ready to be our next metric?
+        </h2>
+<button class="bg-black text-white px-6 py-4 md:px-12 md:py-8 text-xl md:text-3xl font-black uppercase tracking-tighter kinetic-shadow-white md:hover:translate-x-[6px] md:hover:translate-y-[6px] hover:shadow-none transition-all" onclick="window.location.href='/pages/contact.html'">
+            Build My System
+        </button>
+</section>
+<!-- Footer -->
+<footer class="bg-black text-white px-4 md:px-8 py-8 md:py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mt-0">
+<div class="lg:col-span-3 mb-4 md:mb-12">
+<h2 class="text-2xl md:text-5xl lg:text-7xl font-black uppercase tracking-tighter text-white mb-4 md:mb-4 md:mb-8">No fluff. Just systems that work.</h2>
+</div>
+<div class="lg:col-span-2">
+<div class="flex items-center gap-3 mb-4 md:mb-8">
+<span class="material-symbols-outlined text-4xl md:text-6xl text-white">local_florist</span>
+<span class="text-4xl md:text-6xl font-black text-white tracking-tighter font-['Inter'] uppercase">FLOWRA</span>
+</div>
+<p class="font-['Inter'] font-bold uppercase text-sm md:text-xl text-white/80 max-w-md">NO NONSENSE. NO FLUFF. JUST SCALE.</p>
+</div>
+<div>
+<h4 class="text-xl font-black uppercase mb-8 text-[#B19CD9]">Company</h4>
+<ul class="space-y-4 font-['Inter'] font-bold uppercase">
+<li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/under-construction.html">Twitter</a></li>
+<li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/under-construction.html">LinkedIn</a></li>
+<li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/privacy.html">Privacy</a></li>
+</ul>
+</div>
+<div class="lg:col-span-3 pt-8 md:pt-16 border-t border-white/20 flex flex-col md:flex-row justify-between items-center gap-8">
+<p class="font-['Inter'] font-bold uppercase text-sm">© 2024 FLOWRA. NO NONSENSE.</p>
+<div class="flex gap-8">
+<span class="material-symbols-outlined">eco</span>
+<span class="material-symbols-outlined">bolt</span>
+<span class="material-symbols-outlined">public</span>
+</div>
+</div>
+</footer>
+</body></html>

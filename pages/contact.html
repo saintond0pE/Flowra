@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Contact Command | FLOWRA System Kingdom</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#5b5b5b",
+                        "secondary": "#FFC837",
+                        "tertiary": "#10B981",
+                        "error-container": "#FFB7B2",
+                        "background": "#f6f6f6",
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        /* DESKTOP ZOOM - only on screens wider than 768px */
+        @media (min-width: 768px) {
+            html {
+                zoom: 0.70;
+            }
+        }
+
+        /* ZOOM-OUT-FIX */
+        html {
+            overflow-x: hidden;
+        }
+        body {
+            overflow-x: hidden;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: #f6f6f6; }
+        .neo-shadow { box-shadow: 8px 8px 0px 0px rgba(0,0,0,1); }
+        .neo-shadow-hover:hover { box-shadow: 4px 4px 0px 0px rgba(0,0,0,1); transform: translate(4px, 4px); }
+        .neo-shadow-active:active { box-shadow: 0px 0px 0px 0px rgba(0,0,0,1); transform: translate(8px, 8px); }
+        
+        .system-bg {
+            background-image: url('../assets/images/system_kingdom_contact_bg.png');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border: 4px solid black;
+        }
+
+        .toggle-btn.active {
+            background-color: #10B981;
+            color: black;
+            box-shadow: inset 4px 4px 0px 0px rgba(0,0,0,0.2);
+        }
+        @keyframes spring-in {
+            0% { transform: scale(0.6); opacity: 0; }
+            70% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes pulse-success {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 30px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        .animate-spring { animation: spring-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .animate-pulse-glow { animation: pulse-success 2s infinite; }
+    
+        /* DISABLE HOVER ANIMATIONS ON MOBILE (touch devices) */
+        @media (max-width: 767px) {
+            .service-card-pop:hover,
+            .neo-shadow-hover:hover,
+            [class*="hover\:translate"],
+            [class*="hover\:shadow"] {
+                transform: none !important;
+                box-shadow: none !important;
+            }
+            .neo-shadow {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+            }
+            .neo-shadow-hover:hover {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+                transform: none !important;
+            }
+            .neo-shadow-active:active {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+                transform: none !important;
+            }
+            .service-card-pop:hover {
+                transform: none !important;
+                box-shadow: 4px 4px 0px 0px rgba(0,0,0,1) !important;
+            }
+        }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+    <nav class="bg-[#FFF9E6] border-b-2 border-black flex items-center w-full px-4 md:px-8 py-4 max-w-full sticky top-0 z-50">
+<!-- Left: Logo -->
+<div class="flex-1 flex items-center gap-2 cursor-pointer" onclick="window.location.href='/'">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">local_florist</span>
+<span class="text-2xl md:text-4xl font-black text-black tracking-tighter uppercase font-['Inter']">FLOWRA</span>
+</div>
+
+<!-- Center: Symmetrical Navigation -->
+<div class="hidden md:flex flex-1 justify-center items-center gap-8">
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#B19CD9] hover:text-black transition-all duration-100 px-4 py-1" href="/pages/validation.html">Validation</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#B19CD9] hover:text-black transition-all duration-100 px-4 py-1" href="/pages/resources.html">Resources</a>
+</div>
+
+<!-- Right: Actions -->
+<div class="hidden md:flex flex-1 justify-end items-center gap-4">
+<button class="font-['Inter'] font-black uppercase tracking-tighter bg-[#38BDF8] text-black border-2 border-black px-4 py-2 neo-shadow md:hover:translate-x-[4px] md:hover:translate-y-[4px] md:hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all text-sm" onclick="window.location.href='/pages/case-study.html'">Case Study</button>
+<button class="bg-[#B19CD9] text-black border-2 border-black px-6 py-2 font-black uppercase tracking-tighter neo-shadow md:hover:translate-x-[4px] md:hover:translate-y-[4px] md:hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all text-sm" onclick="window.location.href='/pages/contact.html'">
+        Contact Us
+    </button>
+</div>
+
+<!-- Mobile Toggle -->
+<button class="md:hidden ml-auto border-2 border-black p-2 bg-[#B19CD9]" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" aria-label="Menu">
+<span class="material-symbols-outlined text-2xl text-black">menu</span>
+</button>
+</nav>
+
+    <section class="system-bg min-h-screen py-4 md:py-16 px-3 md:px-6 flex flex-col items-center justify-center relative">
+        <div class="absolute inset-0 bg-black/10 pointer-events-none"></div>
+        
+        <div class="glass-panel neo-shadow w-full max-w-3xl p-4 md:p-12 relative z-10">
+            <div class="mb-4 md:mb-12 text-center">
+                <h1 class="text-2xl md:text-7xl font-black uppercase tracking-tighter mb-2 md:mb-4 leading-none strike">System Entry</h1>
+                <p class="text-xs md:text-xl font-bold uppercase text-black/60 tracking-widest">Protocol: Direct Communication</p>
+            </div>
+
+            <!-- Subject Toggle -->
+            <div class="grid grid-cols-2 gap-4 mb-4 md:mb-12">
+                <button id="btn-query" onclick="setMode('query')" class="toggle-btn active p-3 md:p-6 border-2 md:border-4 border-black text-sm md:text-xl font-black uppercase tracking-tighter transition-all">
+                    Query or Booking
+                </button>
+                <button id="btn-issue" onclick="setMode('issue')" class="toggle-btn p-3 md:p-6 border-2 md:border-4 border-black text-sm md:text-xl font-black uppercase tracking-tighter transition-all">
+                    Issue Discussion
+                </button>
+            </div>
+
+            <form id="contact-form" class="space-y-4 md:space-y-8" onsubmit="return validateForm(event)">
+                <div class="p-2 md:p-4 bg-black text-[#B19CD9] border-2 border-black font-black uppercase text-[10px] md:text-sm tracking-widest text-center">
+                    Note: At least one contact method (Email or Number) is COMPULSORY to send request.
+                </div>
+
+                <!-- Shared Fields -->
+                <div class="space-y-3 md:space-y-6">
+                    <div class="mb-4">
+                        <label class="block text-sm font-black uppercase tracking-widest mb-2 text-black">Full Name</label>
+                        <input id="name-field" name="full_name" type="text" placeholder="John Doe" class="w-full p-3 md:p-4 border-2 md:border-4 border-black font-bold text-base md:text-xl focus:outline-none focus:bg-[#B19CD9]/10 text-black">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-black uppercase tracking-widest mb-2">Primary Email</label>
+                        <input id="email-field" type="email" placeholder="admin@system.io" class="w-full p-3 md:p-4 border-2 md:border-4 border-black font-bold text-base md:text-xl focus:outline-none focus:bg-[#B19CD9]/10">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-black uppercase tracking-widest mb-2">Mobile / Region (Numeric Only)</label>
+                        <div class="flex border-2 md:border-4 border-black items-stretch">
+                            <select id="region-field" class="bg-black text-white px-3 py-3 md:px-6 md:py-4 font-black text-sm md:text-base border-r-4 border-black focus:outline-none appearance-none cursor-pointer">
+                                <option>US</option>
+                                <option>UK</option>
+                                <option>CA</option>
+                                <option>AU</option>
+                                <option>IN</option>
+                                <option>DE</option>
+                                <option>FR</option>
+                                <option>AE</option>
+                                <option>SG</option>
+                                <option>JP</option>
+                                <option>OTHER</option>
+                            </select>
+                            <input id="mobile-field" type="tel" oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="NUMBER ONLY" class="flex-1 p-3 md:p-4 font-bold text-base md:text-xl focus:outline-none focus:bg-[#B19CD9]/10">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conditional Inbox -->
+                <div id="inbox-section" class="hidden animate-in fade-in slide-in-from-top-4 duration-300">
+                    <label class="block text-sm font-black uppercase tracking-widest mb-2">System Inbox (Max 500 characters)</label>
+                    <textarea id="message-field" rows="4" maxlength="500" placeholder="Describe the issue in detail..." class="w-full p-3 md:p-4 border-2 md:border-4 border-black font-bold text-base md:text-xl focus:outline-none focus:bg-[#B19CD9]/10 resize-none"></textarea>
+                </div>
+
+                <div id="error-message" class="hidden p-4 bg-red-600 text-white font-black uppercase text-sm text-center border-4 border-black">
+                    ERROR: CONNECTION FAILED. At least one contact method is required.
+                </div>
+
+                <button type="submit" class="w-full bg-black text-white p-4 md:p-8 text-base md:text-3xl font-black uppercase tracking-wider md:tracking-[0.2em] neo-shadow md:hover:translate-x-1 md:hover:translate-y-1 hover:shadow-none transition-all active:bg-[#38BDF8] active:text-black">
+                    Execute Signal
+                </button>
+            </form>
+        </div>
+
+        <div class="mt-6 md:mt-16 text-center max-w-xl">
+            <p class="text-sm font-black uppercase text-white bg-black p-2 inline-block shadow-lg">Warning: All transmissions are logged by Central Command.</p>
+        </div>
+    </section>
+
+    <!-- Success Modal -->
+    <div id="success-popup" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-md">
+        <div class="glass-panel bg-[#FFF9E6] p-6 md:p-12 max-w-xl w-full text-center neo-shadow animate-spring">
+            <div class="w-24 h-24 bg-[#38BDF8] rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse-glow border-4 border-black">
+                <span class="material-symbols-outlined text-5xl text-black font-black">check_circle</span>
+            </div>
+            <h2 class="text-xl md:text-5xl font-black uppercase tracking-tighter mb-2 md:mb-4">Transmission Success</h2>
+            <p class="text-base md:text-2xl font-black uppercase text-black/60 mb-4 md:mb-8">We'll be right back with your request.</p>
+            <div class="h-4 bg-black/10 border-2 border-black w-full overflow-hidden">
+                <div class="h-full bg-[#38BDF8] transition-all duration-[3000ms] ease-linear w-0" id="progress-bar"></div>
+            </div>
+            <p class="mt-4 text-sm font-black uppercase tracking-widest text-[#38BDF8]">Central Command Synced</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-black text-white px-4 md:px-8 py-8 md:py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mt-0">
+        <div class="lg:col-span-3 mb-4 md:mb-12">
+            <h2 class="text-2xl md:text-5xl lg:text-7xl font-black uppercase tracking-tighter text-white mb-4 md:mb-4 md:mb-8">No fluff. Just systems that work.</h2>
+        </div>
+        <div class="lg:col-span-2">
+            <div class="flex items-center gap-3 mb-4 md:mb-8">
+                <span class="material-symbols-outlined text-4xl md:text-6xl text-white">local_florist</span>
+                <span class="text-4xl md:text-6xl font-black text-white tracking-tighter font-['Inter'] uppercase">FLOWRA</span>
+            </div>
+            <p class="font-['Inter'] font-bold uppercase text-sm md:text-xl text-white/80 max-w-md">NO NONSENSE. NO FLUFF. JUST SCALE.</p>
+        </div>
+        <div>
+            <h4 class="text-xl font-black uppercase mb-8 text-[#B19CD9]">Company</h4>
+            <ul class="space-y-4 font-['Inter'] font-bold uppercase">
+                <li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/under-construction.html">Twitter</a></li>
+                <li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/under-construction.html">LinkedIn</a></li>
+                <li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/privacy.html">Privacy</a></li>
+            </ul>
+        </div>
+        <div class="lg:col-span-3 pt-8 md:pt-16 border-t border-white/20 flex flex-col md:flex-row justify-between items-center gap-8">
+            <p class="font-['Inter'] font-bold uppercase text-sm">© 2024 FLOWRA. NO NONSENSE.</p>
+            <div class="flex gap-8">
+                <span class="material-symbols-outlined">eco</span>
+                <span class="material-symbols-outlined">bolt</span>
+                <span class="material-symbols-outlined">public</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = "https://zdaylulmyejoswxoqedi.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_7if5Jz2oEMWY9W9ofy0kQw_HQjCJIae";
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        function setMode(mode) {
+            const queryBtn = document.getElementById('btn-query');
+            const issueBtn = document.getElementById('btn-issue');
+            const inboxSection = document.getElementById('inbox-section');
+
+            if (mode === 'query') {
+                queryBtn.classList.add('active');
+                issueBtn.classList.remove('active');
+                inboxSection.classList.add('hidden');
+            } else {
+                issueBtn.classList.add('active');
+                queryBtn.classList.remove('active');
+                inboxSection.classList.remove('hidden');
+            }
+        }
+
+        async function validateForm(event) {
+            event.preventDefault();
+            const name = document.getElementById('name-field').value.trim();
+            const email = document.getElementById('email-field').value.trim();
+            const mobile = document.getElementById('mobile-field').value.trim();
+            const message = document.getElementById('message-field').value.trim();
+            const errorMsg = document.getElementById('error-message');
+            const successPopup = document.getElementById('success-popup');
+            const progressBar = document.getElementById('progress-bar');
+
+            if (!email && !mobile) {
+                errorMsg.classList.remove('hidden');
+                return false;
+            }
+            
+            errorMsg.classList.add('hidden');
+            
+            try {
+                // Insert into Supabase leads table
+                const { error } = await sb.from('leads').insert([
+                    { 
+                        name: name || 'Anonymous', 
+                        email: email || '', 
+                        mobile: mobile || '', 
+                        message: message || (document.getElementById('inbox-section').classList.contains('hidden') ? 'Query/Booking' : 'Issue Discussion'),
+                        status: 'new'
+                    }
+                ]);
+                
+                if (error) throw error;
+
+                // SHOW THE POPUP
+                successPopup.classList.remove('hidden');
+                
+                // Start the bar animation
+                setTimeout(() => {
+                    progressBar.style.width = '100%';
+                }, 50);
+
+                // Redirect after 3s
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 3050);
+            } catch (err) {
+                console.error('Submission error:', err);
+                errorMsg.innerText = "ERROR: TABLE CONNECTION FAILED.";
+                errorMsg.classList.remove('hidden');
+            }
+
+            return false;
+        }
+    </script>
+</body>
+</html>

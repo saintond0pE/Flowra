@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Everything We Offer | FLOWRA</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#5b5b5b",
+                        "secondary": "#FFC837",
+                        "tertiary": "#10B981",
+                        "error-container": "#FFB7B2",
+                        "background": "#f6f6f6",
+                    },
+                    keyframes: {
+                        'marquee-arrow': {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(100%)' },
+                        }
+                    },
+                    animation: {
+                        'arrow-flow': 'marquee-arrow 1s linear infinite',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* DESKTOP ZOOM - only on screens wider than 768px */
+        @media (min-width: 768px) {
+            html {
+                zoom: 0.70;
+            }
+        }
+
+        /* ZOOM-OUT-FIX */
+        html {
+            overflow-x: hidden;
+        }
+        body {
+            overflow-x: hidden;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; display: inline-block; vertical-align: middle; }
+        body { font-family: 'Inter', sans-serif; background-color: #FFF9E6; }
+        .neo-shadow { box-shadow: 8px 8px 0px 0px rgba(0,0,0,1); }
+        .neo-shadow-hover:hover { box-shadow: 4px 4px 0px 0px rgba(0,0,0,1); transform: translate(4px, 4px); }
+        
+        @keyframes arrow-flow {
+            0% { transform: translateX(-30px); }
+            100% { transform: translateX(70px); }
+        }
+        
+        .pipeline-arrow-container { position: relative; width: 60px; height: 16px; overflow: hidden; border: 4px solid black; background: white; }
+        .pipeline-arrow { position: absolute; left: 0; top: 0; width: 30px; height: 100%; background-color: #10B981; animation: arrow-flow 1s linear infinite; }
+    
+        /* DISABLE HOVER ANIMATIONS ON MOBILE (touch devices) */
+        @media (max-width: 767px) {
+            .service-card-pop:hover,
+            .neo-shadow-hover:hover,
+            [class*="hover\:translate"],
+            [class*="hover\:shadow"] {
+                transform: none !important;
+                box-shadow: none !important;
+            }
+            .neo-shadow {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+            }
+            .neo-shadow-hover:hover {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+                transform: none !important;
+            }
+            .neo-shadow-active:active {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+                transform: none !important;
+            }
+            .service-card-pop:hover {
+                transform: none !important;
+                box-shadow: 4px 4px 0px 0px rgba(0,0,0,1) !important;
+            }
+        }
+    </style>
+</head>
+<body class="text-black overflow-x-hidden"><nav class="bg-[#FFF9E6] border-b-2 border-black flex items-center w-full px-4 md:px-8 py-4 max-w-full sticky top-0 z-50">
+<!-- Left: Logo -->
+<div class="flex-1 flex items-center gap-2 cursor-pointer" onclick="window.location.href='/'">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">local_florist</span>
+<span class="text-2xl md:text-4xl font-black text-black tracking-tighter uppercase font-['Inter']">FLOWRA</span>
+</div>
+
+<!-- Center: Symmetrical Navigation -->
+<div class="hidden md:flex flex-1 justify-center items-center gap-8">
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#B19CD9] hover:text-black transition-all duration-100 px-4 py-1" href="/pages/validation.html">Validation</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#B19CD9] hover:text-black transition-all duration-100 px-4 py-1" href="/pages/resources.html">Resources</a>
+</div>
+
+<!-- Right: Actions -->
+<div class="hidden md:flex flex-1 justify-end items-center gap-4">
+<button class="font-['Inter'] font-black uppercase tracking-tighter bg-[#38BDF8] text-black border-2 border-black px-4 py-2 neo-shadow md:hover:translate-x-[4px] md:hover:translate-y-[4px] md:hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all text-sm" onclick="window.location.href='/pages/case-study.html'">Case Study</button>
+<button class="bg-[#B19CD9] text-black border-2 border-black px-6 py-2 font-black uppercase tracking-tighter neo-shadow md:hover:translate-x-[4px] md:hover:translate-y-[4px] md:hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all text-sm" onclick="window.location.href='/pages/contact.html'">
+        Contact Us
+    </button>
+</div>
+
+<!-- Mobile Toggle -->
+<button class="md:hidden ml-auto border-2 border-black p-2 bg-[#B19CD9]" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" aria-label="Menu">
+<span class="material-symbols-outlined text-2xl text-black">menu</span>
+</button>
+</nav>
+<section class="py-16 md:py-12 px-4 md:px-8 border-b-4 border-black bg-[#B19CD9]">
+<div class="max-w-7xl mx-auto flex flex-col items-center">
+<h1 class="text-[60px] md:text-[56px] font-black uppercase tracking-tighter leading-none text-center">AI System Pipeline</h1>
+<p class="text-2xl font-black uppercase mt-6 tracking-tighter text-black/70">One connected system that runs your business automatically.</p>
+</div>
+</section>
+<section class="py-16 md:py-12 px-4 md:px-4 md:px-8 bg-[#FFF9E6] border-b-4 border-black">
+<!-- HORIZONTAL PIPELINE -->
+<div class="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-4 w-full max-w-[1600px] mx-auto">
+<!-- Box 1 -->
+<div class="min-w-[240px] flex-1 bg-[#FFF9E6] border-4 border-black p-6 neo-shadow flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-7xl text-black mb-4">chat</span>
+<h3 class="text-3xl font-black uppercase mb-2">1. Input</h3>
+<p class="font-bold text-sm leading-tight text-black/70">Chatbot • Calls • WhatsApp</p>
+<div class="mt-4 border-t-4 border-black pt-4 w-full">
+<p class="font-black text-sm uppercase">Captures all data</p>
+</div>
+</div>
+<!-- Arrow -->
+<div class="hidden lg:flex items-center -mx-2 z-10">
+<div class="pipeline-arrow-container"><div class="pipeline-arrow"></div></div>
+<span class="material-symbols-outlined text-5xl font-black -ml-4 stroke-black">arrow_forward_ios</span>
+</div>
+<!-- Mobile arrow -->
+<div class="lg:hidden my-2 flex items-center transform rotate-90 z-10">
+<div class="pipeline-arrow-container"><div class="pipeline-arrow"></div></div>
+<span class="material-symbols-outlined text-5xl font-black -ml-4 stroke-black">arrow_forward_ios</span>
+</div>
+<!-- Box 2 -->
+<div class="min-w-[240px] flex-1 bg-[#38BDF8] border-4 border-black p-6 neo-shadow flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-7xl text-black mb-4">psychology</span>
+<h3 class="text-3xl font-black uppercase mb-2">2. AI Brain</h3>
+<p class="font-bold text-sm leading-tight text-black/80">Scheduling • Logic • Responses</p>
+<div class="mt-4 border-t-4 border-black pt-4 w-full">
+<p class="font-black text-sm uppercase">Decides what to do</p>
+</div>
+</div>
+<!-- Arrow -->
+<div class="hidden lg:flex items-center -mx-2 z-10">
+<div class="pipeline-arrow-container"><div class="pipeline-arrow"></div></div>
+<span class="material-symbols-outlined text-5xl font-black -ml-4 stroke-black">arrow_forward_ios</span>
+</div>
+<!-- Mobile arrow -->
+<div class="lg:hidden my-2 flex items-center transform rotate-90 z-10">
+<div class="pipeline-arrow-container"><div class="pipeline-arrow"></div></div>
+<span class="material-symbols-outlined text-5xl font-black -ml-4 stroke-black">arrow_forward_ios</span>
+</div>
+<!-- Box 3 -->
+<div class="min-w-[240px] flex-1 bg-[#FFF9E6] border-4 border-black p-6 neo-shadow flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-7xl text-black mb-4">bolt</span>
+<h3 class="text-3xl font-black uppercase mb-2">3. Automation</h3>
+<p class="font-bold text-sm leading-tight text-black/70">Sends messages • Creates tasks</p>
+<div class="mt-4 border-t-4 border-black pt-4 w-full">
+<p class="font-black text-sm uppercase">Runs workflows</p>
+</div>
+</div>
+<!-- Arrow -->
+<div class="hidden lg:flex items-center -mx-2 z-10">
+<div class="pipeline-arrow-container"><div class="pipeline-arrow"></div></div>
+<span class="material-symbols-outlined text-5xl font-black -ml-4 stroke-black">arrow_forward_ios</span>
+</div>
+<!-- Mobile arrow -->
+<div class="lg:hidden my-2 flex items-center transform rotate-90 z-10">
+<div class="pipeline-arrow-container"><div class="pipeline-arrow"></div></div>
+<span class="material-symbols-outlined text-5xl font-black -ml-4 stroke-black">arrow_forward_ios</span>
+</div>
+<!-- Box 4 -->
+<div class="min-w-[240px] flex-1 bg-[#FF8A65] border-4 border-black p-6 neo-shadow flex flex-col items-center text-center">
+<span class="material-symbols-outlined text-7xl text-black mb-4">inventory_2</span>
+<h3 class="text-3xl font-black uppercase mb-2">4. Operations</h3>
+<p class="font-bold text-sm leading-tight text-black/80">Orders • Billing • Inventory</p>
+<div class="mt-4 border-t-4 border-black pt-4 w-full">
+<p class="font-black text-sm uppercase">Manages work</p>
+</div>
+</div>
+<!-- Arrow -->
+<div class="hidden lg:flex items-center -mx-2 z-10">
+<div class="pipeline-arrow-container"><div class="pipeline-arrow"></div></div>
+<span class="material-symbols-outlined text-5xl font-black -ml-4 stroke-black">arrow_forward_ios</span>
+</div>
+<!-- Mobile arrow -->
+<div class="lg:hidden my-2 flex items-center transform rotate-90 z-10">
+<div class="pipeline-arrow-container"><div class="pipeline-arrow"></div></div>
+<span class="material-symbols-outlined text-5xl font-black -ml-4 stroke-black">arrow_forward_ios</span>
+</div>
+<!-- Box 5 -->
+<div class="min-w-[240px] flex-1 bg-black text-[#38BDF8] border-4 border-[#10B981] p-6 neo-shadow flex flex-col items-center text-center transform lg:-translate-y-2 lg:scale-110">
+<span class="material-symbols-outlined text-7xl mb-4 text-[#38BDF8]">dashboard</span>
+<h3 class="text-3xl font-black uppercase mb-2 text-white">5. Dashboard</h3>
+<p class="font-bold text-sm leading-tight text-[#38BDF8]/70">Control • Track • Trigger</p>
+<div class="mt-4 border-t-4 border-[#10B981] pt-4 w-full">
+<p class="font-black text-sm uppercase text-white">Everything in one place</p>
+</div>
+</div>
+</div>
+<div class="mt-40 max-w-5xl mx-auto border-4 border-black p-12 bg-[#FFF9E6] neo-shadow text-center relative rotate-1">
+<span class="material-symbols-outlined text-5xl md:text-[60px] mb-8 text-[#B19CD9] border-4 border-black bg-black rounded-full p-2 absolute -top-16 -left-10">all_inclusive</span>
+<div class="text-3xl md:text-5xl font-black uppercase flex flex-col gap-4 md:flex-row md:flex-wrap items-center justify-center">
+<span>Input</span> <span class="text-[#38BDF8] hidden md:inline">→</span> <span class="material-symbols-outlined md:hidden">arrow_downward</span>
+<span>Decide</span> <span class="text-[#38BDF8] hidden md:inline">→</span> <span class="material-symbols-outlined md:hidden">arrow_downward</span>
+<span>Execute</span> <span class="text-[#38BDF8] hidden md:inline">→</span> <span class="material-symbols-outlined md:hidden">arrow_downward</span>
+<span>Track</span> <span class="text-[#38BDF8] hidden md:inline">→</span> <span class="material-symbols-outlined md:hidden">arrow_downward</span>
+<span class="bg-[#38BDF8] text-black px-4 py-2 border-4 border-black rotate-[-2deg]">Repeat</span>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-black text-white px-4 md:px-8 py-8 md:py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mt-0">
+<div class="lg:col-span-3 mb-4 md:mb-12">
+<h2 class="text-2xl md:text-5xl lg:text-7xl font-black uppercase tracking-tighter text-white mb-4 md:mb-4 md:mb-8">No fluff. Just systems that work.</h2>
+</div>
+<div class="lg:col-span-2">
+<div class="flex items-center gap-3 mb-4 md:mb-8">
+<span class="material-symbols-outlined text-4xl md:text-6xl text-white">local_florist</span>
+<span class="text-4xl md:text-6xl font-black text-white tracking-tighter font-['Inter'] uppercase">FLOWRA</span>
+</div>
+<p class="font-['Inter'] font-bold uppercase text-sm md:text-xl text-white/80 max-w-md">NO NONSENSE. NO FLUFF. JUST SCALE.</p>
+</div>
+<div>
+<h4 class="text-xl font-black uppercase mb-8 text-[#B19CD9]">Company</h4>
+<ul class="space-y-4 font-['Inter'] font-bold uppercase">
+<li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/under-construction.html">Twitter</a></li>
+<li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/under-construction.html">LinkedIn</a></li>
+<li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/privacy.html">Privacy</a></li>
+</ul>
+</div>
+<div class="lg:col-span-3 pt-8 md:pt-16 border-t border-white/20 flex flex-col md:flex-row justify-between items-center gap-8">
+<p class="font-['Inter'] font-bold uppercase text-sm">© 2024 FLOWRA. NO NONSENSE.</p>
+<div class="flex gap-8">
+<span class="material-symbols-outlined">eco</span>
+<span class="material-symbols-outlined">bolt</span>
+<span class="material-symbols-outlined">public</span>
+</div>
+</div>
+</footer>
+</body>
+</html>
