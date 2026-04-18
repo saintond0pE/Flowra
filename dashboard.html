@@ -389,16 +389,21 @@
 
                 if (pe || te || leads_err) throw new Error('Query error');
 
-                // Only accept cloud data if it actually has tasks — never accept empty cloud
+                // Map projects and tasks if they exist
                 if (projects && projects.length > 0 && tasks && tasks.length > 0) {
                     const projMap = {};
                     projects.forEach(p => { projMap[p.id] = { ...p, tasks: [] }; });
                     tasks.forEach(t => { if (projMap[t.project_id]) projMap[t.project_id].tasks.push(t); });
                     DB.tables.projects = Object.values(projMap);
-                    DB.tables.leads = leads_data || [];
-                    DB.save();
-                    return true;
                 }
+                
+                // Always load leads if available
+                if (leads_data) {
+                    DB.tables.leads = leads_data;
+                }
+
+                DB.save();
+                return true;
             } catch(err) {
                 console.warn('[Flowra] Supabase sync failed, using localStorage only.', err.message);
                 DB.load();
