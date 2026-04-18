@@ -260,7 +260,7 @@
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script>
         const SUPABASE_URL = "https://zdaylulmyejoswxoqedi.supabase.co";
         const SUPABASE_KEY = "sb_publishable_7if5Jz2oEMWY9W9ofy0kQw_HQjCJIae";
@@ -307,7 +307,8 @@
                 
                 const { error } = await sb.from('leads').insert([
                     { 
-                        name: name || 'Anonymous', 
+                        name: name || 'Anonymous',
+                        full_name: name || 'Anonymous', 
                         email: email || '', 
                         mobile: mobile || '', 
                         message: finalMessage,
