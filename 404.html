@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<title>404 - Page Not Found | FLOWRA</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "error-dim": "#a70138",
+                    "on-surface": "#2d2f2f",
+                    "on-tertiary-fixed-variant": "#006544",
+                    "on-secondary-fixed": "#443100",
+                    "secondary": "#FFC837",
+                    "background": "#FFFFFF",
+                    "surface-dim": "#d2d5d5",
+                    "on-error": "#ffefef",
+                    "on-secondary": "#000000",
+                    "inverse-on-surface": "#9c9d9d",
+                    "primary-dim": "#4f4f4f",
+                    "inverse-primary": "#ffffff",
+                    "on-primary-container": "#575757",
+                    "tertiary": "#10B981", 
+                    "tertiary-container": "#69f6b8",
+                    "on-secondary-container": "#000000",
+                    "surface-container-low": "#f0f1f1",
+                    "surface-container-high": "#e1e3e3",
+                    "surface-container-highest": "#dbdddd",
+                    "surface-bright": "#f6f6f6",
+                    "on-primary-fixed-variant": "#616161",
+                    "surface": "#f6f6f6",
+                    "primary-container": "#ebebeb",
+                    "primary-fixed-dim": "#dddddd",
+                    "outline-variant": "#acadad",
+                    "on-tertiary": "#c8ffe0",
+                    "on-background": "#2d2f2f",
+                    "error-container": "#FFB7B2", 
+                    "surface-container": "#e7e8e8",
+                    "inverse-surface": "#0c0f0f",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#f3f3f3",
+                    "primary": "#000000",
+                    "tertiary-fixed": "#69f6b8",
+                    "on-tertiary-fixed": "#00452d",
+                    "on-error-container": "#510017",
+                    "tertiary-fixed-dim": "#58e7ab",
+                    "on-surface-variant": "#5a5c5c",
+                    "secondary-dim": "#654c00",
+                    "secondary-container": "#ffca44",
+                    "secondary-fixed-dim": "#f2bc2a",
+                    "outline": "#000000",
+                    "on-secondary-fixed-variant": "#674d00",
+                    "error": "#b41340",
+                    "on-tertiary-container": "#005a3c",
+                    "on-primary-fixed": "#444444",
+                    "tertiary-dim": "#005c3d",
+                    "surface-variant": "#dbdddd",
+                    "surface-tint": "#5b5b5b",
+                    "primary-fixed": "#ebebeb",
+                    "secondary-fixed": "#ffca44"
+            },
+            "borderRadius": {
+                    "none": "0px",
+                    "DEFAULT": "0px",
+                    "lg": "0px",
+                    "xl": "0px",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Inter", "sans-serif"],
+                    "body": ["Inter", "sans-serif"],
+                    "label": ["Inter", "sans-serif"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        /* DESKTOP ZOOM - only on screens wider than 768px */
+        @media (min-width: 768px) {
+            html {
+                zoom: 0.75;
+            }
+        }
+
+        /* ZOOM-OUT-FIX */
+        html {
+            overflow-x: hidden;
+        }
+        body {
+            overflow-x: hidden;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFF9E6;
+        }
+        .neo-shadow { box-shadow: 6px 6px 0px 0px rgba(0,0,0,1); }
+    
+        /* DISABLE HOVER ANIMATIONS ON MOBILE (touch devices) */
+        @media (max-width: 767px) {
+            .service-card-pop:hover,
+            .neo-shadow-hover:hover,
+            [class*="hover\:translate"],
+            [class*="hover\:shadow"] {
+                transform: none !important;
+                box-shadow: none !important;
+            }
+            .neo-shadow {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+            }
+            .neo-shadow-hover:hover {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+                transform: none !important;
+            }
+            .neo-shadow-active:active {
+                box-shadow: 3px 3px 0px 0px rgba(0,0,0,1) !important;
+                transform: none !important;
+            }
+            .service-card-pop:hover {
+                transform: none !important;
+                box-shadow: 4px 4px 0px 0px rgba(0,0,0,1) !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#FFF9E6] text-black overflow-x-hidden">
+<nav class="bg-[#FFF9E6] border-b-2 border-black flex items-center w-full px-4 md:px-8 py-4 max-w-full sticky top-0 z-50">
+<!-- Left: Logo -->
+<div class="flex-1 flex items-center gap-2 cursor-pointer" onclick="window.location.href='/'">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">local_florist</span>
+<span class="text-2xl md:text-3xl font-black text-black tracking-tighter uppercase font-['Inter']">FLOWRA</span>
+</div>
+
+<!-- Center: Symmetrical Navigation -->
+<div class="hidden md:flex flex-1 justify-center items-center gap-10">
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#B19CD9] hover:text-black transition-all px-4 py-1" href="/pages/validation.html">Validation</a>
+<a class="font-['Inter'] font-black uppercase tracking-tighter text-black/60 hover:bg-[#B19CD9] hover:text-black transition-all px-4 py-1" href="/pages/resources.html">Resources</a>
+</div>
+
+<!-- Right: Actions -->
+<div class="hidden md:flex flex-1 justify-end items-center gap-4">
+<button class="font-['Inter'] font-black uppercase tracking-tighter bg-[#38BDF8] text-black border-2 border-black px-4 py-2 neo-shadow hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none transition-all text-sm" onclick="window.location.href='/pages/case-study.html'">Case Study</button>
+<button class="bg-[#B19CD9] text-black border-2 border-black px-6 py-2 font-black uppercase tracking-tighter neo-shadow hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-none transition-all text-sm" onclick="window.location.href='/pages/contact.html'">
+        Contact Us
+    </button>
+</div>
+
+<!-- Mobile Toggle -->
+<div class="md:hidden flex justify-end flex-1">
+    <button class="border-2 border-black p-2 bg-[#B19CD9]" onclick="document.getElementById('mobile-menu').classList.toggle('hidden')" aria-label="Menu">
+        <span class="material-symbols-outlined text-2xl text-black">menu</span>
+    </button>
+</div>
+</nav>
+
+<!-- Mobile Dropdown Menu -->
+<div id="mobile-menu" class="hidden md:hidden bg-[#FFF9E6] border-b-2 border-black px-4 py-3 flex flex-col gap-2 sticky top-[60px] z-[60]">
+    <a class="font-['Inter'] font-black uppercase tracking-tighter text-sm text-black/70 py-2 border-b border-black/20" href="/pages/validation.html">Validation</a>
+    <a class="font-['Inter'] font-black uppercase tracking-tighter text-sm text-black/70 py-2 border-b border-black/20" href="/pages/resources.html">Resources</a>
+    <a class="font-['Inter'] font-black uppercase tracking-tighter text-sm bg-[#38BDF8] text-black py-2 border-b border-black/20 px-2" href="/pages/case-study.html">Case Study</a>
+    <a class="font-['Inter'] font-black uppercase tracking-tighter text-xs bg-[#B19CD9] text-black border-2 border-black p-2 text-center" href="/pages/contact.html">Contact Us</a>
+</div>
+
+<main class="min-h-[70vh] flex flex-col items-center justify-center px-6 py-8 md:py-16 text-center max-w-7xl mx-auto">
+<div class="w-full mb-8 md:mb-12 flex flex-col items-center">
+<h1 class="text-[80px] md:text-[180px] font-black text-[#FF8A65] leading-[1.0] mb-2 tracking-tighter uppercase border-black" style="text-shadow: 6px 6px 0px #000; -webkit-text-stroke: 4px black;">
+    404
+</h1>
+<h2 class="text-3xl md:text-[60px] font-black text-black leading-[1.0] mb-8 tracking-tighter uppercase relative z-10 px-4 py-2 bg-[#B19CD9] border-4 border-black inline-block shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] -rotate-2">
+    PAGE NOT FOUND
+</h2>
+<p class="text-xl md:text-2xl font-bold text-on-surface-variant max-w-2xl mx-auto leading-relaxed mb-8">
+    The system could not locate the file you requested. Perhaps it was lost in the gears. Let's get you back to safety.
+</p>
+<button class="bg-[#38BDF8] text-black border-4 border-black text-xl md:text-2xl px-6 py-4 md:px-10 md:py-5 font-black uppercase tracking-tighter shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-x-[8px] active:translate-y-[8px] active:shadow-none transition-all" onclick="window.location.href='/'">
+    BACK TO MISSION CONTROL
+</button>
+</div>
+</main>
+
+<footer class="bg-black text-white px-4 md:px-8 py-8 md:py-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8 mt-0 w-full">
+<div class="lg:col-span-3 mb-4 md:mb-12">
+<h2 class="text-2xl md:text-5xl lg:text-7xl font-black uppercase tracking-tighter text-white mb-4 md:mb-4 md:mb-8">No fluff. Just systems that work.</h2>
+</div>
+<div class="lg:col-span-2">
+<div class="flex items-center gap-3 mb-4 md:mb-8">
+<span class="material-symbols-outlined text-4xl md:text-6xl text-white">local_florist</span>
+<span class="text-4xl md:text-6xl font-black text-white tracking-tighter font-['Inter'] uppercase">FLOWRA</span>
+</div>
+<p class="font-['Inter'] font-bold uppercase text-sm md:text-xl text-white/80 max-w-md">NO NONSENSE. NO FLUFF. JUST SCALE.</p>
+</div>
+<div>
+<h4 class="text-xl font-black uppercase mb-8 text-[#B19CD9]">Company</h4>
+<ul class="space-y-4 font-['Inter'] font-bold uppercase">
+<li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/under-construction.html">Twitter</a></li>
+<li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/under-construction.html">LinkedIn</a></li>
+<li><a class="text-white hover:text-[#38BDF8] transition-colors" href="/pages/privacy.html">Privacy</a></li>
+</ul>
+</div>
+<div class="lg:col-span-3 pt-8 md:pt-16 border-t border-white/20 flex flex-col md:flex-row justify-between items-center gap-8">
+<p class="font-['Inter'] font-bold uppercase text-sm">© 2024 FLOWRA. NO NONSENSE.</p>
+<div class="flex gap-8">
+<span class="material-symbols-outlined">eco</span>
+<span class="material-symbols-outlined">bolt</span>
+<span class="material-symbols-outlined">public</span>
+</div>
+</div>
+</footer>
+</body></html>
