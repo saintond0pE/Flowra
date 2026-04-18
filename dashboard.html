@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flowra OS Dashboard</title>
+    <script>
+        (function() {
+            try {
+                const sessionStr = localStorage.getItem('flowra_session');
+                if (!sessionStr) { window.location.href = '/login.html'; return; }
+                const session = JSON.parse(sessionStr);
+                const now = new Date().getTime();
+                if (!session.email || !session.expiry || now > session.expiry) {
+                    window.location.href = '/login.html';
+                }
+            } catch (e) { window.location.href = '/login.html'; }
+        })();
+    </script>
     <style>
         /* CSS reset & variables */
         :root {
