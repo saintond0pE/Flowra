@@ -302,14 +302,14 @@
             errorMsg.classList.add('hidden');
             
             try {
-                // Insert into Supabase leads table
-                const finalMessage = `[${currentMode.toUpperCase()}] ${message || 'System Notification'}`;
+                // Build robust message with mobile data Prepended (Schema-safe)
+                const mobilePrefix = mobile ? `[MOBILE: ${mobile}] ` : '';
+                const finalMessage = `${mobilePrefix}[${currentMode.toUpperCase()}] ${message || 'System Notification'}`;
                 
                 const { error } = await sb.from('leads').insert([
                     { 
                         name: name || 'Anonymous',
                         email: email || '', 
-                        mobile: mobile || '', 
                         message: finalMessage,
                         status: 'new'
                     }
