@@ -127,6 +127,7 @@
             <div class="nav-item active" onclick="switchView('home')">Command Center</div>
             <div class="nav-item" onclick="switchView('projects')">Active Projects</div>
             <div class="nav-item" onclick="switchView('leads')">Leads & Clients</div>
+            <div class="nav-item" onclick="switchView('planner')">Meetings & Deals</div>
             <div class="nav-item" onclick="switchView('team')">Team Ops</div>
             <div class="nav-item" onclick="switchView('automation')">n8n Automation</div>
             <div class="nav-item" onclick="switchView('knowledge')">Knowledge Base</div>
@@ -188,7 +189,51 @@
                 <div style="display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 24px;" id="projects-grid"></div>
             </div>
 
-            <!-- 4. Tasks Pipeline removed as per user spec -->
+            <!-- 4. Meetings & Deals Planner -->
+            <div id="view-planner" class="view-section">
+                <div class="flex-between">
+                    <div>
+                        <h2>Meetings & Deal Closing Planner</h2>
+                        <p style="font-weight: 700; font-size: 12px; margin-bottom: 16px; text-transform: uppercase;">Manage your schedule and close deals on autopilot.</p>
+                    </div>
+                    <button class="btn" style="background:var(--accent-color); color:#fff; font-size:16px; padding: 12px 24px; box-shadow: 4px 4px 0 var(--border-color); display: flex; align-items: center; gap: 8px;" onclick="triggerVoiceWebhook()">
+                        <span style="font-size: 20px;">🎙️</span> TRIGGER REVENUE VOICE
+                    </button>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="card" style="background:#fffebc; border-color: var(--accent-color);">
+                        <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px;">Tomorrow's Meetup</h3>
+                        <div style="font-weight: 900; font-size: 32px; color: var(--accent-color); margin: 16px 0;">10:00 AM</div>
+                        <p style="font-weight: 800; font-size: 16px; margin-bottom: 16px;">Flowra Strategy Sync & Deal Finalization</p>
+                        <div style="font-size: 12px; font-weight: 800; background: var(--bg-color); padding: 12px; border: 3px solid var(--border-color);">
+                            <strong>Participants:</strong> Chira, Rudra, Client<br>
+                            <strong>Goal:</strong> Finalize Voice Agent 1.0 scope & connect webhooks.
+                        </div>
+                        <button class="btn btn-primary" style="margin-top: 16px; width: 100%; border-color: var(--border-color);">JOIN MEETING ROOM</button>
+                    </div>
+                    
+                    <div class="card">
+                        <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px;">Upcoming Deal Calls</h3>
+                        <ul style="list-style: none; padding: 0; margin-top: 16px; display: flex; flex-direction: column; gap: 12px;">
+                            <li style="border: 2px solid var(--border-color); padding: 12px; font-weight: 800; font-size: 12px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-color);">
+                                <span>Acme Corp Discovery Call</span> <span class="badge" style="background:#ccffcc">Thurs 2PM</span>
+                            </li>
+                            <li style="border: 2px solid var(--border-color); padding: 12px; font-weight: 800; font-size: 12px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-color);">
+                                <span>GlobalTech Contract Review</span> <span class="badge" style="background:#ccffcc">Fri 11AM</span>
+                            </li>
+                        </ul>
+                        <button class="btn" style="margin-top: 16px; width: 100%;">+ SCHEDULE NEW DEAL</button>
+                    </div>
+                </div>
+                
+                <div class="card" style="background:var(--border-color); color:#fff; border-color:var(--border-color);">
+                    <h3 style="border-bottom: 2px solid #333; padding-bottom: 8px; margin-bottom: 12px;">Voice Agent Terminal</h3>
+                    <div id="voice-logs" style="font-family: monospace; font-size: 12px; height: 120px; overflow-y: auto; color: #00ff00; font-weight: bold;">
+                        > Webhook System Online. Waiting for Voice Trigger...<br>
+                    </div>
+                </div>
+            </div>
 
             <!-- 5. Team Ops Leaderboard -->
             <div id="view-team" class="view-section">
@@ -704,6 +749,23 @@
         function renderKnowledge() { document.getElementById('knowledge-grid').innerHTML = DB.tables.docs.map(doc => `<div class="card"><h3>${doc.title}</h3><p style="font-size:13px; border-left: 3px solid var(--accent-color); padding-left: 12px; background: #fff8f5">${doc.content.substring(0,60)}...</p></div>`).join(''); }
         function renderFeedback() { document.getElementById('feedback-table-body').innerHTML = DB.tables.feedback.slice().reverse().map(f => `<tr><td><span class="badge">${f.type}</span></td><td>${f.description}</td></tr>`).join(''); }
         window.triggerAutomation = function(action) { alert(`Webhook Payload ready for: ${action}`); }
+        
+        window.triggerVoiceWebhook = function() {
+            const logs = document.getElementById('voice-logs');
+            logs.innerHTML += `> [${new Date().toLocaleTimeString()}] Triggering n8n Voice Webhook...<br>`;
+            logs.scrollTop = logs.scrollHeight;
+            
+            // Mocked API call for n8n Webhook
+            setTimeout(() => {
+                logs.innerHTML += `> [${new Date().toLocaleTimeString()}] <span style="color: #ff3c00;">✔ PAYLOAD ACCEPTED BY N8N</span><br>`;
+                logs.innerHTML += `> [${new Date().toLocaleTimeString()}] Voice Engine connected. Listening to prospect data...<br>`;
+                logs.scrollTop = logs.scrollHeight;
+            }, 800);
+            
+            setTimeout(() => {
+                alert('n8n REVENUE WEBHOK INITIATED! Voice interface is active.');
+            }, 1000);
+        };
         
         window.onload = async () => {
             const sessionData = localStorage.getItem('flowra_session');
