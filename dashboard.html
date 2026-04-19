@@ -517,8 +517,10 @@
            PROJECT GENERATION ENGINE 
            -------------------------------------- */
 
-        window.openProjectGenerator = function() {
-            document.getElementById('gen-client').value = '';
+        let activeLeadIdForGen = null;
+        window.openProjectGenerator = function(clientName = '', leadId = null) {
+            activeLeadIdForGen = leadId;
+            document.getElementById('gen-client').value = clientName || '';
             document.getElementById('gen-title').value = '';
             document.getElementById('gen-notes').value = '';
             
@@ -596,8 +598,16 @@
                 id: generateId(),
                 client_name: client,
                 project_name: title,
-                tasks: combinedTasks
+                tasks: combinedTasks,
+                lead_id: activeLeadIdForGen
             });
+
+            // If this was started from a lead, update the lead status
+            if (activeLeadIdForGen) {
+                const lead = DB.tables.leads.find(l => l.id === activeLeadIdForGen);
+                if (lead) lead.status = 'working';
+                activeLeadIdForGen = null; 
+            }
 
             DB.save(); syncToSupabase(); renderAll();
             document.getElementById('projectGeneratorModal').style.display = 'none';
@@ -778,8 +788,11 @@
                         <td>${lead.email}</td>
                         <td>${lead.number || lead.mobile || '---'}</td>
                         <td><span style="font-size:12px; font-weight:700;">${displayMsg.substring(0,40)}${displayMsg.length > 40 ? '...' : ''}</span></td>
-                        <td><span class="badge" style="background:${lead.status==='new'?'#ffdd00': lead.status==='closed'?'#ccffcc':'#ddddff'}">${lead.status}</span></td>
-                        <td><button class="btn" onclick="updateLeadStatus('${lead.id}')">Edit</button></td>
+                        <td><span class="badge" style="background:${lead.status==='new'?'#ffdd00': lead.status==='working'?'#ff3c00': lead.status==='closed'?'#ccffcc':'#ddddff'}; color: ${lead.status==='working'?'#fff':'#000'}">${lead.status}</span></td>
+                        <td style="display:flex; gap:8px;">
+                            <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px;" onclick="openProjectGenerator('${lead.name.replace(/'/g, "\\'")}', '${lead.id}')">START</button>
+                            <button class="btn" style="padding: 4px 8px; font-size:10px;" onclick="updateLeadStatus('${lead.id}')">EDIT</button>
+                        </td>
                     </tr>
                 `;
             }).join(''); 
@@ -795,7 +808,7 @@
         window.updateLeadStatus = function(id) { 
             const lead = DB.tables.leads.find(l => l.id === id); 
             if(lead) { 
-                openModal("UPDATE LEAD", [{id: 'name', label: 'Name', val: lead.name}, {id: 'number', label: 'Number', val: lead.number || lead.mobile}, {id: 'status', label: 'Status', type: 'select', options: ['new', 'contacted', 'closed'], val: lead.status}], (res) => { 
+                openModal("UPDATE LEAD", [{id: 'name', label: 'Name', val: lead.name}, {id: 'number', label: 'Number', val: lead.number || lead.mobile}, {id: 'status', label: 'Status', type: 'select', options: ['new', 'contacted', 'working', 'closed'], val: lead.status}], (res) => { 
                     Object.assign(lead, {name: res.name, number: res.number, status: res.status}); 
                     DB.save(); renderAll(); syncToSupabase(); closeModal(); 
                 }); 
