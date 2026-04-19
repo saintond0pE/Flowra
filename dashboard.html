@@ -704,9 +704,23 @@
                     } else {
                         t.completed_by = null;
                     }
+
+                    // AUTO-UPDATE ASSOCIATED LEAD STATUS
+                    if (proj.lead_id) {
+                        const lead = DB.tables.leads.find(l => l.id === proj.lead_id);
+                        if (lead) {
+                            const allDone = proj.tasks.length > 0 && proj.tasks.every(task => task.done);
+                            if (allDone) {
+                                lead.status = 'finished';
+                            } else if (lead.status === 'finished') {
+                                // If tasks are unchecked, revert from finished to working
+                                lead.status = 'working';
+                            }
+                        }
+                    }
                     
                     DB.save(); 
-                    syncTaskToggle(t.id, t.done); 
+                    syncToSupabase(); // Use full sync to ensure lead status is pushed
                     renderAll(); 
                 }
             }
