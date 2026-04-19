@@ -499,6 +499,7 @@
             document.getElementById('gen-title').value = '';
             document.getElementById('gen-notes').value = '';
             
+            let html = '';
             Object.keys(TASK_STRUCTURE).forEach((cat) => {
                 const modules = TASK_STRUCTURE[cat];
                 html += `
