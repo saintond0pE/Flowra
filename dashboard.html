@@ -215,15 +215,10 @@
                     
                     <div class="card">
                         <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px;">Upcoming Deal Calls</h3>
-                        <ul style="list-style: none; padding: 0; margin-top: 16px; display: flex; flex-direction: column; gap: 12px;">
-                            <li style="border: 2px solid var(--border-color); padding: 12px; font-weight: 800; font-size: 12px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-color);">
-                                <span>Acme Corp Discovery Call</span> <span class="badge" style="background:#ccffcc">Thurs 2PM</span>
-                            </li>
-                            <li style="border: 2px solid var(--border-color); padding: 12px; font-weight: 800; font-size: 12px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-color);">
-                                <span>GlobalTech Contract Review</span> <span class="badge" style="background:#ccffcc">Fri 11AM</span>
-                            </li>
+                        <ul id="meetings-list" style="list-style: none; padding: 0; margin-top: 16px; display: flex; flex-direction: column; gap: 12px;">
+                            <!-- Dynamic meetings populated here -->
                         </ul>
-                        <button class="btn" style="margin-top: 16px; width: 100%;">+ SCHEDULE NEW DEAL</button>
+                        <button class="btn" style="margin-top: 16px; width: 100%;" onclick="openScheduler()">+ SCHEDULE NEW DEAL</button>
                     </div>
                 </div>
                 
@@ -335,6 +330,15 @@
                     });
                     const { error: le } = await sb.from('leads').upsert(leadRows, { onConflict: 'id' });
                     if (le) throw le;
+                }
+
+                // Upsert meetings
+                if (DB.tables.meetings && DB.tables.meetings.length > 0) {
+                    const meetRows = DB.tables.meetings.map(m => ({
+                        id: m.id, title: m.title, time: m.time, lead_id: m.lead_id || null
+                    }));
+                    const { error: me } = await sb.from('meetings').upsert(meetRows, { onConflict: 'id' });
+                    if (me) throw me;
                 }
                 setSyncStatus('ok');
             } catch(err) {
@@ -461,17 +465,11 @@
 
         /* DB MOCKING SYSTEM (Local Storage) */
         const DB = {
-            tables: { leads: [], projects: [], team: [], docs: [], feedback: [] },
+            tables: { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [] },
             load: () => { const saved = localStorage.getItem('flowra_mock_db'); if (saved) { DB.tables = JSON.parse(saved); } else { DB.seed(); } },
             save: () => { localStorage.setItem('flowra_mock_db', JSON.stringify(DB.tables)); },
             seed: () => {
-                DB.tables = {
-                    leads: [],
-                    projects: [],
-                    team: [],
-                    docs: [],
-                    feedback: []
-                };
+                DB.tables = { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [] };
                 DB.save();
             }
         };
@@ -731,7 +729,7 @@
            -------------------------------------- */
 
         function renderAll() {
-            DB.load(); renderHomeMetrics(); renderLeads(); renderProjects(); renderTeam(); renderKnowledge(); renderFeedback();
+            DB.load(); renderHomeMetrics(); renderLeads(); renderPlanner(); renderProjects(); renderTeam(); renderKnowledge(); renderFeedback();
         }
 
         function renderHomeMetrics() {
@@ -800,6 +798,7 @@
                         <td><span style="font-size:12px; font-weight:700;">${displayMsg.substring(0,40)}${displayMsg.length > 40 ? '...' : ''}</span></td>
                         <td><span class="badge" style="background:${lead.status==='new'?'#ffdd00': lead.status==='working'?'#ff3c00': lead.status==='finished'?'#10B981': lead.status==='closed'?'#ccffcc':'#ddddff'}; color: ${['working','finished'].includes(lead.status)?'#fff':'#000'}">${lead.status}</span></td>
                         <td style="display:flex; gap:8px;">
+                            <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px; background:#000; border-color:#000;" onclick="openScheduler('${lead.name.replace(/'/g, "\\'")}', '${lead.id}')">SCHEDULE</button>
                             <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px;" onclick="openProjectGenerator('${lead.name.replace(/'/g, "\\'")}', '${lead.id}')">START</button>
                             <button class="btn" style="padding: 4px 8px; font-size:10px;" onclick="updateLeadStatus('${lead.id}')">EDIT</button>
                         </td>
@@ -869,8 +868,42 @@
                 logs.innerHTML += `> [${new Date().toLocaleTimeString()}] Voice Engine connected. Listening to prospect data...<br>`;
                 logs.scrollTop = logs.scrollHeight;
             }, 800);
-            
-            setTimeout(() => {
+        }
+
+        window.openScheduler = function(clientName = '', leadId = null) {
+            openModal("SCHEDULE MEETING / DEAL CALL", [
+                {id: 'title', label: 'Meeting Title (e.g. Discovery Call)', val: clientName ? `${clientName} Discovery` : ''},
+                {id: 'time', label: 'Preferred Time (e.g. Mon 2PM or Tomorrow 10AM)', val: ''}
+            ], (res) => {
+                if(res.title && res.time) {
+                    if(!DB.tables.meetings) DB.tables.meetings = [];
+                    DB.tables.meetings.push({
+                        id: generateId(),
+                        title: res.title,
+                        time: res.time,
+                        lead_id: leadId
+                    });
+                    DB.save(); syncToSupabase(); renderAll(); closeModal();
+                }
+            });
+        }
+
+        function renderPlanner() {
+            const list = document.getElementById('meetings-list');
+            if(!list) return;
+
+            if(!DB.tables.meetings || DB.tables.meetings.length === 0) {
+                list.innerHTML = `<li style="padding: 12px; font-weight: 800; font-size: 12px; text-align: center; color: #888;">No upcoming deals scheduled.</li>`;
+                return;
+            }
+
+            list.innerHTML = DB.tables.meetings.slice().reverse().map(m => `
+                <li style="border: 2px solid var(--border-color); padding: 12px; font-weight: 800; font-size: 11px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-color);">
+                    <span style="max-width: 60%;">${m.title}</span> 
+                    <span class="badge" style="background:#ccffcc; font-size: 9px; min-width: 70px; text-align: center;">${m.time}</span>
+                </li>
+            `).join('');
+        }
                 alert('n8n REVENUE WEBHOK INITIATED! Voice interface is active.');
             }, 1000);
         };
