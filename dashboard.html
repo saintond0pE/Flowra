@@ -768,11 +768,11 @@
                     <td>${lead.number || '---'}</td>
                     <td><span style="font-size:12px; font-weight:700;">${dMsg.substring(0,40)}${dMsg.length > 40 ? '...' : ''}</span></td>
                     <td><span class="badge" style="background:${sCol}; color: ${['working','finished'].includes(s)?'#fff':'#000'}">${s}</span></td>
-                    <td style="display:flex; gap:8px;">
+                    <td><div style="display:flex; gap:8px;">
                         <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px; background:#000; border-color:#000;" onclick="openScheduler('${lead.name.replace(/'/g, "\\'")}', '${lead.id}')">SCHEDULE</button>
                         <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px;" onclick="openProjectGenerator('${lead.name.replace(/'/g, "\\'")}', '${lead.id}')">START</button>
                         <button class="btn" style="padding: 4px 8px; font-size:10px;" onclick="updateLeadStatus('${lead.id}')">EDIT</button>
-                    </td>
+                    </div></td>
                 </tr>`;
             }).join(''); 
         }
