@@ -149,10 +149,10 @@
             <!-- Subject Toggle -->
             <div class="grid grid-cols-2 gap-4 mb-4 md:mb-12">
                 <button id="btn-query" onclick="setMode('query')" class="toggle-btn active p-3 md:p-6 border-2 md:border-4 border-black text-sm md:text-xl font-black uppercase tracking-tighter transition-all">
-                    Query or Booking
+                    QUERY
                 </button>
                 <button id="btn-issue" onclick="setMode('issue')" class="toggle-btn p-3 md:p-6 border-2 md:border-4 border-black text-sm md:text-xl font-black uppercase tracking-tighter transition-all">
-                    Issue Discussion
+                    BOOKING OR ISSUES
                 </button>
             </div>
 
@@ -303,7 +303,7 @@
             
             try {
                 // Map to the correct Supabase column 'number' and use refined prefixes
-                const refinedPrefix = currentMode === 'query' ? '[CALL BOOKED]' : '[ISSUE DISCUSSION]';
+                const refinedPrefix = currentMode === 'query' ? '[QUERY]' : '[BOOKING/ISSUE]';
                 const finalMessage = `${refinedPrefix} ${message || 'System Notification'}`;
                 
                 // Manual ID generation to satisfy NOT NULL constraint

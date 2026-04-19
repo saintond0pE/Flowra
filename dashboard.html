@@ -775,24 +775,20 @@
                 const msg = lead.message || '';
                 let category = 'QUERY';
                 let displayMsg = msg;
-                let badgeColor = '#38BDF8'; // Blue for Query
+                let badgeColor = '#38BDF8'; // Default blue
 
-                if (msg.includes('[ISSUE DISCUSSION]')) {
-                    category = 'ISSUE';
-                    displayMsg = msg.replace('[ISSUE DISCUSSION]', '').trim();
-                    badgeColor = '#ff3c00'; // Red for Issue
-                } else if (msg.includes('[CALL BOOKED]')) {
-                    category = 'BOOKING';
-                    displayMsg = msg.replace('[CALL BOOKED]', '').trim();
-                    badgeColor = '#10B981'; // Green for Booking
-                } else if (msg.startsWith('[ISSUE]')) {
-                    category = 'ISSUE';
-                    displayMsg = msg.replace('[ISSUE]', '').trim();
-                    badgeColor = '#ff3c00'; 
-                } else if (msg.startsWith('[QUERY]')) {
+                // Category Logic: Simplified to QUERY or BOOKING / ISSUE
+                if (msg.includes('[QUERY]') || msg.startsWith('[QUERY]')) {
                     category = 'QUERY';
                     displayMsg = msg.replace('[QUERY]', '').trim();
-                    badgeColor = '#10B981';
+                    badgeColor = '#38BDF8';
+                } else if (msg.includes('[BOOKING/ISSUE]') || msg.includes('[ISSUE DISCUSSION]') || msg.includes('[CALL BOOKED]') || msg.includes('[ISSUE]')) {
+                    category = 'BOOKING / ISSUE';
+                    displayMsg = msg.replace(/\[BOOKING\/ISSUE\]|\[ISSUE DISCUSSION\]|\[CALL BOOKED\]|\[ISSUE\]/, '').trim();
+                    badgeColor = '#10B981'; // Green for combined category
+                } else {
+                    category = 'SYSTEM';
+                    badgeColor = '#5b5b5b';
                 }
 
                 return `
