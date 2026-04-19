@@ -321,9 +321,17 @@
 
                 // Upsert leads
                 if (DB.tables.leads.length > 0) {
-                    const leadRows = DB.tables.leads.map(l => ({
-                        id: l.id, name: l.name, email: l.email, message: l.message || '', status: l.status, number: l.number || l.mobile || ''
-                    }));
+                    const leadRows = DB.tables.leads.map(l => {
+                        const rawNum = l.number || l.mobile || '';
+                        return {
+                            id: l.id, 
+                            name: l.name, 
+                            email: l.email, 
+                            message: l.message || '', 
+                            status: l.status, 
+                            number: rawNum.trim() === '' ? null : rawNum 
+                        };
+                    });
                     const { error: le } = await sb.from('leads').upsert(leadRows, { onConflict: 'id' });
                     if (le) throw le;
                 }
