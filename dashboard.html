@@ -788,7 +788,7 @@
                         <td>${lead.email}</td>
                         <td>${lead.number || lead.mobile || '---'}</td>
                         <td><span style="font-size:12px; font-weight:700;">${displayMsg.substring(0,40)}${displayMsg.length > 40 ? '...' : ''}</span></td>
-                        <td><span class="badge" style="background:${lead.status==='new'?'#ffdd00': lead.status==='working'?'#ff3c00': lead.status==='closed'?'#ccffcc':'#ddddff'}; color: ${lead.status==='working'?'#fff':'#000'}">${lead.status}</span></td>
+                        <td><span class="badge" style="background:${lead.status==='new'?'#ffdd00': lead.status==='working'?'#ff3c00': lead.status==='finished'?'#10B981': lead.status==='closed'?'#ccffcc':'#ddddff'}; color: ${['working','finished'].includes(lead.status)?'#fff':'#000'}">${lead.status}</span></td>
                         <td style="display:flex; gap:8px;">
                             <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px;" onclick="openProjectGenerator('${lead.name.replace(/'/g, "\\'")}', '${lead.id}')">START</button>
                             <button class="btn" style="padding: 4px 8px; font-size:10px;" onclick="updateLeadStatus('${lead.id}')">EDIT</button>
@@ -808,7 +808,7 @@
         window.updateLeadStatus = function(id) { 
             const lead = DB.tables.leads.find(l => l.id === id); 
             if(lead) { 
-                openModal("UPDATE LEAD", [{id: 'name', label: 'Name', val: lead.name}, {id: 'number', label: 'Number', val: lead.number || lead.mobile}, {id: 'status', label: 'Status', type: 'select', options: ['new', 'contacted', 'working', 'closed'], val: lead.status}], (res) => { 
+                openModal("UPDATE LEAD", [{id: 'name', label: 'Name', val: lead.name}, {id: 'number', label: 'Number', val: lead.number || lead.mobile}, {id: 'status', label: 'Status', type: 'select', options: ['new', 'contacted', 'working', 'finished', 'closed'], val: lead.status}], (res) => { 
                     Object.assign(lead, {name: res.name, number: res.number, status: res.status}); 
                     DB.save(); renderAll(); syncToSupabase(); closeModal(); 
                 }); 
