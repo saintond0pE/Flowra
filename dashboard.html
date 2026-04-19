@@ -339,18 +339,6 @@
             }
         }
 
-        /* Sync a single task toggle immediately */
-        async function syncTaskToggle(taskId, done) {
-            try {
-                const { error } = await sb.from('tasks').upsert({ id: taskId, done: done, updated_at: new Date().toISOString() }, { onConflict: 'id' });
-                if (error) throw error;
-                setSyncStatus('ok');
-            } catch(err) {
-                console.error('[Flowra] Task sync error:', err);
-                setSyncStatus('error', err.message || JSON.stringify(err));
-            }
-        }
-
         function setSyncStatus(state, msg) {
             let el = document.getElementById('sync-status');
             if (!el) return;
@@ -393,8 +381,7 @@
                 const hasLocalData = DB.tables.projects && DB.tables.projects.length > 0;
 
                 if (hasLocalData) {
-                    // Push local projects up to Supabase in background
-                    syncToSupabase();
+                    syncToSupabase(); // Sync back to Supabase in background
                     return true;
                 }
 
@@ -410,14 +397,12 @@
                         DB.tables.projects = Object.values(projMap);
                         DB.save();
                     }
+                    return true;
                 } catch (e) { 
-                    console.warn('[Flowra] Optional tables missing or fetch failed:', e.message); 
+                    console.warn('[Flowra] Cloud fetch failed:', e.message); 
                 }
-                
-                return true; 
             } catch(err) {
-                console.error('[Flowra] Fatal Supabase sync error:', err.message);
-                DB.load();
+                console.error('[Flowra] Supabase load error:', err.message);
             }
             return false;
         }
@@ -514,24 +499,20 @@
             document.getElementById('gen-title').value = '';
             document.getElementById('gen-notes').value = '';
             
-            let html = '';
             Object.keys(TASK_STRUCTURE).forEach((cat) => {
-                html += `<div style="margin-bottom: 24px;">`;
-                html += `  <h3 style="background:#eee; padding:8px; border:2px solid #111; font-size:14px; margin-bottom:12px;">${cat}</h3>`;
-                html += `  <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; padding-left:12px;">`;
-                
-                Object.keys(TASK_STRUCTURE[cat]).forEach((mod) => {
-                    // Unique string val.
-                    const valStr = `${cat}|||${mod}`;
-                    html += `
-                        <label style="display:flex; align-items:center; cursor:pointer; font-size:13px; font-weight:700;">
-                            <input type="checkbox" class="proj-mod-checkbox" value="${valStr}" style="width:16px; height:16px; margin-right:8px; border:2px solid #000;">
-                            ${mod}
-                        </label>
-                    `;
-                });
-                html += `  </div>`;
-                html += `</div>`;
+                const modules = TASK_STRUCTURE[cat];
+                html += `
+                    <div style="margin-bottom: 24px;">
+                        <h3 style="background:#eee; padding:8px; border:2px solid #111; font-size:14px; margin-bottom:12px;">${cat}</h3>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; padding-left:12px;">
+                            ${Object.keys(modules).map(mod => `
+                                <label style="display:flex; align-items:center; cursor:pointer; font-size:13px; font-weight:700;">
+                                    <input type="checkbox" class="proj-mod-checkbox" value="${cat}|||${mod}" style="width:16px; height:16px; margin-right:8px; border:2px solid #000;">
+                                    ${mod}
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>`;
             });
 
             document.getElementById('category-module-picker').innerHTML = html;
@@ -760,42 +741,39 @@
 
         // LEADS 
         function renderLeads() { 
-            const leadsToShow = (DB.tables.leads || []).slice(0, 15);
-            document.getElementById('leads-table-body').innerHTML = leadsToShow.map(lead => {
+            const leads = (DB.tables.leads || []).slice(0, 15);
+            document.getElementById('leads-table-body').innerHTML = leads.map(lead => {
                 const msg = lead.message || '';
-                let category = 'QUERY';
-                let displayMsg = msg;
-                let badgeColor = '#38BDF8'; // Default blue
-
-                // Category Logic: Simplified to QUERY or BOOKING / ISSUE
-                if (msg.includes('[QUERY]') || msg.startsWith('[QUERY]')) {
-                    category = 'QUERY';
-                    displayMsg = msg.replace('[QUERY]', '').trim();
-                    badgeColor = '#38BDF8';
-                } else if (msg.includes('[BOOKING/ISSUE]') || msg.includes('[ISSUE DISCUSSION]') || msg.includes('[CALL BOOKED]') || msg.includes('[ISSUE]')) {
-                    category = 'BOOKING / ISSUE';
-                    displayMsg = msg.replace(/\[BOOKING\/ISSUE\]|\[ISSUE DISCUSSION\]|\[CALL BOOKED\]|\[ISSUE\]/, '').trim();
-                    badgeColor = '#10B981'; // Green for combined category
-                } else {
-                    category = 'SYSTEM';
-                    badgeColor = '#5b5b5b';
+                
+                // Optimized category routing
+                let cat = 'QUERY', col = '#38BDF8', dMsg = msg;
+                const isWork = msg.includes('[BOOKING/ISSUE]') || msg.includes('[ISSUE DISCUSSION]') || msg.includes('[CALL BOOKED]') || msg.includes('[ISSUE]');
+                
+                if (isWork) {
+                    cat = 'BOOKING / ISSUE'; col = '#10B981';
+                    dMsg = msg.replace(/\[BOOKING\/ISSUE\]|\[ISSUE DISCUSSION\]|\[CALL BOOKED\]|\[ISSUE\]/, '').trim();
+                } else if (msg.includes('[QUERY]')) {
+                    dMsg = msg.replace('[QUERY]', '').trim();
+                } else if (!msg.trim()) {
+                    cat = 'SYSTEM'; col = '#5b5b5b'; dMsg = 'Manual Entry / Legacy Record';
                 }
 
-                return `
-                    <tr>
-                        <td><span class="badge" style="background:${badgeColor}; color:#fff; border:none;">${category}</span></td>
-                        <td><strong>${lead.name}</strong></td>
-                        <td>${lead.email}</td>
-                        <td>${lead.number || lead.mobile || '---'}</td>
-                        <td><span style="font-size:12px; font-weight:700;">${displayMsg.substring(0,40)}${displayMsg.length > 40 ? '...' : ''}</span></td>
-                        <td><span class="badge" style="background:${lead.status==='new'?'#ffdd00': lead.status==='working'?'#ff3c00': lead.status==='finished'?'#10B981': lead.status==='closed'?'#ccffcc':'#ddddff'}; color: ${['working','finished'].includes(lead.status)?'#fff':'#000'}">${lead.status}</span></td>
-                        <td style="display:flex; gap:8px;">
-                            <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px; background:#000; border-color:#000;" onclick="openScheduler('${lead.name.replace(/'/g, "\\'")}', '${lead.id}')">SCHEDULE</button>
-                            <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px;" onclick="openProjectGenerator('${lead.name.replace(/'/g, "\\'")}', '${lead.id}')">START</button>
-                            <button class="btn" style="padding: 4px 8px; font-size:10px;" onclick="updateLeadStatus('${lead.id}')">EDIT</button>
-                        </td>
-                    </tr>
-                `;
+                const s = lead.status;
+                const sCol = s==='new'?'#ffdd00': s==='working'?'#ff3c00': s==='finished'?'#10B981': s==='closed'?'#ccffcc':'#ddddff';
+
+                return `<tr>
+                    <td><span class="badge" style="background:${col}; color:#fff; border:none;">${cat}</span></td>
+                    <td><strong>${lead.name}</strong></td>
+                    <td>${lead.email}</td>
+                    <td>${lead.number || '---'}</td>
+                    <td><span style="font-size:12px; font-weight:700;">${dMsg.substring(0,40)}${dMsg.length > 40 ? '...' : ''}</span></td>
+                    <td><span class="badge" style="background:${sCol}; color: ${['working','finished'].includes(s)?'#fff':'#000'}">${s}</span></td>
+                    <td style="display:flex; gap:8px;">
+                        <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px; background:#000; border-color:#000;" onclick="openScheduler('${lead.name.replace(/'/g, "\\'")}', '${lead.id}')">SCHEDULE</button>
+                        <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px;" onclick="openProjectGenerator('${lead.name.replace(/'/g, "\\'")}', '${lead.id}')">START</button>
+                        <button class="btn" style="padding: 4px 8px; font-size:10px;" onclick="updateLeadStatus('${lead.id}')">EDIT</button>
+                    </td>
+                </tr>`;
             }).join(''); 
         }
         window.createNewLead = function() { 
