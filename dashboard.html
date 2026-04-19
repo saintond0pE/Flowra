@@ -332,14 +332,6 @@
                     if (le) throw le;
                 }
 
-                // Upsert meetings
-                if (DB.tables.meetings && DB.tables.meetings.length > 0) {
-                    const meetRows = DB.tables.meetings.map(m => ({
-                        id: m.id, title: m.title, time: m.time, lead_id: m.lead_id || null
-                    }));
-                    const { error: me } = await sb.from('meetings').upsert(meetRows, { onConflict: 'id' });
-                    if (me) throw me;
-                }
                 setSyncStatus('ok');
             } catch(err) {
                 console.error('[Flowra] Supabase sync error:', err);
