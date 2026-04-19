@@ -322,14 +322,15 @@
                 // Upsert leads
                 if (DB.tables.leads.length > 0) {
                     const leadRows = DB.tables.leads.map(l => {
-                        const rawNum = l.number || l.mobile || '';
+                        const val = l.number || l.mobile || '';
+                        const rawNum = String(val).trim();
                         return {
                             id: l.id, 
                             name: l.name, 
                             email: l.email, 
                             message: l.message || '', 
                             status: l.status, 
-                            number: rawNum.trim() === '' ? null : rawNum 
+                            number: rawNum === '' ? null : rawNum 
                         };
                     });
                     const { error: le } = await sb.from('leads').upsert(leadRows, { onConflict: 'id' });
