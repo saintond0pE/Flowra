@@ -362,29 +362,38 @@
             try {
                 // Always load localStorage first
                 DB.load();
+
+                // 1. ALWAYS Fetch leads independently from Supabase
+                try {
+                    const leadFetch = await sb.from('leads').select('*').order('id', { ascending: false });
+                    let leads_data = [];
+                    if (leadFetch.error) {
+                        console.warn('[Flowra] Lead sorting failed, retrying unsorted...');
+                        const retryFetch = await sb.from('leads').select('*');
+                        leads_data = retryFetch.data;
+                    } else {
+                        leads_data = leadFetch.data;
+                    }
+                    
+                    if (leads_data && leads_data.length > 0) {
+                        DB.tables.leads = leads_data;
+                        DB.save();
+                        console.log('[Flowra] Leads synced from Supabase:', leads_data.length);
+                    }
+                } catch (e) { 
+                    console.error('[Flowra] Leads fetch crash:', e); 
+                }
+
+                // 2. Project/Task Logic: Local storage is source of truth for workspace activity
                 const hasLocalData = DB.tables.projects && DB.tables.projects.length > 0;
 
                 if (hasLocalData) {
-                    // Push local state up to Supabase in background — never overwrite local with cloud
+                    // Push local projects up to Supabase in background
                     syncToSupabase();
                     return true;
                 }
 
-                // Fetch leads independently
-                let leads_data = [], leads_err = null;
-                try {
-                    const leadFetch = await sb.from('leads').select('*').order('id', { ascending: false });
-                    if (leadFetch.error) {
-                        console.warn('[Flowra] Sorting failed, retrying unsorted...');
-                        const retryFetch = await sb.from('leads').select('*');
-                        leads_data = retryFetch.data;
-                        leads_err = retryFetch.error;
-                    } else {
-                        leads_data = leadFetch.data;
-                    }
-                } catch (e) { console.error('Leads fetch crash:', e); }
-
-                // Fetch Projects/Tasks (Optional fallback)
+                // Fetch Projects/Tasks from Cloud only if local is empty
                 try {
                     const { data: projects } = await sb.from('projects').select('*');
                     const { data: tasks } = await sb.from('tasks').select('*');
@@ -394,20 +403,15 @@
                         projects.forEach(p => { projMap[p.id] = { ...p, tasks: [] }; });
                         if (tasks) tasks.forEach(t => { if (projMap[t.project_id]) projMap[t.project_id].tasks.push(t); });
                         DB.tables.projects = Object.values(projMap);
+                        DB.save();
                     }
-                } catch (e) { console.warn('Optional tables missing:', e.message); }
-                
-                // Always update leads if we got any data
-                if (leads_data && leads_data.length > 0) {
-                    DB.tables.leads = leads_data;
-                    DB.save();
-                    return true;
+                } catch (e) { 
+                    console.warn('[Flowra] Optional tables missing or fetch failed:', e.message); 
                 }
-
-                if (leads_err) throw leads_err;
+                
                 return true; 
             } catch(err) {
-                console.warn('[Flowra] Supabase sync failed, using localStorage only.', err.message);
+                console.error('[Flowra] Fatal Supabase sync error:', err.message);
                 DB.load();
             }
             return false;
