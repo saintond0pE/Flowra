@@ -358,7 +358,8 @@
 
                 // 1. ALWAYS Fetch leads independently from Supabase
                 try {
-                    const leadFetch = await sb.from('leads').select('*').order('id', { ascending: false });
+                    // Ensure local representation sorts by created_at safely so oldest goes bottom
+                    const leadFetch = await sb.from('leads').select('*').order('created_at', { ascending: false });
                     let leads_data = [];
                     if (leadFetch.error) {
                         console.warn('[Flowra] Lead sorting failed, retrying unsorted...');
@@ -407,8 +408,9 @@
             return false;
         }
 
-        /* Generate safe unique string IDs to avoid Number precision bugs in inline HTML handlers */
-        function generateId() { return 'id_' + Math.random().toString(36).substr(2, 9); }
+        /* Generate safe unique string IDs to avoid Number precision bugs in inline HTML handlers.
+           Uses timestamp prefix so newest ID lexically sorts at the top */
+        function generateId() { return 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 5); }
 
         /* UI Switching */
         function switchView(viewId) {

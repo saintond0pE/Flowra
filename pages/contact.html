@@ -326,8 +326,8 @@
                 const refinedPrefix = currentMode === 'query' ? '[QUERY]' : '[BOOKING/ISSUE]';
                 const finalMessage = `${displayMobilePrefix}${refinedPrefix} ${message || 'System Notification'}`;
                 
-                // Manual ID generation to satisfy NOT NULL constraint
-                const newId = 'id_' + Math.random().toString(36).substr(2, 9);
+                // Safe temporally sortable ID so newest appears at the top: id_[timestamp]_[random]
+                const newId = 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 5);
 
                 const { error } = await sb.from('leads').insert([
                     { 
