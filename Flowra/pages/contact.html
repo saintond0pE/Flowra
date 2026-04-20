@@ -320,9 +320,22 @@
                 
                 if (error) throw error;
 
-                // We pivot away from fetch entirely and rely exclusively on Supabase for the integration event.
-                // n8n natively integrates with Supabase DB without any CORS, webhooks, or browser blocks.
-                // You can trigger n8n workflows directly when rows are inserted.
+                // Fire Webhook using FormData and no-cors to forcefully bypass browser restrictions
+                try {
+                    const formPayload = new URLSearchParams();
+                    formPayload.append('name', payloadData.name);
+                    formPayload.append('email', payloadData.email);
+                    formPayload.append('mobile', payloadData.mobile);
+                    formPayload.append('message', payloadData.message);
+
+                    fetch('https://sdfvsd4r5.app.n8n.cloud/webhook-test/45f6b781-c499-4c66-b0fd-cde3b78ce528', {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: formPayload
+                    }).catch(e => console.error(e));
+                } catch (webhookError) {
+                    console.error('Webhook execution failed:', webhookError);
+                }
                 
                 // SHOW THE POPUP
                 successPopup.classList.remove('hidden');
