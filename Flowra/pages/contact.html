@@ -299,19 +299,45 @@
             
             errorMsg.classList.add('hidden');
             
+            const payloadData = {
+                name: name || 'Anonymous', 
+                email: email || '', 
+                mobile: mobile || '', 
+                message: message || (document.getElementById('inbox-section').classList.contains('hidden') ? 'Query/Booking' : 'Issue Discussion')
+            };
+
             try {
                 // Insert into Supabase leads table
                 const { error } = await sb.from('leads').insert([
                     { 
-                        name: name || 'Anonymous', 
-                        email: email || '', 
-                        mobile: mobile || '', 
-                        message: message || (document.getElementById('inbox-section').classList.contains('hidden') ? 'Query/Booking' : 'Issue Discussion'),
+                        name: payloadData.name, 
+                        email: payloadData.email, 
+                        mobile: payloadData.mobile, 
+                        message: payloadData.message,
                         status: 'new'
                     }
                 ]);
                 
                 if (error) throw error;
+
+                // Fire Webhook ONLY if Supabase insert was successful
+                try {
+                    // Send as standard form data to completely bypass browser CORS blocks
+                    const formPayload = new URLSearchParams();
+                    formPayload.append('name', payloadData.name);
+                    formPayload.append('email', payloadData.email);
+                    formPayload.append('mobile', payloadData.mobile);
+                    formPayload.append('message', payloadData.message);
+
+                    await fetch('http://localhost:5678/webhook-test/f9af033c-f4b9-4294-badc-4c5effa70c16', {
+                        method: 'POST',
+                        mode: 'no-cors', // Forces browser to send without asking n8n for permission
+                        body: formPayload
+                    });
+                    console.log('Webhook dispatched automatically (CORS bypassed).');
+                } catch (webhookError) {
+                    console.error('Webhook execution failed:', webhookError);
+                }
 
                 // SHOW THE POPUP
                 successPopup.classList.remove('hidden');
