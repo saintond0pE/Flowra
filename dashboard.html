@@ -762,11 +762,25 @@
                 const s = lead.status;
                 const sCol = s==='new'?'#ffdd00': s==='working'?'#ff3c00': s==='finished'?'#10B981': s==='closed'?'#ccffcc':'#ddddff';
 
+                // Safely format display number with + if numeric DB dropped it
+                let displayNumber = lead.number || '---';
+                if (displayNumber !== '---') {
+                    let numStr = String(displayNumber).replace(/\D/g, '');
+                    if (numStr.length >= 10 && !String(displayNumber).startsWith('+')) {
+                         // Check common prefixes to restore +
+                         if (numStr.startsWith('91') && numStr.length >= 12) displayNumber = '+' + numStr;
+                         else if (numStr.startsWith('1') && numStr.length === 11) displayNumber = '+' + numStr;
+                         else if (numStr.startsWith('44') && numStr.length >= 12) displayNumber = '+' + numStr;
+                         else if (numStr.startsWith('61') && numStr.length >= 11) displayNumber = '+' + numStr;
+                         else if (numStr.length > 10) displayNumber = '+' + numStr;
+                    }
+                }
+
                 return `<tr>
                     <td><span class="badge" style="background:${col}; color:#fff; border:none;">${cat}</span></td>
                     <td><strong>${lead.name}</strong></td>
                     <td>${lead.email}</td>
-                    <td>${lead.number || '---'}</td>
+                    <td>${displayNumber}</td>
                     <td><span style="font-size:12px; font-weight:700;">${dMsg.substring(0,40)}${dMsg.length > 40 ? '...' : ''}</span></td>
                     <td><span class="badge" style="background:${sCol}; color: ${['working','finished'].includes(s)?'#fff':'#000'}">${s}</span></td>
                     <td><div style="display:flex; gap:8px;">

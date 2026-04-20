@@ -293,20 +293,25 @@
             const successPopup = document.getElementById('success-popup');
             const progressBar = document.getElementById('progress-bar');
             
-            // Map regions to country codes
+            // Map regions to purely numeric country codes for Supabase
             const countryCodes = {
-                'US': '+1', 'CA': '+1', 'UK': '+44', 'AU': '+61', 
-                'IN': '+91', 'DE': '+49', 'FR': '+33', 'AE': '+971', 
-                'SG': '+65', 'JP': '+81', 'OTHER': ''
+                'US': '1', 'UK': '44', 'CA': '1', 'AU': '61', 
+                'IN': '91', 'DE': '49', 'FR': '33', 'AE': '971', 
+                'SG': '65', 'JP': '81', 'OTHER': ''
             };
             
-            if (mobile && countryCodes[region]) {
-                mobile = countryCodes[region] + mobile;
-            } else if (mobile && region !== 'OTHER') {
-                mobile = region + mobile;
+            // Strip any accidental plus or letters the user typed into the input
+            let cleanMobile = mobile.replace(/\D/g, '');
+            let numericMobileForDb = cleanMobile;
+            
+            if (cleanMobile && countryCodes[region]) {
+                numericMobileForDb = countryCodes[region] + cleanMobile;
+            } else if (cleanMobile && region !== 'OTHER') {
+                // Ignore fallback to raw 'IN' to prevent DB crash, only use numeric
+                numericMobileForDb = countryCodes[region] || cleanMobile;
             }
 
-            if (!email && !mobile) {
+            if (!email && !cleanMobile) {
                 errorMsg.classList.remove('hidden');
                 return false;
             }
@@ -314,16 +319,17 @@
             errorMsg.classList.add('hidden');
             
             try {
-                const mobilePrefix = mobile ? `[MOBILE: ${mobile}] ` : '';
-                const finalMessage = mobilePrefix + (message || (document.getElementById('inbox-section').classList.contains('hidden') ? 'Query/Booking' : 'Issue Discussion'));
+                // Display strictly numeric string (+ prefixed for display consistency) in message
+                const displayMobilePrefix = cleanMobile ? `[MOBILE: +${numericMobileForDb}] ` : '';
+                const refinedPrefix = currentMode === 'query' ? '[QUERY]' : '[BOOKING/ISSUE]';
+                const finalMessage = `${displayMobilePrefix}${refinedPrefix} ${message || 'System Notification'}`;
 
                 // Insert into Supabase leads table
                 const { error } = await sb.from('leads').insert([
                     { 
                         name: name || 'Anonymous', 
                         email: email || '', 
-                        mobile: mobile || '',
-                        number: mobile || '',
+                        number: numericMobileForDb, // NUMERIC COLUMN SAFE string of digits
                         message: finalMessage,
                         status: 'new'
                     }
