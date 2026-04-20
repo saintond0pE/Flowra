@@ -176,18 +176,18 @@
                     <div>
                         <label class="block text-sm font-black uppercase tracking-widest mb-2">Mobile / Region (Numeric Only)</label>
                         <div class="flex border-2 md:border-4 border-black items-stretch">
-                            <select id="region-field" class="bg-black text-white px-3 py-3 md:px-6 md:py-4 font-black text-sm md:text-base border-r-4 border-black focus:outline-none cursor-pointer">
-                                <option value="US">US (+1)</option>
-                                <option value="UK">UK (+44)</option>
-                                <option value="CA">CA (+1)</option>
-                                <option value="AU">AU (+61)</option>
-                                <option value="IN">IN (+91)</option>
-                                <option value="DE">DE (+49)</option>
-                                <option value="FR">FR (+33)</option>
-                                <option value="AE">AE (+971)</option>
-                                <option value="SG">SG (+65)</option>
-                                <option value="JP">JP (+81)</option>
-                                <option value="OTHER">OTHER</option>
+                            <select id="region-field" class="bg-black text-white px-3 py-3 md:px-6 md:py-4 font-black text-sm md:text-base border-r-4 border-black focus:outline-none appearance-none cursor-pointer">
+                                <option>US</option>
+                                <option>UK</option>
+                                <option>CA</option>
+                                <option>AU</option>
+                                <option>IN</option>
+                                <option>DE</option>
+                                <option>FR</option>
+                                <option>AE</option>
+                                <option>SG</option>
+                                <option>JP</option>
+                                <option>OTHER</option>
                             </select>
                             <input id="mobile-field" type="tel" oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="NUMBER ONLY" class="flex-1 p-3 md:p-4 font-bold text-base md:text-xl focus:outline-none focus:bg-[#B19CD9]/10">
                         </div>
@@ -286,60 +286,58 @@
             event.preventDefault();
             const name = document.getElementById('name-field').value.trim();
             const email = document.getElementById('email-field').value.trim();
-            let mobile = document.getElementById('mobile-field').value.trim();
-            const region = document.getElementById('region-field').value;
+            const mobile = document.getElementById('mobile-field').value.trim();
             const message = document.getElementById('message-field').value.trim();
             const errorMsg = document.getElementById('error-message');
             const successPopup = document.getElementById('success-popup');
             const progressBar = document.getElementById('progress-bar');
-            
-            // Map regions to purely numeric country codes for Supabase
-            const countryCodes = {
-                'US': '1', 'UK': '44', 'CA': '1', 'AU': '61', 
-                'IN': '91', 'DE': '49', 'FR': '33', 'AE': '971', 
-                'SG': '65', 'JP': '81', 'OTHER': ''
-            };
-            
-            // Strip any accidental plus or letters the user typed into the input
-            let cleanMobile = mobile.replace(/\D/g, '');
-            let numericMobileForDb = cleanMobile;
-            
-            if (cleanMobile && countryCodes[region]) {
-                numericMobileForDb = countryCodes[region] + cleanMobile;
-            } else if (cleanMobile && region !== 'OTHER') {
-                // Ignore fallback to raw 'IN' to prevent DB crash, only use numeric
-                numericMobileForDb = countryCodes[region] || cleanMobile;
-            }
 
-            if (!email && !cleanMobile) {
+            if (!email && !mobile) {
                 errorMsg.classList.remove('hidden');
                 return false;
             }
             
             errorMsg.classList.add('hidden');
             
+            const payloadData = {
+                name: name || 'Anonymous', 
+                email: email || '', 
+                mobile: mobile || '', 
+                message: message || (document.getElementById('inbox-section').classList.contains('hidden') ? 'Query/Booking' : 'Issue Discussion')
+            };
+
             try {
-                // Display strictly numeric string (+ prefixed for display consistency) in message
-                const displayMobilePrefix = cleanMobile ? `[MOBILE: +${numericMobileForDb}] ` : '';
-                const refinedPrefix = currentMode === 'query' ? '[QUERY]' : '[BOOKING/ISSUE]';
-                const finalMessage = `${displayMobilePrefix}${refinedPrefix} ${message || 'System Notification'}`;
-
-                // Safe temporally sortable ID so newest appears at the top: id_[timestamp]_[random]
-                const newId = 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 5);
-
                 // Insert into Supabase leads table
                 const { error } = await sb.from('leads').insert([
                     { 
-                        id: newId,
-                        name: name || 'Anonymous', 
-                        email: email || '', 
-                        number: numericMobileForDb, // NUMERIC COLUMN SAFE string of digits
-                        message: finalMessage,
+                        name: payloadData.name, 
+                        email: payloadData.email, 
+                        mobile: payloadData.mobile, 
+                        message: payloadData.message,
                         status: 'new'
                     }
                 ]);
                 
                 if (error) throw error;
+
+                // Fire Webhook ONLY if Supabase insert was successful
+                try {
+                    // Send as standard form data to completely bypass browser CORS blocks
+                    const formPayload = new URLSearchParams();
+                    formPayload.append('name', payloadData.name);
+                    formPayload.append('email', payloadData.email);
+                    formPayload.append('mobile', payloadData.mobile);
+                    formPayload.append('message', payloadData.message);
+
+                    await fetch('https://sdfvsd4r5.app.n8n.cloud/webhook/f9af033c-f4b9-4294-badc-4c5effa70c16', {
+                        method: 'POST',
+                        mode: 'no-cors', // Forces browser to send without asking n8n for permission
+                        body: formPayload
+                    });
+                    console.log('Webhook dispatched automatically (CORS bypassed).');
+                } catch (webhookError) {
+                    console.error('Webhook execution failed:', webhookError);
+                }
 
                 // SHOW THE POPUP
                 successPopup.classList.remove('hidden');
