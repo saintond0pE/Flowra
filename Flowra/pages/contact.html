@@ -286,11 +286,25 @@
             event.preventDefault();
             const name = document.getElementById('name-field').value.trim();
             const email = document.getElementById('email-field').value.trim();
-            const mobile = document.getElementById('mobile-field').value.trim();
+            let mobile = document.getElementById('mobile-field').value.trim();
+            const region = document.getElementById('region-field').value;
             const message = document.getElementById('message-field').value.trim();
             const errorMsg = document.getElementById('error-message');
             const successPopup = document.getElementById('success-popup');
             const progressBar = document.getElementById('progress-bar');
+            
+            // Map regions to country codes
+            const countryCodes = {
+                'US': '+1', 'CA': '+1', 'UK': '+44', 'AU': '+61', 
+                'IN': '+91', 'DE': '+49', 'FR': '+33', 'AE': '+971', 
+                'SG': '+65', 'JP': '+81', 'OTHER': ''
+            };
+            
+            if (mobile && countryCodes[region]) {
+                mobile = countryCodes[region] + ' ' + mobile;
+            } else if (mobile && region !== 'OTHER') {
+                mobile = region + ' ' + mobile;
+            }
 
             if (!email && !mobile) {
                 errorMsg.classList.remove('hidden');
