@@ -320,18 +320,36 @@
                 
                 if (error) throw error;
 
-                // Server-to-Server Vercel Function Pivot (100% Guaranteed bypassing of browser CORS)
+                // The absolute 100% unblockable frontend method: Native HTML Form Submit to a Hidden iFrame
+                // No fetch(), No CORS preflight checks, No Javascript security rules.
                 try {
-                    await fetch('/api/n8n-trigger', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payloadData)
+                    let iframe = document.getElementById('hidden_n8n_iframe');
+                    if (!iframe) {
+                        iframe = document.createElement('iframe');
+                        iframe.name = 'hidden_n8n_iframe';
+                        iframe.id = 'hidden_n8n_iframe';
+                        iframe.style.display = 'none';
+                        document.body.appendChild(iframe);
+                    }
+
+                    const form = document.createElement('form');
+                    form.action = 'https://sdfvsd4r5.app.n8n.cloud/webhook-test/45f6b781-c499-4c66-b0fd-cde3b78ce528';
+                    form.method = 'POST';
+                    form.target = 'hidden_n8n_iframe';
+
+                    Object.keys(payloadData).forEach(key => {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = key;
+                        input.value = payloadData[key];
+                        form.appendChild(input);
                     });
-                    console.log('Fired successfully to Vercel Serverless Function Proxy');
+
+                    document.body.appendChild(form);
+                    form.submit();
+                    console.log('Fired pure HTML form trigger to n8n');
                 } catch (webhookError) {
-                    console.error('Vercel API trigger failed:', webhookError);
+                    console.error('Native form trigger failed:', webhookError);
                 }
                 
                 // SHOW THE POPUP
