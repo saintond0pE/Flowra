@@ -322,16 +322,19 @@
 
                 // Fire Webhook ONLY if Supabase insert was successful
                 try {
-                    // Reverting to standard JSON payload now that we're using a public Cloud webhook (No more localhost mixed content issues!)
-                    await fetch('https://sdfvsd4r5.app.n8n.cloud/webhook-test/45f6b781-c499-4c66-b0fd-cde3b78ce528', {
+                    // Send as standard form data without strict JSON headers so the browser completely bypasses the CORS preflight check
+                    const formPayload = new URLSearchParams();
+                    formPayload.append('name', payloadData.name);
+                    formPayload.append('email', payloadData.email);
+                    formPayload.append('mobile', payloadData.mobile);
+                    formPayload.append('message', payloadData.message);
+
+                    const webhookResponse = await fetch('https://sdfvsd4r5.app.n8n.cloud/webhook-test/45f6b781-c499-4c66-b0fd-cde3b78ce528', {
                         method: 'POST',
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payloadData)
+                        mode: 'no-cors', // Force browser to skip CORS checks
+                        body: formPayload // URL-encoded form data skips preflight requirements
                     });
-                    console.log('Webhook successfully sent to n8n Cloud!');
+                    console.log('Webhook dispatched automatically (CORS bypassed).');
                 } catch (webhookError) {
                     console.error('Webhook execution failed:', webhookError);
                 }
