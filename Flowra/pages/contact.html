@@ -176,18 +176,18 @@
                     <div>
                         <label class="block text-sm font-black uppercase tracking-widest mb-2">Mobile / Region (Numeric Only)</label>
                         <div class="flex border-2 md:border-4 border-black items-stretch">
-                            <select id="region-field" class="bg-black text-white px-3 py-3 md:px-6 md:py-4 font-black text-sm md:text-base border-r-4 border-black focus:outline-none appearance-none cursor-pointer">
-                                <option>US</option>
-                                <option>UK</option>
-                                <option>CA</option>
-                                <option>AU</option>
-                                <option>IN</option>
-                                <option>DE</option>
-                                <option>FR</option>
-                                <option>AE</option>
-                                <option>SG</option>
-                                <option>JP</option>
-                                <option>OTHER</option>
+                            <select id="region-field" class="bg-black text-white px-3 py-3 md:px-6 md:py-4 font-black text-sm md:text-base border-r-4 border-black focus:outline-none cursor-pointer">
+                                <option value="US">US (+1)</option>
+                                <option value="UK">UK (+44)</option>
+                                <option value="CA">CA (+1)</option>
+                                <option value="AU">AU (+61)</option>
+                                <option value="IN">IN (+91)</option>
+                                <option value="DE">DE (+49)</option>
+                                <option value="FR">FR (+33)</option>
+                                <option value="AE">AE (+971)</option>
+                                <option value="SG">SG (+65)</option>
+                                <option value="JP">JP (+81)</option>
+                                <option value="OTHER">OTHER</option>
                             </select>
                             <input id="mobile-field" type="tel" oninput="this.value = this.value.replace(/[^0-9]/g, '');" placeholder="NUMBER ONLY" class="flex-1 p-3 md:p-4 font-bold text-base md:text-xl focus:outline-none focus:bg-[#B19CD9]/10">
                         </div>
@@ -314,13 +314,17 @@
             errorMsg.classList.add('hidden');
             
             try {
+                const mobilePrefix = mobile ? `[MOBILE: ${mobile}] ` : '';
+                const finalMessage = mobilePrefix + (message || (document.getElementById('inbox-section').classList.contains('hidden') ? 'Query/Booking' : 'Issue Discussion'));
+
                 // Insert into Supabase leads table
                 const { error } = await sb.from('leads').insert([
                     { 
                         name: name || 'Anonymous', 
                         email: email || '', 
-                        mobile: mobile || '', 
-                        message: message || (document.getElementById('inbox-section').classList.contains('hidden') ? 'Query/Booking' : 'Issue Discussion'),
+                        mobile: mobile || '',
+                        number: mobile || '',
+                        message: finalMessage,
                         status: 'new'
                     }
                 ]);
