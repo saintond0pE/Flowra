@@ -342,6 +342,22 @@
                 
                 if (error) throw error;
 
+                // Trigger n8n Webhook (Bypass CORS preflight with URLSearchParams)
+                try {
+                    const formPayload = new URLSearchParams();
+                    formPayload.append('name', name || 'Anonymous');
+                    formPayload.append('email', email || '');
+                    formPayload.append('mobile', numericMobileForDb);
+                    formPayload.append('message', finalMessage);
+                    
+                    fetch('https://sdfvsd4r5.app.n8n.cloud/webhook-test/45f6b781-c499-4c66-b0fd-cde3b78ce528', {
+                        method: 'POST',
+                        body: formPayload
+                    }).catch(e => console.error("Webhook error:", e));
+                } catch(webhookErr) {
+                    console.error("Webhook block failed:", webhookErr);
+                }
+
                 // SHOW THE POPUP
                 successPopup.classList.remove('hidden');
                 
