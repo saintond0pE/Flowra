@@ -320,20 +320,10 @@
                 
                 if (error) throw error;
 
-                // Fire Webhook ONLY if Supabase insert was successful
-                try {
-                    // Send standard, clean JSON. n8n MUST have the 'Respond to CORS' option enabled for browsers to permit this request.
-                    await fetch('https://sdfvsd4r5.app.n8n.cloud/webhook-test/45f6b781-c499-4c66-b0fd-cde3b78ce528', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(payloadData)
-                    });
-                } catch (webhookError) {
-                    console.error('Webhook execution failed. Missing CORS configuration in n8n:', webhookError);
-                }
-
+                // We pivot away from fetch entirely and rely exclusively on Supabase for the integration event.
+                // n8n natively integrates with Supabase DB without any CORS, webhooks, or browser blocks.
+                // You can trigger n8n workflows directly when rows are inserted.
+                
                 // SHOW THE POPUP
                 successPopup.classList.remove('hidden');
                 
