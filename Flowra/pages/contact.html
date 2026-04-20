@@ -322,21 +322,16 @@
 
                 // Fire Webhook ONLY if Supabase insert was successful
                 try {
-                    // Send as standard form data without strict JSON headers so the browser completely bypasses the CORS preflight check
-                    const formPayload = new URLSearchParams();
-                    formPayload.append('name', payloadData.name);
-                    formPayload.append('email', payloadData.email);
-                    formPayload.append('mobile', payloadData.mobile);
-                    formPayload.append('message', payloadData.message);
-
-                    const webhookResponse = await fetch('https://sdfvsd4r5.app.n8n.cloud/webhook-test/45f6b781-c499-4c66-b0fd-cde3b78ce528', {
+                    // Send standard, clean JSON. n8n MUST have the 'Respond to CORS' option enabled for browsers to permit this request.
+                    await fetch('https://sdfvsd4r5.app.n8n.cloud/webhook-test/45f6b781-c499-4c66-b0fd-cde3b78ce528', {
                         method: 'POST',
-                        mode: 'no-cors', // Force browser to skip CORS checks
-                        body: formPayload // URL-encoded form data skips preflight requirements
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payloadData)
                     });
-                    console.log('Webhook dispatched automatically (CORS bypassed).');
                 } catch (webhookError) {
-                    console.error('Webhook execution failed:', webhookError);
+                    console.error('Webhook execution failed. Missing CORS configuration in n8n:', webhookError);
                 }
 
                 // SHOW THE POPUP
