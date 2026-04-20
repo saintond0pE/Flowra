@@ -320,8 +320,19 @@
                 
                 if (error) throw error;
 
-                // The frontend ONLY handles Supabase DB insertion now.
-                // n8n is triggered securely on the backend when this row hits the database.
+                // Server-to-Server Vercel Function Pivot (100% Guaranteed bypassing of browser CORS)
+                try {
+                    await fetch('/api/n8n-trigger', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payloadData)
+                    });
+                    console.log('Fired successfully to Vercel Serverless Function Proxy');
+                } catch (webhookError) {
+                    console.error('Vercel API trigger failed:', webhookError);
+                }
                 
                 // SHOW THE POPUP
                 successPopup.classList.remove('hidden');
