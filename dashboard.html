@@ -568,13 +568,33 @@
                 combinedTasks.push({ id: generateId(), category: "⬜ CUSTOM", module: "General Setup", name: "Configure Project", notes: '', done: false });
             }
 
+            const newProjectId = generateId();
+
             DB.tables.projects.unshift({
-                id: generateId(),
+                id: newProjectId,
                 client_name: client,
                 project_name: title,
                 tasks: combinedTasks,
                 lead_id: activeLeadIdForGen
             });
+
+            // Trigger n8n Automation on Project Generation for Invoice/Task scaling
+            try {
+                const projectPayload = new URLSearchParams();
+                projectPayload.append('event', 'dev_project_created');
+                projectPayload.append('project_id', newProjectId);
+                projectPayload.append('lead_id', activeLeadIdForGen || 'none');
+                projectPayload.append('client_name', client);
+                projectPayload.append('project_name', title);
+                projectPayload.append('tasks_json', JSON.stringify(combinedTasks));
+
+                fetch('https://sdfvsd4r5.app.n8n.cloud/webhook/45f6b781-c499-4c66-b0fd-cde3b78ce528', {
+                    method: 'POST',
+                    body: projectPayload
+                }).catch(e => console.error("Webhook error:", e));
+            } catch(e) {
+                console.error(e);
+            }
 
             // If this was started from a lead, update the lead status
             if (activeLeadIdForGen) {
