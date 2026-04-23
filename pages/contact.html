@@ -345,6 +345,7 @@
                 // Trigger n8n Webhook (Bypass CORS preflight with URLSearchParams)
                 try {
                     const formPayload = new URLSearchParams();
+                    formPayload.append('lead_id', newId); // Linking the n8n execution to the exact Supabase lead ID
                     formPayload.append('name', name || 'Anonymous');
                     formPayload.append('email', email || '');
                     formPayload.append('mobile', numericMobileForDb);
