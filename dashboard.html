@@ -288,6 +288,7 @@
         const SUPABASE_URL = "https://zdaylulmyejoswxoqedi.supabase.co";
         const SUPABASE_KEY = "sb_publishable_7if5Jz2oEMWY9W9ofy0kQw_HQjCJIae";
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const INVOICE_WEBHOOK_URL = 'YOUR_INVOICE_WEBHOOK_URL_HERE';
 
         /* Push entire local DB state to Supabase (upsert-based) */
         async function syncToSupabase() {
@@ -371,6 +372,34 @@
                     if (tle) throw tle;
                 }
 
+                // Upsert invoices (optional table: skip hard failure if table not created yet)
+                if ((DB.tables.invoices || []).length > 0) {
+                    try {
+                        const invoiceRows = DB.tables.invoices.map(i => ({
+                            id: i.id,
+                            lead_id: i.lead_id || null,
+                            lead_name: i.lead_name || 'Unknown',
+                            project_id: i.project_id || null,
+                            project_name: i.project_name || 'Unassigned',
+                            modules: Array.isArray(i.modules) ? i.modules : [],
+                            payment_mode: i.payment_mode || 'add_25_now',
+                            base_amount: i.base_amount || 0,
+                            addon_amount: i.addon_amount || 0,
+                            locked_total_amount: i.locked_total_amount || 0,
+                            upfront_percent: i.upfront_percent || 25,
+                            upfront_amount: i.upfront_amount || 0,
+                            due_now_amount: i.due_now_amount || 0,
+                            currency: i.currency || 'INR',
+                            notes: i.notes || '',
+                            created_at: i.created_at || new Date().toISOString()
+                        }));
+                        const { error: ie } = await sb.from('invoices').upsert(invoiceRows, { onConflict: 'id' });
+                        if (ie) throw ie;
+                    } catch (invoiceErr) {
+                        console.warn('[Flowra] Invoices sync skipped:', invoiceErr.message || invoiceErr);
+                    }
+                }
+
                 setSyncStatus('ok');
             } catch(err) {
                 console.error('[Flowra] Supabase sync error:', err);
@@ -439,6 +468,18 @@
                     }
                 } catch (e) {
                     console.warn('[Flowra] Team logs fetch skipped:', e.message || e);
+                }
+
+                // 1d. ALWAYS Fetch invoices independently from Supabase (newest first)
+                try {
+                    const { data: invoiceData, error: invoiceErr } = await sb.from('invoices').select('*').order('created_at', { ascending: false });
+                    if (invoiceErr) throw invoiceErr;
+                    if (invoiceData) {
+                        DB.tables.invoices = invoiceData;
+                        DB.save();
+                    }
+                } catch (e) {
+                    console.warn('[Flowra] Invoices fetch skipped:', e.message || e);
                 }
 
                 // 2. Project/Task Logic: Local storage is source of truth for workspace activity
@@ -520,6 +561,7 @@
             }));
             DB.tables.feedback = sortNewestFirst(DB.tables.feedback || [], 'created_at');
             DB.tables.team = sortNewestFirst(DB.tables.team || [], 'created_at');
+            DB.tables.invoices = sortNewestFirst(DB.tables.invoices || [], 'created_at');
         }
 
         /* UI Switching */
@@ -554,11 +596,26 @@
 
         /* DB MOCKING SYSTEM (Local Storage) */
         const DB = {
-            tables: { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [] },
-            load: () => { const saved = localStorage.getItem('flowra_mock_db'); if (saved) { DB.tables = JSON.parse(saved); } else { DB.seed(); } },
-            save: () => { localStorage.setItem('flowra_mock_db', JSON.stringify(DB.tables)); },
+            tables: { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [], invoices: [] },
+            ensureShape: () => {
+                const defaults = { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [], invoices: [] };
+                DB.tables = { ...defaults, ...(DB.tables || {}) };
+                Object.keys(defaults).forEach((k) => {
+                    if (!Array.isArray(DB.tables[k])) DB.tables[k] = defaults[k];
+                });
+            },
+            load: () => {
+                const saved = localStorage.getItem('flowra_mock_db');
+                if (saved) {
+                    DB.tables = JSON.parse(saved);
+                } else {
+                    DB.seed();
+                }
+                DB.ensureShape();
+            },
+            save: () => { DB.ensureShape(); localStorage.setItem('flowra_mock_db', JSON.stringify(DB.tables)); },
             seed: () => {
-                DB.tables = { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [] };
+                DB.tables = { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [], invoices: [] };
                 DB.save();
             }
         };
@@ -947,7 +1004,7 @@
                     <td><span style="font-size:12px; font-weight:700;">${dMsg.substring(0,40)}${dMsg.length > 40 ? '...' : ''}</span></td>
                     <td><span class="badge" style="background:${sCol}; color: ${['working','finished'].includes(s)?'#fff':'#000'}">${s}</span></td>
                     <td><div style="display:flex; gap:8px;">
-                        <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px; background:#000; border-color:#000;" onclick="openScheduler('${lead.name.replace(/'/g, "\\'")}', '${lead.id}')">SCHEDULE</button>
+                        <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px; background:#000; border-color:#000;" onclick="openScheduleAction('${lead.name.replace(/'/g, "\\'")}', '${lead.id}')">SCHEDULE</button>
                         <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px;" onclick="openProjectGenerator('${lead.name.replace(/'/g, "\\'")}', '${lead.id}')">START</button>
                         <button class="btn" style="padding: 4px 8px; font-size:10px;" onclick="updateLeadStatus('${lead.id}')">EDIT</button>
                     </div></td>
@@ -1010,6 +1067,159 @@
             if (!logs) return;
             logs.innerHTML += `> [${new Date().toLocaleTimeString()}] Voice generator is disabled for now. Invoice pipeline remains active.<br>`;
             logs.scrollTop = logs.scrollHeight;
+        }
+
+        function parseMoney(v) {
+            const n = Number(v);
+            return Number.isFinite(n) ? n : 0;
+        }
+
+        function uniqSorted(arr) {
+            return [...new Set((arr || []).filter(Boolean).map(x => String(x).trim()))].sort();
+        }
+
+        function buildLeadInvoiceModules(leadId, selectedProjectId) {
+            const relatedProjects = (DB.tables.projects || []).filter(p => {
+                if (selectedProjectId && p.id === selectedProjectId) return true;
+                if (!selectedProjectId && p.lead_id === leadId) return true;
+                return false;
+            });
+            const projectNames = relatedProjects.map(p => p.project_name || p.id);
+            const modules = [];
+            relatedProjects.forEach((p) => {
+                (p.tasks || []).forEach((t) => {
+                    if (t.module) modules.push(t.module);
+                });
+            });
+            return {
+                modules: uniqSorted(modules),
+                projectNames: uniqSorted(projectNames),
+                projectIds: uniqSorted(relatedProjects.map(p => p.id))
+            };
+        }
+
+        async function dispatchInvoiceToN8n(invoiceRecord) {
+            if (INVOICE_WEBHOOK_URL === 'YOUR_INVOICE_WEBHOOK_URL_HERE') {
+                console.warn('[Flowra] Invoice webhook URL not configured yet.');
+                return;
+            }
+            try {
+                const payload = new URLSearchParams();
+                payload.append('event', 'lead_invoice_scheduled');
+                payload.append('invoice_id', invoiceRecord.id);
+                payload.append('lead_id', invoiceRecord.lead_id || 'none');
+                payload.append('lead_name', invoiceRecord.lead_name || 'Unknown');
+                payload.append('project_id', invoiceRecord.project_id || 'none');
+                payload.append('project_name', invoiceRecord.project_name || 'Unassigned');
+                payload.append('project_ids', JSON.stringify(invoiceRecord.project_ids || []));
+                payload.append('project_names', JSON.stringify(invoiceRecord.project_names || []));
+                payload.append('modules', JSON.stringify(invoiceRecord.modules || []));
+                payload.append('payment_mode', invoiceRecord.payment_mode);
+                payload.append('base_amount', String(invoiceRecord.base_amount || 0));
+                payload.append('addon_amount', String(invoiceRecord.addon_amount || 0));
+                payload.append('locked_total_amount', String(invoiceRecord.locked_total_amount || 0));
+                payload.append('upfront_percent', String(invoiceRecord.upfront_percent || 25));
+                payload.append('upfront_amount', String(invoiceRecord.upfront_amount || 0));
+                payload.append('due_now_amount', String(invoiceRecord.due_now_amount || 0));
+                payload.append('currency', invoiceRecord.currency || 'INR');
+                payload.append('notes', invoiceRecord.notes || '');
+                await fetch(INVOICE_WEBHOOK_URL, {
+                    method: 'POST',
+                    body: payload
+                });
+            } catch (e) {
+                console.error('[Flowra] Invoice webhook failed:', e);
+            }
+        }
+
+        window.openScheduleAction = function(clientName = '', leadId = null) {
+            openModal("SCHEDULE ACTION", [
+                {id: 'action', label: 'Choose Action', type: 'select', options: ['schedule_meeting', 'schedule_invoice'], val: 'schedule_meeting'}
+            ], (res) => {
+                const action = (res.action || '').toLowerCase();
+                if (action === 'schedule_invoice') {
+                    window.openInvoiceScheduler(clientName, leadId);
+                } else {
+                    window.openScheduler(clientName, leadId);
+                }
+            });
+        }
+
+        window.openInvoiceScheduler = function(clientName = '', leadId = null) {
+            const leadProjects = (DB.tables.projects || []).filter(p => p.lead_id === leadId);
+            const projectOptions = leadProjects.length > 0
+                ? leadProjects.map(p => `${p.id}|||${p.project_name || 'Unnamed Project'}`)
+                : ['none|||No Linked Project'];
+
+            openModal("SCHEDULE INVOICE", [
+                {id: 'project_ref', label: 'Project', type: 'select', options: projectOptions, val: projectOptions[0]},
+                {id: 'base_amount', label: 'Base Total Amount', type: 'number', val: '0'},
+                {id: 'addon_amount', label: 'Add-on Amount', type: 'number', val: '0'},
+                {id: 'upfront_percent', label: 'Upfront Percent (editable)', type: 'number', val: '25'},
+                {id: 'payment_mode', label: 'Payment Mode', type: 'select', options: ['add_25_now', 'pay_full_now', 'pay_partial_of_upfront', 'add_another_invoice'], val: 'add_25_now'},
+                {id: 'partial_amount', label: 'Partial Amount (for pay_partial_of_upfront)', type: 'number', val: '0'},
+                {id: 'currency', label: 'Currency', val: 'INR'},
+                {id: 'notes', label: 'Invoice Notes', type: 'textarea', val: ''}
+            ], async (res) => {
+                const projectRef = String(res.project_ref || 'none|||No Linked Project');
+                const refParts = projectRef.split('|||');
+                const selectedProjectId = refParts[0] === 'none' ? null : refParts[0];
+                const selectedProjectName = refParts[1] || 'Unassigned';
+
+                const baseAmount = parseMoney(res.base_amount);
+                const addonAmount = parseMoney(res.addon_amount);
+                const partialAmount = parseMoney(res.partial_amount);
+                const upfrontPercent = parseMoney(res.upfront_percent) > 0 ? parseMoney(res.upfront_percent) : 25;
+                const paymentMode = String(res.payment_mode || 'add_25_now');
+
+                const contextInvoices = (DB.tables.invoices || []).filter(i => i.lead_id === leadId && i.project_id === selectedProjectId);
+                const latestInvoice = sortNewestFirst(contextInvoices, 'created_at')[0] || null;
+                const previousLockedTotal = latestInvoice ? parseMoney(latestInvoice.locked_total_amount) : 0;
+
+                let lockedTotal = baseAmount + addonAmount;
+                if (paymentMode === 'add_another_invoice' && latestInvoice) {
+                    lockedTotal = previousLockedTotal + addonAmount;
+                }
+
+                const upfrontAmount = Number((lockedTotal * (upfrontPercent / 100)).toFixed(2));
+                let dueNow = upfrontAmount;
+                if (paymentMode === 'pay_full_now') dueNow = Number(lockedTotal.toFixed(2));
+                if (paymentMode === 'pay_partial_of_upfront') {
+                    dueNow = Number(Math.min(Math.max(partialAmount, 0), upfrontAmount).toFixed(2));
+                }
+
+                const leadContext = buildLeadInvoiceModules(leadId, selectedProjectId);
+                const invoiceRecord = {
+                    id: generateId(),
+                    lead_id: leadId,
+                    lead_name: clientName || 'Unknown Client',
+                    project_id: selectedProjectId,
+                    project_name: selectedProjectName,
+                    project_ids: leadContext.projectIds,
+                    project_names: leadContext.projectNames,
+                    modules: leadContext.modules,
+                    payment_mode: paymentMode,
+                    base_amount: baseAmount,
+                    addon_amount: addonAmount,
+                    previous_locked_total: previousLockedTotal,
+                    locked_total_amount: Number(lockedTotal.toFixed(2)),
+                    upfront_percent: upfrontPercent,
+                    upfront_amount: upfrontAmount,
+                    due_now_amount: dueNow,
+                    currency: res.currency || 'INR',
+                    notes: res.notes || '',
+                    created_at: new Date().toISOString()
+                };
+
+                if (!Array.isArray(DB.tables.invoices)) DB.tables.invoices = [];
+                DB.tables.invoices.unshift(invoiceRecord);
+                DB.save();
+                await syncToSupabase();
+                await dispatchInvoiceToN8n(invoiceRecord);
+                renderAll();
+                closeModal();
+                alert(`Invoice queued. Due now: ${invoiceRecord.currency} ${invoiceRecord.due_now_amount}`);
+            });
         }
 
         window.openScheduler = function(clientName = '', leadId = null) {
