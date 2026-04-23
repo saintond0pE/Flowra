@@ -1120,6 +1120,7 @@
                 payload.append('locked_total_amount', String(invoiceRecord.locked_total_amount || 0));
                 payload.append('upfront_percent', String(invoiceRecord.upfront_percent || 25));
                 payload.append('upfront_amount', String(invoiceRecord.upfront_amount || 0));
+                payload.append('partial_percent_of_upfront', String(invoiceRecord.partial_percent_of_upfront || 0));
                 payload.append('due_now_amount', String(invoiceRecord.due_now_amount || 0));
                 payload.append('currency', invoiceRecord.currency || 'INR');
                 payload.append('notes', invoiceRecord.notes || '');
@@ -1157,7 +1158,7 @@
                 {id: 'addon_amount', label: 'Add-on Amount', type: 'number', val: '0'},
                 {id: 'upfront_percent', label: 'Upfront Percent (editable)', type: 'number', val: '25'},
                 {id: 'payment_mode', label: 'Payment Mode', type: 'select', options: ['add_25_now', 'pay_full_now', 'pay_partial_of_upfront', 'add_another_invoice'], val: 'add_25_now'},
-                {id: 'partial_amount', label: 'Partial Amount (for pay_partial_of_upfront)', type: 'number', val: '0'},
+                {id: 'partial_amount', label: 'Partial of Upfront (%)', type: 'number', val: '50'},
                 {id: 'currency', label: 'Currency', val: 'INR'},
                 {id: 'notes', label: 'Invoice Notes', type: 'textarea', val: ''}
             ], async (res) => {
@@ -1168,7 +1169,7 @@
 
                 const baseAmount = parseMoney(res.base_amount);
                 const addonAmount = parseMoney(res.addon_amount);
-                const partialAmount = parseMoney(res.partial_amount);
+                const partialPercent = Math.min(Math.max(parseMoney(res.partial_amount), 0), 100);
                 const upfrontPercent = parseMoney(res.upfront_percent) > 0 ? parseMoney(res.upfront_percent) : 25;
                 const paymentMode = String(res.payment_mode || 'add_25_now');
 
@@ -1185,7 +1186,7 @@
                 let dueNow = upfrontAmount;
                 if (paymentMode === 'pay_full_now') dueNow = Number(lockedTotal.toFixed(2));
                 if (paymentMode === 'pay_partial_of_upfront') {
-                    dueNow = Number(Math.min(Math.max(partialAmount, 0), upfrontAmount).toFixed(2));
+                    dueNow = Number((upfrontAmount * (partialPercent / 100)).toFixed(2));
                 }
 
                 const leadContext = buildLeadInvoiceModules(leadId, selectedProjectId);
@@ -1205,6 +1206,7 @@
                     locked_total_amount: Number(lockedTotal.toFixed(2)),
                     upfront_percent: upfrontPercent,
                     upfront_amount: upfrontAmount,
+                    partial_percent_of_upfront: partialPercent,
                     due_now_amount: dueNow,
                     currency: res.currency || 'INR',
                     notes: res.notes || '',
