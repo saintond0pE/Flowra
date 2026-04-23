@@ -222,10 +222,60 @@
                     </div>
                 </div>
                 
+                <div class="card" style="background:#fffebc; border-color: var(--border-color);">
+                    <div class="flex-between" style="margin-bottom: 12px;">
+                        <h3 style="margin:0;">Voice Generator</h3>
+                        <span class="badge" style="background:#000; color:#fff; border-color:#000;">LIVE DRAFT BUILDER</span>
+                    </div>
+
+                    <div class="grid-2" style="margin-bottom: 12px;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>Lead</label>
+                            <select id="voice-lead-select"></select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>Intent</label>
+                            <select id="voice-intent-select">
+                                <option value="discovery">Discovery Call Follow-up</option>
+                                <option value="proposal">Proposal Walkthrough</option>
+                                <option value="invoice">Invoice Reminder</option>
+                                <option value="status">Project Status Update</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid-3" style="margin-bottom: 12px; grid-template-columns: 1fr 120px 120px;">
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>Browser Voice</label>
+                            <select id="voice-browser-voice"></select>
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>Rate</label>
+                            <input id="voice-rate" type="number" min="0.7" max="1.3" step="0.1" value="1.0">
+                        </div>
+                        <div class="form-group" style="margin-bottom:0;">
+                            <label>Pitch</label>
+                            <input id="voice-pitch" type="number" min="0.7" max="1.3" step="0.1" value="1.0">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label>Generated Voice Script</label>
+                        <textarea id="voice-script-text" rows="6" placeholder="Generate from lead + tasks, then preview voice."></textarea>
+                    </div>
+
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="btn btn-primary" onclick="generateVoiceScript()">GENERATE SCRIPT</button>
+                        <button class="btn" onclick="previewGeneratedVoice()">PREVIEW VOICE</button>
+                        <button class="btn" onclick="stopGeneratedVoice()">STOP PREVIEW</button>
+                        <button class="btn btn-primary" onclick="sendVoicePayload()">SEND TO N8N</button>
+                    </div>
+                </div>
+
                 <div class="card" style="background:var(--border-color); color:#fff; border-color:var(--border-color);">
                     <h3 style="border-bottom: 2px solid #333; padding-bottom: 8px; margin-bottom: 12px;">Voice Agent Terminal</h3>
                     <div id="voice-logs" style="font-family: monospace; font-size: 12px; height: 120px; overflow-y: auto; color: #00ff00; font-weight: bold;">
-                        > Webhook System Online. Waiting for Voice Trigger...<br>
+                        > Voice generator online. Build a script, preview, and dispatch.<br>
                     </div>
                 </div>
             </div>
@@ -863,18 +913,200 @@
         function renderKnowledge() { document.getElementById('knowledge-grid').innerHTML = DB.tables.docs.map(doc => `<div class="card"><h3>${doc.title}</h3><p style="font-size:13px; border-left: 3px solid var(--accent-color); padding-left: 12px; background: #fff8f5">${doc.content.substring(0,60)}...</p></div>`).join(''); }
         function renderFeedback() { document.getElementById('feedback-table-body').innerHTML = DB.tables.feedback.slice().reverse().map(f => `<tr><td><span class="badge">${f.type}</span></td><td>${f.description}</td></tr>`).join(''); }
         window.triggerAutomation = function(action) { alert(`Webhook Payload ready for: ${action}`); }
-        
-        window.triggerVoiceWebhook = function() {
+
+        const VOICE_WEBHOOK_URL = 'YOUR_VOICE_WEBHOOK_URL_HERE';
+        let cachedSpeechVoices = [];
+
+        function addVoiceLog(line) {
             const logs = document.getElementById('voice-logs');
-            logs.innerHTML += `> [${new Date().toLocaleTimeString()}] Triggering n8n Voice Webhook...<br>`;
+            if (!logs) return;
+            logs.innerHTML += `> [${new Date().toLocaleTimeString()}] ${line}<br>`;
             logs.scrollTop = logs.scrollHeight;
-            
-            // Mocked API call for n8n Webhook
-            setTimeout(() => {
-                logs.innerHTML += `> [${new Date().toLocaleTimeString()}] <span style="color: #ff3c00;">✔ PAYLOAD ACCEPTED BY N8N</span><br>`;
-                logs.innerHTML += `> [${new Date().toLocaleTimeString()}] Voice Engine connected. Listening to prospect data...<br>`;
-                logs.scrollTop = logs.scrollHeight;
-            }, 800);
+        }
+
+        function getLeadPendingTaskContext(leadId) {
+            const relatedProjects = (DB.tables.projects || []).filter(p => p.lead_id === leadId);
+            const projectIds = relatedProjects.map(p => p.id);
+            const pendingTaskItems = [];
+
+            relatedProjects.forEach((p) => {
+                (p.tasks || []).forEach((t) => {
+                    if (!t.done) {
+                        pendingTaskItems.push(`${p.project_name}: ${t.name}`);
+                    }
+                });
+            });
+
+            return {
+                projectIds,
+                pendingTaskItems,
+                pendingTaskCount: pendingTaskItems.length
+            };
+        }
+
+        function renderVoiceLeadOptions() {
+            const leadSelect = document.getElementById('voice-lead-select');
+            if (!leadSelect) return;
+
+            const currentValue = leadSelect.value;
+            const leads = DB.tables.leads || [];
+            leadSelect.innerHTML = '<option value="">Select Lead</option>' + leads.map(l => `<option value="${l.id}">${l.name || 'Unknown'} (${l.email || 'no-email'})</option>`).join('');
+
+            if (currentValue && leads.some(l => l.id === currentValue)) {
+                leadSelect.value = currentValue;
+            }
+        }
+
+        function refreshSpeechVoiceOptions() {
+            const voiceSelect = document.getElementById('voice-browser-voice');
+            if (!voiceSelect || !('speechSynthesis' in window)) return;
+
+            const selected = voiceSelect.value;
+            cachedSpeechVoices = window.speechSynthesis.getVoices() || [];
+
+            if (cachedSpeechVoices.length === 0) {
+                voiceSelect.innerHTML = '<option value="">No browser voices found</option>';
+                return;
+            }
+
+            voiceSelect.innerHTML = cachedSpeechVoices.map((voice, idx) => `<option value="${idx}">${voice.name} (${voice.lang})</option>`).join('');
+            if (selected !== '' && cachedSpeechVoices[Number(selected)]) {
+                voiceSelect.value = selected;
+            }
+        }
+
+        function buildVoiceScriptForLead(lead, intent) {
+            const cleanMessage = (lead.message || '').replace(/\[[^\]]+\]\s*/g, '').trim();
+            const ctx = getLeadPendingTaskContext(lead.id);
+            const topTasks = ctx.pendingTaskItems.slice(0, 3);
+            const taskSnippet = topTasks.length > 0 ? `Top pending actions: ${topTasks.join('; ')}.` : 'No pending actions are currently open in the project board.';
+
+            if (intent === 'proposal') {
+                return `Hi ${lead.name || 'there'}, this is Flowra with your proposal walkthrough. We have mapped your project scope and prepared the execution sequence. ${taskSnippet} Reply with your preferred approval time and we will lock the schedule.`;
+            }
+            if (intent === 'invoice') {
+                return `Hi ${lead.name || 'there'}, this is Flowra with an invoice update for your ongoing project. ${taskSnippet} Please confirm once payment is processed so we can continue all queued tasks without delay.`;
+            }
+            if (intent === 'status') {
+                return `Hi ${lead.name || 'there'}, here is your current project status from Flowra. ${taskSnippet} We are tracking progress continuously and will send the next update after the next milestone is completed.`;
+            }
+
+            return `Hi ${lead.name || 'there'}, this is Flowra following up on your request${cleanMessage ? `: ${cleanMessage}.` : '.'} ${taskSnippet} Let us know your best time for a short call and we will align the next steps.`;
+        }
+
+        window.generateVoiceScript = function() {
+            const leadId = document.getElementById('voice-lead-select')?.value;
+            const intent = document.getElementById('voice-intent-select')?.value || 'discovery';
+            const scriptBox = document.getElementById('voice-script-text');
+
+            if (!leadId) {
+                alert('Select a lead first to generate a voice script.');
+                return;
+            }
+
+            const lead = (DB.tables.leads || []).find(l => l.id === leadId);
+            if (!lead) {
+                alert('Selected lead not found in local data.');
+                return;
+            }
+
+            const script = buildVoiceScriptForLead(lead, intent);
+            scriptBox.value = script;
+            addVoiceLog(`Script generated for lead ${lead.id}.`);
+        }
+
+        window.previewGeneratedVoice = function() {
+            if (!('speechSynthesis' in window)) {
+                alert('Speech preview is not supported in this browser.');
+                return;
+            }
+
+            const script = (document.getElementById('voice-script-text')?.value || '').trim();
+            if (!script) {
+                alert('Generate a script before previewing voice.');
+                return;
+            }
+
+            const voiceIndex = Number(document.getElementById('voice-browser-voice')?.value);
+            const rate = Number(document.getElementById('voice-rate')?.value || 1);
+            const pitch = Number(document.getElementById('voice-pitch')?.value || 1);
+
+            const utterance = new SpeechSynthesisUtterance(script);
+            utterance.rate = Number.isFinite(rate) ? rate : 1;
+            utterance.pitch = Number.isFinite(pitch) ? pitch : 1;
+            if (cachedSpeechVoices[voiceIndex]) {
+                utterance.voice = cachedSpeechVoices[voiceIndex];
+            }
+
+            window.speechSynthesis.cancel();
+            window.speechSynthesis.speak(utterance);
+            addVoiceLog('Voice preview started.');
+        }
+
+        window.stopGeneratedVoice = function() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+            }
+            addVoiceLog('Voice preview stopped.');
+        }
+
+        window.sendVoicePayload = async function() {
+            const leadId = document.getElementById('voice-lead-select')?.value;
+            const intent = document.getElementById('voice-intent-select')?.value || 'discovery';
+            const script = (document.getElementById('voice-script-text')?.value || '').trim();
+
+            if (!leadId) {
+                alert('Select a lead before sending voice payload.');
+                return;
+            }
+
+            if (!script) {
+                alert('Generate a script before sending to n8n.');
+                return;
+            }
+
+            if (VOICE_WEBHOOK_URL === 'YOUR_VOICE_WEBHOOK_URL_HERE') {
+                addVoiceLog('Webhook URL is not configured yet. Replace VOICE_WEBHOOK_URL.');
+                return;
+            }
+
+            const lead = (DB.tables.leads || []).find(l => l.id === leadId);
+            if (!lead) {
+                alert('Selected lead not found in local data.');
+                return;
+            }
+
+            const ctx = getLeadPendingTaskContext(lead.id);
+            const payload = new URLSearchParams();
+            payload.append('event', 'voice_generator_request');
+            payload.append('lead_id', lead.id);
+            payload.append('client_name', lead.name || 'Unknown');
+            payload.append('client_email', lead.email || '');
+            payload.append('client_number', lead.number ? String(lead.number) : '');
+            payload.append('intent', intent);
+            payload.append('script', script);
+            payload.append('project_ids', JSON.stringify(ctx.projectIds));
+            payload.append('pending_task_count', String(ctx.pendingTaskCount));
+            payload.append('pending_tasks', JSON.stringify(ctx.pendingTaskItems));
+
+            addVoiceLog('Dispatching voice payload to n8n...');
+
+            try {
+                await fetch(VOICE_WEBHOOK_URL, {
+                    method: 'POST',
+                    body: payload
+                });
+                addVoiceLog('<span style="color:#ff3c00;">Payload accepted by webhook endpoint.</span>');
+            } catch (e) {
+                addVoiceLog(`<span style="color:#ff8a8a;">Webhook failed: ${e.message || 'unknown error'}</span>`);
+            }
+        }
+
+        window.triggerVoiceWebhook = async function() {
+            if (!(document.getElementById('voice-script-text')?.value || '').trim()) {
+                window.generateVoiceScript();
+            }
+            await window.sendVoicePayload();
         }
 
         window.openScheduler = function(clientName = '', leadId = null) {
@@ -898,6 +1130,9 @@
         function renderPlanner() {
             const list = document.getElementById('meetings-list');
             if(!list) return;
+
+            renderVoiceLeadOptions();
+            refreshSpeechVoiceOptions();
 
             if(!DB.tables.meetings || DB.tables.meetings.length === 0) {
                 list.innerHTML = `<li style="padding: 12px; font-weight: 800; font-size: 12px; text-align: center; color: #888;">No upcoming deals scheduled.</li>`;
@@ -927,6 +1162,10 @@
             // Attempt Supabase load first; fall back to localStorage
             const fromCloud = await loadFromSupabase();
             if (!fromCloud) DB.load();
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.onvoiceschanged = refreshSpeechVoiceOptions;
+                refreshSpeechVoiceOptions();
+            }
             renderAll();
         };
         window.logout = function() { localStorage.removeItem('flowra_session'); window.location.href = '/login.html'; }
