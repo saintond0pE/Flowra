@@ -588,7 +588,7 @@
                 projectPayload.append('project_name', title);
                 projectPayload.append('tasks_json', JSON.stringify(combinedTasks));
 
-                fetch('https://sdfvsd4r5.app.n8n.cloud/webhook/45f6b781-c499-4c66-b0fd-cde3b78ce528', {
+                fetch('YOUR_NEW_WEBHOOK_URL_HERE', {
                     method: 'POST',
                     body: projectPayload
                 }).catch(e => console.error("Webhook error:", e));
