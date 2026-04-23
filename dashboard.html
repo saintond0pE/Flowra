@@ -296,7 +296,10 @@
                 // Upsert projects
                 if (DB.tables.projects.length > 0) {
                     const projRows = DB.tables.projects.map(p => ({
-                        id: p.id, client_name: p.client_name, project_name: p.project_name
+                        id: p.id,
+                        client_name: p.client_name,
+                        project_name: p.project_name,
+                        created_at: p.created_at || new Date().toISOString()
                     }));
                     const { error: pe } = await sb.from('projects').upsert(projRows, { onConflict: 'id' });
                     if (pe) throw pe;
@@ -305,7 +308,16 @@
                     let allTasks = [];
                     DB.tables.projects.forEach(p => {
                         (p.tasks || []).forEach(t => {
-                            allTasks.push({ id: t.id, project_id: p.id, category: t.category, module: t.module, name: t.name, notes: t.notes || '', done: t.done, updated_at: new Date().toISOString() });
+                            allTasks.push({
+                                id: t.id,
+                                project_id: p.id,
+                                category: t.category,
+                                module: t.module,
+                                name: t.name,
+                                notes: t.notes || '',
+                                done: t.done,
+                                updated_at: t.updated_at || new Date().toISOString()
+                            });
                         });
                     });
                     if (allTasks.length > 0) {
@@ -325,11 +337,37 @@
                             email: l.email, 
                             message: l.message || '', 
                             status: l.status, 
-                            number: rawNum === '' ? null : rawNum 
+                            number: rawNum === '' ? null : rawNum,
+                            created_at: l.created_at || new Date().toISOString()
                         };
                     });
                     const { error: le } = await sb.from('leads').upsert(leadRows, { onConflict: 'id' });
                     if (le) throw le;
+                }
+
+                // Upsert feedback registry
+                if ((DB.tables.feedback || []).length > 0) {
+                    const feedbackRows = DB.tables.feedback.map(f => ({
+                        id: f.id,
+                        type: f.type || 'idea',
+                        description: f.description || '',
+                        created_at: f.created_at || new Date().toISOString()
+                    }));
+                    const { error: fe } = await sb.from('feedback').upsert(feedbackRows, { onConflict: 'id' });
+                    if (fe) throw fe;
+                }
+
+                // Upsert team logs (if present)
+                if ((DB.tables.team || []).length > 0) {
+                    const teamRows = DB.tables.team.map(t => ({
+                        id: t.id,
+                        member: t.member || 'Unknown',
+                        hours: t.hours == null || t.hours === '' ? null : t.hours,
+                        status: t.status || 'active',
+                        created_at: t.created_at || new Date().toISOString()
+                    }));
+                    const { error: tle } = await sb.from('team_logs').upsert(teamRows, { onConflict: 'id' });
+                    if (tle) throw tle;
                 }
 
                 setSyncStatus('ok');
@@ -378,24 +416,54 @@
                     console.error('[Flowra] Leads fetch crash:', e); 
                 }
 
+                // 1b. ALWAYS Fetch feedback independently from Supabase (newest first)
+                try {
+                    const { data: feedbackData, error: feedbackErr } = await sb.from('feedback').select('*').order('created_at', { ascending: false });
+                    if (feedbackErr) throw feedbackErr;
+                    if (feedbackData) {
+                        DB.tables.feedback = feedbackData;
+                        DB.save();
+                    }
+                } catch (e) {
+                    console.warn('[Flowra] Feedback fetch skipped:', e.message || e);
+                }
+
+                // 1c. ALWAYS Fetch team logs independently from Supabase (newest first)
+                try {
+                    const { data: teamData, error: teamErr } = await sb.from('team_logs').select('*').order('created_at', { ascending: false });
+                    if (teamErr) throw teamErr;
+                    if (teamData) {
+                        DB.tables.team = teamData;
+                        DB.save();
+                    }
+                } catch (e) {
+                    console.warn('[Flowra] Team logs fetch skipped:', e.message || e);
+                }
+
                 // 2. Project/Task Logic: Local storage is source of truth for workspace activity
                 const hasLocalData = DB.tables.projects && DB.tables.projects.length > 0;
 
                 if (hasLocalData) {
+                    sortAllTablesNewestFirst();
+                    DB.save();
                     syncToSupabase(); // Sync back to Supabase in background
                     return true;
                 }
 
                 // Fetch Projects/Tasks from Cloud only if local is empty
                 try {
-                    const { data: projects } = await sb.from('projects').select('*');
-                    const { data: tasks } = await sb.from('tasks').select('*');
+                    const { data: projects } = await sb.from('projects').select('*').order('created_at', { ascending: false });
+                    const { data: tasks } = await sb.from('tasks').select('*').order('updated_at', { ascending: false });
                     
                     if (projects && projects.length > 0) {
                         const projMap = {};
                         projects.forEach(p => { projMap[p.id] = { ...p, tasks: [] }; });
                         if (tasks) tasks.forEach(t => { if (projMap[t.project_id]) projMap[t.project_id].tasks.push(t); });
-                        DB.tables.projects = Object.values(projMap);
+                        DB.tables.projects = Object.values(projMap).map(p => ({
+                            ...p,
+                            tasks: sortNewestFirst(p.tasks || [], 'updated_at')
+                        }));
+                        sortAllTablesNewestFirst();
                         DB.save();
                     }
                     return true;
@@ -411,6 +479,47 @@
         /* Generate safe unique string IDs to avoid Number precision bugs in inline HTML handlers.
            Uses timestamp prefix so newest ID lexically sorts at the top */
         function generateId() { return 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 5); }
+
+        function parseIdTimestamp(id) {
+            if (!id || typeof id !== 'string' || !id.startsWith('id_')) return 0;
+            const parts = id.split('_');
+            if (parts.length < 2) return 0;
+            const parsed = parseInt(parts[1], 36);
+            return Number.isFinite(parsed) ? parsed : 0;
+        }
+
+        function normalizeDateValue(value) {
+            if (!value) return 0;
+            const ms = new Date(value).getTime();
+            return Number.isFinite(ms) ? ms : 0;
+        }
+
+        function sortNewestFirst(items, dateField) {
+            if (!Array.isArray(items)) return [];
+            return items.slice().sort((a, b) => {
+                const aDate = normalizeDateValue(a && a[dateField]);
+                const bDate = normalizeDateValue(b && b[dateField]);
+                if (aDate !== bDate) return bDate - aDate;
+
+                const aIdTs = parseIdTimestamp(a && a.id);
+                const bIdTs = parseIdTimestamp(b && b.id);
+                if (aIdTs !== bIdTs) return bIdTs - aIdTs;
+
+                const aId = String((a && a.id) || '');
+                const bId = String((b && b.id) || '');
+                return bId.localeCompare(aId);
+            });
+        }
+
+        function sortAllTablesNewestFirst() {
+            DB.tables.leads = sortNewestFirst(DB.tables.leads || [], 'created_at');
+            DB.tables.projects = sortNewestFirst(DB.tables.projects || [], 'created_at').map(p => ({
+                ...p,
+                tasks: sortNewestFirst(p.tasks || [], 'updated_at')
+            }));
+            DB.tables.feedback = sortNewestFirst(DB.tables.feedback || [], 'created_at');
+            DB.tables.team = sortNewestFirst(DB.tables.team || [], 'created_at');
+        }
 
         /* UI Switching */
         function switchView(viewId) {
@@ -545,7 +654,8 @@
                             module: mod,
                             name: taskName,
                             notes: '',
-                            done: false
+                            done: false,
+                            updated_at: new Date().toISOString()
                         });
                     });
                 }
@@ -559,13 +669,14 @@
                     module: "Client Notes & Additions",
                     name: "Execute Custom Scope given by Client",
                     notes: globalNotes,
-                    done: false
+                    done: false,
+                    updated_at: new Date().toISOString()
                 });
             }
 
             // Fallback if absolutely nothing is selected
             if(combinedTasks.length === 0) {
-                combinedTasks.push({ id: generateId(), category: "⬜ CUSTOM", module: "General Setup", name: "Configure Project", notes: '', done: false });
+                combinedTasks.push({ id: generateId(), category: "⬜ CUSTOM", module: "General Setup", name: "Configure Project", notes: '', done: false, updated_at: new Date().toISOString() });
             }
 
             // Keep project ID stable per lead so all tasks for a client map to one project key.
@@ -585,7 +696,8 @@
                         client_name: client,
                         project_name: title,
                         tasks: combinedTasks,
-                        lead_id: activeLeadIdForGen
+                        lead_id: activeLeadIdForGen,
+                        created_at: new Date().toISOString()
                     });
                 }
             } else {
@@ -595,7 +707,8 @@
                     client_name: client,
                     project_name: title,
                     tasks: combinedTasks,
-                    lead_id: null
+                    lead_id: null,
+                    created_at: new Date().toISOString()
                 });
             }
 
@@ -693,7 +806,8 @@
                         module: 'Ad-hoc Task',
                         name: res.name,
                         notes: res.notes,
-                        done: false
+                        done: false,
+                        updated_at: new Date().toISOString()
                     });
                     DB.save(); syncToSupabase(); renderAll(); closeModal();
                 } else {
@@ -709,6 +823,7 @@
                 const t = proj.tasks.find(x => x.id === taskId);
                 if(t) { 
                     t.done = !t.done; 
+                    t.updated_at = new Date().toISOString();
                     
                     // Leaderboard Tracking: Record WHO completed this task
                     if (t.done) {
@@ -746,7 +861,9 @@
            -------------------------------------- */
 
         function renderAll() {
-            DB.load(); renderHomeMetrics(); renderLeads(); renderPlanner(); renderProjects(); renderTeam(); renderKnowledge(); renderFeedback();
+            DB.load();
+            sortAllTablesNewestFirst();
+            renderHomeMetrics(); renderLeads(); renderPlanner(); renderProjects(); renderTeam(); renderKnowledge(); renderFeedback();
         }
 
         function renderHomeMetrics() {
@@ -769,8 +886,9 @@
 
             let allPendingTasks = [];
             DB.tables.projects.forEach(p => { (p.tasks || []).forEach(t => { if(!t.done) allPendingTasks.push({proj: p.project_name, ...t}); }) });
+            allPendingTasks = sortNewestFirst(allPendingTasks, 'updated_at');
             
-            document.getElementById('home-recent-tasks-body').innerHTML = allPendingTasks.slice().reverse().slice(0, 5).map(task => `
+            document.getElementById('home-recent-tasks-body').innerHTML = allPendingTasks.slice(0, 5).map(task => `
                 <tr>
                     <td><strong>${task.proj}</strong></td>
                     <td><div style="font-weight:800; font-size:11px;">${task.category}</div></td>
@@ -837,7 +955,7 @@
         window.createNewLead = function() { 
             openModal("ADD NEW LEAD", [{id: 'name', label: 'Full Name'}, {id: 'email', label: 'Email Address'}, {id: 'number', label: 'Mobile Number'}, {id: 'status', label: 'Initial Status', type: 'select', options: ['new', 'contacted', 'closed']}], (res) => { 
                 if(res.name) { 
-                    DB.tables.leads.push({ id: generateId(), name: res.name, email: res.email, number: res.number, message: "", status: res.status }); 
+                    DB.tables.leads.unshift({ id: generateId(), name: res.name, email: res.email, number: res.number, message: "", status: res.status, created_at: new Date().toISOString() }); 
                     DB.save(); renderAll(); syncToSupabase(); closeModal(); 
                 }
             }); 
@@ -882,7 +1000,7 @@
             `).join(''); 
         }
         function renderKnowledge() { document.getElementById('knowledge-grid').innerHTML = DB.tables.docs.map(doc => `<div class="card"><h3>${doc.title}</h3><p style="font-size:13px; border-left: 3px solid var(--accent-color); padding-left: 12px; background: #fff8f5">${doc.content.substring(0,60)}...</p></div>`).join(''); }
-        function renderFeedback() { document.getElementById('feedback-table-body').innerHTML = DB.tables.feedback.slice().reverse().map(f => `<tr><td><span class="badge">${f.type}</span></td><td>${f.description}</td></tr>`).join(''); }
+        function renderFeedback() { document.getElementById('feedback-table-body').innerHTML = DB.tables.feedback.map(f => `<tr><td><span class="badge">${f.type}</span></td><td>${f.description}</td></tr>`).join(''); }
         window.triggerAutomation = function(action) { alert(`Webhook Payload ready for: ${action}`); }
         
         window.triggerVoiceWebhook = function() {
