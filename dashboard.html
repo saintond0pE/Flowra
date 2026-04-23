@@ -299,6 +299,7 @@
                         id: p.id,
                         client_name: p.client_name,
                         project_name: p.project_name,
+                        lead_id: p.lead_id || null,
                         created_at: p.created_at || new Date().toISOString()
                     }));
                     const { error: pe } = await sb.from('projects').upsert(projRows, { onConflict: 'id' });
@@ -687,6 +688,7 @@
                     projectIdForPayload = existingLeadProject.id;
                     existingLeadProject.client_name = client;
                     existingLeadProject.project_name = title;
+                    existingLeadProject.lead_id = activeLeadIdForGen;
                     if (!Array.isArray(existingLeadProject.tasks)) existingLeadProject.tasks = [];
                     existingLeadProject.tasks = existingLeadProject.tasks.concat(combinedTasks);
                 } else {
