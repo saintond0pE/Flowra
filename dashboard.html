@@ -391,6 +391,7 @@
                 project_id: i.project_id || null,
                 invoice_id: i.id || null,
                 lead_name: i.lead_name || 'Unknown',
+                lead_email: i.lead_email || '',
                 project_name: i.project_name || 'Unassigned',
                 project_ids: Array.isArray(i.project_ids) ? i.project_ids : [],
                 project_names: Array.isArray(i.project_names) ? i.project_names : [],
@@ -420,6 +421,7 @@
                 id: r.invoice_id || generateId(),
                 lead_id: r.lead_id || null,
                 lead_name: r.lead_name || 'Unknown',
+                lead_email: r.lead_email || '',
                 project_id: r.project_id || null,
                 project_name: r.project_name || 'Unassigned',
                 project_ids: Array.isArray(r.project_ids) ? r.project_ids : (r.project_id ? [r.project_id] : []),
@@ -452,6 +454,7 @@
             const updatePayload = {
                 invoice_id: row.invoice_id || null,
                 lead_name: row.lead_name || 'Unknown',
+                lead_email: row.lead_email || '',
                 project_name: row.project_name || 'Unassigned',
                 project_ids: Array.isArray(row.project_ids) ? row.project_ids : [],
                 project_names: Array.isArray(row.project_names) ? row.project_names : [],
@@ -1504,6 +1507,7 @@
                 payload.append('invoice_id', invoiceRecord.id);
                 payload.append('lead_id', invoiceRecord.lead_id || 'none');
                 payload.append('lead_name', invoiceRecord.lead_name || 'Unknown');
+                payload.append('lead_email', invoiceRecord.lead_email || '');
                 payload.append('project_id', invoiceRecord.project_id || 'none');
                 payload.append('project_name', invoiceRecord.project_name || 'Unassigned');
                 payload.append('project_ids', JSON.stringify(invoiceRecord.project_ids || []));
@@ -1605,6 +1609,7 @@
             const { selectedProjectId, selectedProjectName } = getSelectedInvoiceProjectRef();
             const calc = getInvoiceComputation();
             const leadContext = buildLeadInvoiceModules(invoiceModalState.leadId, selectedProjectId);
+            const leadRecord = (DB.tables.leads || []).find((l) => l.id === invoiceModalState.leadId) || null;
             const currencyRaw = document.getElementById('invoice-currency')?.value || 'INR';
             const currency = String(currencyRaw).trim().toUpperCase().slice(0, 8) || 'INR';
             const paymentMethod = normalizePaymentMethod(document.getElementById('invoice-payment-method')?.value);
@@ -1641,6 +1646,7 @@
                 id: generateId(),
                 lead_id: invoiceModalState.leadId,
                 lead_name: invoiceModalState.clientName || 'Unknown Client',
+                lead_email: leadRecord ? (leadRecord.email || '') : '',
                 project_id: selectedProjectId,
                 project_name: selectedProjectName,
                 project_ids: leadContext.projectIds,

@@ -6,6 +6,7 @@ create table if not exists public.invoice_lock (
   project_id text not null,
   invoice_id text,
   lead_name text,
+  lead_email text,
   project_name text,
   project_ids jsonb default '[]'::jsonb,
   project_names jsonb default '[]'::jsonb,
@@ -32,6 +33,7 @@ create table if not exists public.invoice_lock (
 
 alter table public.invoice_lock add column if not exists invoice_id text;
 alter table public.invoice_lock add column if not exists lead_name text;
+alter table public.invoice_lock add column if not exists lead_email text;
 alter table public.invoice_lock add column if not exists project_name text;
 alter table public.invoice_lock add column if not exists project_ids jsonb default '[]'::jsonb;
 alter table public.invoice_lock add column if not exists project_names jsonb default '[]'::jsonb;
@@ -81,30 +83,32 @@ with check (true);
 -- n8n can fetch this view directly to get normalized payload.
 create or replace view public.v_invoice_lock_payload as
 select
-  lead_id,
-  project_id,
-  invoice_id,
-  lead_name,
-  project_name,
-  project_ids,
-  project_names,
-  modules,
-  payment_mode,
-  payment_method,
-  base_amount,
-  addon_amount,
-  previous_locked_total,
-  current_charge_base,
-  locked_total,
-  upfront_percent,
-  upfront_amount,
-  partial_percent_of_upfront,
-  due_now_amount,
-  paid_now_amount,
-  remaining_amount,
-  currency,
-  notes,
-  created_at,
-  updated_at
-from public.invoice_lock
+  il.lead_id,
+  il.project_id,
+  il.invoice_id,
+  il.lead_name,
+  coalesce(il.lead_email, l.email, '') as lead_email,
+  il.project_name,
+  il.project_ids,
+  il.project_names,
+  il.modules,
+  il.payment_mode,
+  il.payment_method,
+  il.base_amount,
+  il.addon_amount,
+  il.previous_locked_total,
+  il.current_charge_base,
+  il.locked_total,
+  il.upfront_percent,
+  il.upfront_amount,
+  il.partial_percent_of_upfront,
+  il.due_now_amount,
+  il.paid_now_amount,
+  il.remaining_amount,
+  il.currency,
+  il.notes,
+  il.created_at,
+  il.updated_at
+from public.invoice_lock il
+left join public.leads l on l.id = il.lead_id
 order by updated_at desc;
