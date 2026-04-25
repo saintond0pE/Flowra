@@ -1570,20 +1570,117 @@
             };
         }
 
+        async function syncSingleInvoiceToSupabase(invoiceRecord) {
+            const fullInvoiceRow = {
+                id: invoiceRecord.id,
+                lead_id: invoiceRecord.lead_id || null,
+                lead_name: invoiceRecord.lead_name || 'Unknown',
+                project_id: invoiceRecord.project_id || null,
+                project_name: invoiceRecord.project_name || 'Unassigned',
+                project_ids: Array.isArray(invoiceRecord.project_ids) ? invoiceRecord.project_ids : [],
+                project_names: Array.isArray(invoiceRecord.project_names) ? invoiceRecord.project_names : [],
+                modules: Array.isArray(invoiceRecord.modules) ? invoiceRecord.modules : [],
+                payment_mode: invoiceRecord.payment_mode || 'add_25_now',
+                payment_method: invoiceRecord.payment_method || 'upi',
+                base_amount: invoiceRecord.base_amount || 0,
+                addon_amount: invoiceRecord.addon_amount || 0,
+                current_charge_base: invoiceRecord.current_charge_base || 0,
+                previous_locked_total: invoiceRecord.previous_locked_total || 0,
+                locked_total_amount: invoiceRecord.locked_total_amount || 0,
+                upfront_percent: invoiceRecord.upfront_percent || 25,
+                upfront_amount: invoiceRecord.upfront_amount || 0,
+                partial_percent_of_upfront: invoiceRecord.partial_percent_of_upfront || 0,
+                due_now_amount: invoiceRecord.due_now_amount || 0,
+                paid_now_amount: invoiceRecord.paid_now_amount || 0,
+                remaining_amount: invoiceRecord.remaining_amount || 0,
+                currency: invoiceRecord.currency || 'INR',
+                notes: invoiceRecord.notes || '',
+                created_at: invoiceRecord.created_at || new Date().toISOString()
+            };
+
+            const minimalInvoiceRow = {
+                id: invoiceRecord.id,
+                lead_id: invoiceRecord.lead_id || null,
+                lead_name: invoiceRecord.lead_name || 'Unknown',
+                project_id: invoiceRecord.project_id || null,
+                project_name: invoiceRecord.project_name || 'Unassigned',
+                modules: Array.isArray(invoiceRecord.modules) ? invoiceRecord.modules : [],
+                payment_mode: invoiceRecord.payment_mode || 'add_25_now',
+                base_amount: invoiceRecord.base_amount || 0,
+                addon_amount: invoiceRecord.addon_amount || 0,
+                locked_total_amount: invoiceRecord.locked_total_amount || 0,
+                upfront_percent: invoiceRecord.upfront_percent || 25,
+                upfront_amount: invoiceRecord.upfront_amount || 0,
+                due_now_amount: invoiceRecord.due_now_amount || 0,
+                currency: invoiceRecord.currency || 'INR',
+                notes: invoiceRecord.notes || '',
+                created_at: invoiceRecord.created_at || new Date().toISOString()
+            };
+
+            const invoiceLockRow = {
+                lead_id: invoiceRecord.lead_id || null,
+                project_id: invoiceRecord.project_id || null,
+                locked_total: invoiceRecord.locked_total_amount || 0,
+                upfront_percent: invoiceRecord.upfront_percent || 25,
+                currency: invoiceRecord.currency || 'INR'
+            };
+
+            let lastError = null;
+
+            try {
+                const { error } = await sb.from('invoices').upsert([fullInvoiceRow], { onConflict: 'id' });
+                if (error) throw error;
+                return 'invoices';
+            } catch (e1) {
+                lastError = e1;
+            }
+
+            try {
+                const { error } = await sb.from('invoices').upsert([minimalInvoiceRow], { onConflict: 'id' });
+                if (error) throw error;
+                return 'invoices';
+            } catch (e2) {
+                lastError = e2;
+            }
+
+            try {
+                const { error } = await sb.from('invoice_lock').insert([invoiceLockRow]);
+                if (error) throw error;
+                return 'invoice_lock';
+            } catch (e3) {
+                lastError = e3;
+            }
+
+            throw lastError || new Error('Unknown invoice sync error');
+        }
+
         async function persistInvoiceRecord(invoiceRecord) {
-            if (!invoiceRecord) return;
+            if (!invoiceRecord) return false;
 
             if (!Array.isArray(DB.tables.invoices)) DB.tables.invoices = [];
             DB.tables.invoices.unshift(invoiceRecord);
             DB.save();
+
+            try {
+                await syncSingleInvoiceToSupabase(invoiceRecord);
+            } catch (e) {
+                console.error('[Flowra] Invoice cloud sync failed:', e);
+                setSyncStatus('error', e.message || 'Invoice sync failed');
+                renderAll();
+                alert('Invoice saved locally, but failed to save in Supabase invoice table. Check table schema and RLS.');
+                return false;
+            }
+
             await syncToSupabase();
             renderAll();
+            return true;
         }
 
         window.saveInvoiceScheduler = async function() {
             const invoiceRecord = buildInvoiceRecordFromForm();
             if (!invoiceRecord) return;
-            await persistInvoiceRecord(invoiceRecord);
+            const synced = await persistInvoiceRecord(invoiceRecord);
+            if (!synced) return;
             closeInvoiceModal();
             alert(`Invoice saved. Due now: ${invoiceRecord.currency} ${invoiceRecord.due_now_amount.toFixed(2)} | Remaining: ${invoiceRecord.currency} ${invoiceRecord.remaining_amount.toFixed(2)} | Method: ${invoiceRecord.payment_method.toUpperCase()}`);
         }
@@ -1591,7 +1688,8 @@
         window.sendInvoiceScheduler = async function() {
             const invoiceRecord = buildInvoiceRecordFromForm();
             if (!invoiceRecord) return;
-            await persistInvoiceRecord(invoiceRecord);
+            const synced = await persistInvoiceRecord(invoiceRecord);
+            if (!synced) return;
             await dispatchInvoiceToN8n(invoiceRecord);
             closeInvoiceModal();
             alert(`Invoice sent. Due now: ${invoiceRecord.currency} ${invoiceRecord.due_now_amount.toFixed(2)} | Remaining: ${invoiceRecord.currency} ${invoiceRecord.remaining_amount.toFixed(2)} | Method: ${invoiceRecord.payment_method.toUpperCase()}`);
