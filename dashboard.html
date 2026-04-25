@@ -385,6 +385,65 @@
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const INVOICE_WEBHOOK_URL = 'https://sdfvsd4r5.app.n8n.cloud/webhook-test/61ae570c-1099-415e-a7fe-6e92ac485c3b';
 
+        function mapInvoiceRecordToInvoiceLockRow(i) {
+            return {
+                lead_id: i.lead_id || null,
+                project_id: i.project_id || null,
+                invoice_id: i.id || null,
+                lead_name: i.lead_name || 'Unknown',
+                project_name: i.project_name || 'Unassigned',
+                project_ids: Array.isArray(i.project_ids) ? i.project_ids : [],
+                project_names: Array.isArray(i.project_names) ? i.project_names : [],
+                modules: Array.isArray(i.modules) ? i.modules : [],
+                payment_mode: i.payment_mode || 'add_25_now',
+                payment_method: i.payment_method || 'upi',
+                base_amount: i.base_amount || 0,
+                addon_amount: i.addon_amount || 0,
+                previous_locked_total: i.previous_locked_total || 0,
+                current_charge_base: i.current_charge_base || 0,
+                locked_total: i.locked_total_amount || 0,
+                upfront_percent: i.upfront_percent || 25,
+                upfront_amount: i.upfront_amount || 0,
+                partial_percent_of_upfront: i.partial_percent_of_upfront || 0,
+                due_now_amount: i.due_now_amount || 0,
+                paid_now_amount: i.paid_now_amount || 0,
+                remaining_amount: i.remaining_amount || 0,
+                currency: i.currency || 'INR',
+                notes: i.notes || '',
+                created_at: i.created_at || new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+        }
+
+        function mapInvoiceLockRowToLocalInvoice(r) {
+            return {
+                id: r.invoice_id || generateId(),
+                lead_id: r.lead_id || null,
+                lead_name: r.lead_name || 'Unknown',
+                project_id: r.project_id || null,
+                project_name: r.project_name || 'Unassigned',
+                project_ids: Array.isArray(r.project_ids) ? r.project_ids : (r.project_id ? [r.project_id] : []),
+                project_names: Array.isArray(r.project_names) ? r.project_names : [],
+                modules: Array.isArray(r.modules) ? r.modules : [],
+                payment_mode: r.payment_mode || 'add_25_now',
+                payment_method: r.payment_method || 'upi',
+                base_amount: Number(r.base_amount) || 0,
+                addon_amount: Number(r.addon_amount) || 0,
+                previous_locked_total: Number(r.previous_locked_total) || 0,
+                current_charge_base: Number(r.current_charge_base) || 0,
+                locked_total_amount: Number(r.locked_total) || 0,
+                upfront_percent: Number(r.upfront_percent) || 25,
+                upfront_amount: Number(r.upfront_amount) || 0,
+                partial_percent_of_upfront: Number(r.partial_percent_of_upfront) || 0,
+                due_now_amount: Number(r.due_now_amount) || 0,
+                paid_now_amount: Number(r.paid_now_amount) || 0,
+                remaining_amount: Number(r.remaining_amount) || 0,
+                currency: r.currency || 'INR',
+                notes: r.notes || '',
+                created_at: r.created_at || new Date().toISOString()
+            };
+        }
+
         /* Push entire local DB state to Supabase (upsert-based) */
         async function syncToSupabase() {
             try {
@@ -478,13 +537,7 @@
                             if (!leadId || !projectId) return;
                             const key = `${leadId}__${projectId}`;
                             if (!lockByPair[key]) {
-                                lockByPair[key] = {
-                                    lead_id: leadId,
-                                    project_id: projectId,
-                                    locked_total: i.locked_total_amount || 0,
-                                    upfront_percent: i.upfront_percent || 25,
-                                    currency: i.currency || 'INR'
-                                };
+                                lockByPair[key] = mapInvoiceRecordToInvoiceLockRow(i);
                             }
                         });
 
@@ -573,32 +626,7 @@
                     const { data: invoiceLockData, error: invoiceLockErr } = await sb.from('invoice_lock').select('*');
                     if (invoiceLockErr) throw invoiceLockErr;
                     if (invoiceLockData) {
-                        DB.tables.invoices = invoiceLockData.map((r) => ({
-                            id: generateId(),
-                            lead_id: r.lead_id || null,
-                            lead_name: 'Unknown',
-                            project_id: r.project_id || null,
-                            project_name: 'Unassigned',
-                            project_ids: r.project_id ? [r.project_id] : [],
-                            project_names: [],
-                            modules: [],
-                            payment_mode: 'add_25_now',
-                            payment_method: 'upi',
-                            base_amount: Number(r.locked_total) || 0,
-                            addon_amount: 0,
-                            current_charge_base: Number(r.locked_total) || 0,
-                            previous_locked_total: Number(r.locked_total) || 0,
-                            locked_total_amount: Number(r.locked_total) || 0,
-                            upfront_percent: Number(r.upfront_percent) || 25,
-                            upfront_amount: roundMoney((Number(r.locked_total) || 0) * ((Number(r.upfront_percent) || 25) / 100)),
-                            partial_percent_of_upfront: 0,
-                            due_now_amount: roundMoney((Number(r.locked_total) || 0) * ((Number(r.upfront_percent) || 25) / 100)),
-                            paid_now_amount: 0,
-                            remaining_amount: Number(r.locked_total) || 0,
-                            currency: r.currency || 'INR',
-                            notes: '',
-                            created_at: new Date().toISOString()
-                        }));
+                        DB.tables.invoices = invoiceLockData.map(mapInvoiceLockRowToLocalInvoice);
                         DB.save();
                     }
                 } catch (e) {
@@ -1579,45 +1607,11 @@
         }
 
         async function syncSingleInvoiceToSupabase(invoiceRecord) {
-            const invoiceLockRow = {
-                lead_id: invoiceRecord.lead_id || null,
-                project_id: invoiceRecord.project_id || null,
-                locked_total: invoiceRecord.locked_total_amount || 0,
-                upfront_percent: invoiceRecord.upfront_percent || 25,
-                currency: invoiceRecord.currency || 'INR'
-            };
-
-            // Try update first for existing lock row.
-            const { error: updateErr } = await sb
+            const invoiceLockRow = mapInvoiceRecordToInvoiceLockRow(invoiceRecord);
+            const { error: upsertErr } = await sb
                 .from('invoice_lock')
-                .update({
-                    locked_total: invoiceLockRow.locked_total,
-                    upfront_percent: invoiceLockRow.upfront_percent,
-                    currency: invoiceLockRow.currency
-                })
-                .eq('lead_id', invoiceLockRow.lead_id)
-                .eq('project_id', invoiceLockRow.project_id);
-
-            if (updateErr) {
-                throw updateErr;
-            }
-
-            // Ensure a row exists (if no row existed, insert a new one).
-            const { data: lockRows, error: selectErr } = await sb
-                .from('invoice_lock')
-                .select('lead_id, project_id')
-                .eq('lead_id', invoiceLockRow.lead_id)
-                .eq('project_id', invoiceLockRow.project_id)
-                .limit(1);
-
-            if (selectErr) {
-                throw selectErr;
-            }
-
-            if (!Array.isArray(lockRows) || lockRows.length === 0) {
-                const { error: insertErr } = await sb.from('invoice_lock').insert([invoiceLockRow]);
-                if (insertErr) throw insertErr;
-            }
+                .upsert([invoiceLockRow], { onConflict: 'lead_id,project_id' });
+            if (upsertErr) throw upsertErr;
 
             return 'invoice_lock';
         }
