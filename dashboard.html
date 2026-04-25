@@ -467,39 +467,34 @@
                     if (tle) throw tle;
                 }
 
-                // Upsert invoices (optional table: skip hard failure if table not created yet)
+                // Upsert invoice locks (single latest lock per lead+project)
                 if ((DB.tables.invoices || []).length > 0) {
                     try {
-                        const invoiceRows = DB.tables.invoices.map(i => ({
-                            id: i.id,
-                            lead_id: i.lead_id || null,
-                            lead_name: i.lead_name || 'Unknown',
-                            project_id: i.project_id || null,
-                            project_name: i.project_name || 'Unassigned',
-                            project_ids: Array.isArray(i.project_ids) ? i.project_ids : [],
-                            project_names: Array.isArray(i.project_names) ? i.project_names : [],
-                            modules: Array.isArray(i.modules) ? i.modules : [],
-                            payment_mode: i.payment_mode || 'add_25_now',
-                            payment_method: i.payment_method || 'upi',
-                            base_amount: i.base_amount || 0,
-                            addon_amount: i.addon_amount || 0,
-                            current_charge_base: i.current_charge_base || 0,
-                            previous_locked_total: i.previous_locked_total || 0,
-                            locked_total_amount: i.locked_total_amount || 0,
-                            upfront_percent: i.upfront_percent || 25,
-                            upfront_amount: i.upfront_amount || 0,
-                            partial_percent_of_upfront: i.partial_percent_of_upfront || 0,
-                            due_now_amount: i.due_now_amount || 0,
-                            paid_now_amount: i.paid_now_amount || i.due_now_amount || 0,
-                            remaining_amount: i.remaining_amount || 0,
-                            currency: i.currency || 'INR',
-                            notes: i.notes || '',
-                            created_at: i.created_at || new Date().toISOString()
-                        }));
-                        const { error: ie } = await sb.from('invoices').upsert(invoiceRows, { onConflict: 'id' });
-                        if (ie) throw ie;
+                        const newestFirst = sortNewestFirst(DB.tables.invoices || [], 'created_at');
+                        const lockByPair = {};
+                        newestFirst.forEach((i) => {
+                            const leadId = i && i.lead_id ? String(i.lead_id) : '';
+                            const projectId = i && i.project_id ? String(i.project_id) : '';
+                            if (!leadId || !projectId) return;
+                            const key = `${leadId}__${projectId}`;
+                            if (!lockByPair[key]) {
+                                lockByPair[key] = {
+                                    lead_id: leadId,
+                                    project_id: projectId,
+                                    locked_total: i.locked_total_amount || 0,
+                                    upfront_percent: i.upfront_percent || 25,
+                                    currency: i.currency || 'INR'
+                                };
+                            }
+                        });
+
+                        const invoiceLockRows = Object.values(lockByPair);
+                        if (invoiceLockRows.length > 0) {
+                            const { error: ile } = await sb.from('invoice_lock').upsert(invoiceLockRows, { onConflict: 'lead_id,project_id' });
+                            if (ile) throw ile;
+                        }
                     } catch (invoiceErr) {
-                        console.warn('[Flowra] Invoices sync skipped:', invoiceErr.message || invoiceErr);
+                        console.warn('[Flowra] Invoice lock sync skipped:', invoiceErr.message || invoiceErr);
                     }
                 }
 
@@ -573,28 +568,41 @@
                     console.warn('[Flowra] Team logs fetch skipped:', e.message || e);
                 }
 
-                // 1d. ALWAYS Fetch invoices independently from Supabase (newest first)
+                // 1d. ALWAYS Fetch invoice_lock independently from Supabase
                 try {
-                    const { data: invoiceData, error: invoiceErr } = await sb.from('invoices').select('*').order('created_at', { ascending: false });
-                    if (invoiceErr) throw invoiceErr;
-                    if (invoiceData) {
-                        DB.tables.invoices = invoiceData.map((i) => ({
-                            ...i,
-                            project_ids: Array.isArray(i.project_ids) ? i.project_ids : [],
-                            project_names: Array.isArray(i.project_names) ? i.project_names : [],
-                            modules: Array.isArray(i.modules) ? i.modules : [],
-                            payment_mode: i.payment_mode || 'add_25_now',
-                            payment_method: i.payment_method || 'upi',
-                            current_charge_base: Number.isFinite(Number(i.current_charge_base)) ? Number(i.current_charge_base) : 0,
-                            partial_percent_of_upfront: Number.isFinite(Number(i.partial_percent_of_upfront)) ? Number(i.partial_percent_of_upfront) : 0,
-                            previous_locked_total: Number.isFinite(Number(i.previous_locked_total)) ? Number(i.previous_locked_total) : 0,
-                            paid_now_amount: Number.isFinite(Number(i.paid_now_amount)) ? Number(i.paid_now_amount) : (Number(i.due_now_amount) || 0),
-                            remaining_amount: Number.isFinite(Number(i.remaining_amount)) ? Number(i.remaining_amount) : 0
+                    const { data: invoiceLockData, error: invoiceLockErr } = await sb.from('invoice_lock').select('*');
+                    if (invoiceLockErr) throw invoiceLockErr;
+                    if (invoiceLockData) {
+                        DB.tables.invoices = invoiceLockData.map((r) => ({
+                            id: generateId(),
+                            lead_id: r.lead_id || null,
+                            lead_name: 'Unknown',
+                            project_id: r.project_id || null,
+                            project_name: 'Unassigned',
+                            project_ids: r.project_id ? [r.project_id] : [],
+                            project_names: [],
+                            modules: [],
+                            payment_mode: 'add_25_now',
+                            payment_method: 'upi',
+                            base_amount: Number(r.locked_total) || 0,
+                            addon_amount: 0,
+                            current_charge_base: Number(r.locked_total) || 0,
+                            previous_locked_total: Number(r.locked_total) || 0,
+                            locked_total_amount: Number(r.locked_total) || 0,
+                            upfront_percent: Number(r.upfront_percent) || 25,
+                            upfront_amount: roundMoney((Number(r.locked_total) || 0) * ((Number(r.upfront_percent) || 25) / 100)),
+                            partial_percent_of_upfront: 0,
+                            due_now_amount: roundMoney((Number(r.locked_total) || 0) * ((Number(r.upfront_percent) || 25) / 100)),
+                            paid_now_amount: 0,
+                            remaining_amount: Number(r.locked_total) || 0,
+                            currency: r.currency || 'INR',
+                            notes: '',
+                            created_at: new Date().toISOString()
                         }));
                         DB.save();
                     }
                 } catch (e) {
-                    console.warn('[Flowra] Invoices fetch skipped:', e.message || e);
+                    console.warn('[Flowra] Invoice lock fetch skipped:', e.message || e);
                 }
 
                 // 2. Project/Task Logic: Local storage is source of truth for workspace activity
@@ -1571,52 +1579,6 @@
         }
 
         async function syncSingleInvoiceToSupabase(invoiceRecord) {
-            const fullInvoiceRow = {
-                id: invoiceRecord.id,
-                lead_id: invoiceRecord.lead_id || null,
-                lead_name: invoiceRecord.lead_name || 'Unknown',
-                project_id: invoiceRecord.project_id || null,
-                project_name: invoiceRecord.project_name || 'Unassigned',
-                project_ids: Array.isArray(invoiceRecord.project_ids) ? invoiceRecord.project_ids : [],
-                project_names: Array.isArray(invoiceRecord.project_names) ? invoiceRecord.project_names : [],
-                modules: Array.isArray(invoiceRecord.modules) ? invoiceRecord.modules : [],
-                payment_mode: invoiceRecord.payment_mode || 'add_25_now',
-                payment_method: invoiceRecord.payment_method || 'upi',
-                base_amount: invoiceRecord.base_amount || 0,
-                addon_amount: invoiceRecord.addon_amount || 0,
-                current_charge_base: invoiceRecord.current_charge_base || 0,
-                previous_locked_total: invoiceRecord.previous_locked_total || 0,
-                locked_total_amount: invoiceRecord.locked_total_amount || 0,
-                upfront_percent: invoiceRecord.upfront_percent || 25,
-                upfront_amount: invoiceRecord.upfront_amount || 0,
-                partial_percent_of_upfront: invoiceRecord.partial_percent_of_upfront || 0,
-                due_now_amount: invoiceRecord.due_now_amount || 0,
-                paid_now_amount: invoiceRecord.paid_now_amount || 0,
-                remaining_amount: invoiceRecord.remaining_amount || 0,
-                currency: invoiceRecord.currency || 'INR',
-                notes: invoiceRecord.notes || '',
-                created_at: invoiceRecord.created_at || new Date().toISOString()
-            };
-
-            const minimalInvoiceRow = {
-                id: invoiceRecord.id,
-                lead_id: invoiceRecord.lead_id || null,
-                lead_name: invoiceRecord.lead_name || 'Unknown',
-                project_id: invoiceRecord.project_id || null,
-                project_name: invoiceRecord.project_name || 'Unassigned',
-                modules: Array.isArray(invoiceRecord.modules) ? invoiceRecord.modules : [],
-                payment_mode: invoiceRecord.payment_mode || 'add_25_now',
-                base_amount: invoiceRecord.base_amount || 0,
-                addon_amount: invoiceRecord.addon_amount || 0,
-                locked_total_amount: invoiceRecord.locked_total_amount || 0,
-                upfront_percent: invoiceRecord.upfront_percent || 25,
-                upfront_amount: invoiceRecord.upfront_amount || 0,
-                due_now_amount: invoiceRecord.due_now_amount || 0,
-                currency: invoiceRecord.currency || 'INR',
-                notes: invoiceRecord.notes || '',
-                created_at: invoiceRecord.created_at || new Date().toISOString()
-            };
-
             const invoiceLockRow = {
                 lead_id: invoiceRecord.lead_id || null,
                 project_id: invoiceRecord.project_id || null,
@@ -1625,33 +1587,39 @@
                 currency: invoiceRecord.currency || 'INR'
             };
 
-            let lastError = null;
+            // Try update first for existing lock row.
+            const { error: updateErr } = await sb
+                .from('invoice_lock')
+                .update({
+                    locked_total: invoiceLockRow.locked_total,
+                    upfront_percent: invoiceLockRow.upfront_percent,
+                    currency: invoiceLockRow.currency
+                })
+                .eq('lead_id', invoiceLockRow.lead_id)
+                .eq('project_id', invoiceLockRow.project_id);
 
-            try {
-                const { error } = await sb.from('invoices').upsert([fullInvoiceRow], { onConflict: 'id' });
-                if (error) throw error;
-                return 'invoices';
-            } catch (e1) {
-                lastError = e1;
+            if (updateErr) {
+                throw updateErr;
             }
 
-            try {
-                const { error } = await sb.from('invoices').upsert([minimalInvoiceRow], { onConflict: 'id' });
-                if (error) throw error;
-                return 'invoices';
-            } catch (e2) {
-                lastError = e2;
+            // Ensure a row exists (if no row existed, insert a new one).
+            const { data: lockRows, error: selectErr } = await sb
+                .from('invoice_lock')
+                .select('lead_id, project_id')
+                .eq('lead_id', invoiceLockRow.lead_id)
+                .eq('project_id', invoiceLockRow.project_id)
+                .limit(1);
+
+            if (selectErr) {
+                throw selectErr;
             }
 
-            try {
-                const { error } = await sb.from('invoice_lock').insert([invoiceLockRow]);
-                if (error) throw error;
-                return 'invoice_lock';
-            } catch (e3) {
-                lastError = e3;
+            if (!Array.isArray(lockRows) || lockRows.length === 0) {
+                const { error: insertErr } = await sb.from('invoice_lock').insert([invoiceLockRow]);
+                if (insertErr) throw insertErr;
             }
 
-            throw lastError || new Error('Unknown invoice sync error');
+            return 'invoice_lock';
         }
 
         async function persistInvoiceRecord(invoiceRecord) {
@@ -1667,7 +1635,7 @@
                 console.error('[Flowra] Invoice cloud sync failed:', e);
                 setSyncStatus('error', e.message || 'Invoice sync failed');
                 renderAll();
-                alert('Invoice saved locally, but failed to save in Supabase invoice table. Check table schema and RLS.');
+                alert('Invoice saved locally, but failed to save in Supabase invoice_lock table. Check RLS and table permissions.');
                 return false;
             }
 
