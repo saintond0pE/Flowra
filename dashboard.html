@@ -444,6 +444,64 @@
             };
         }
 
+        async function upsertInvoiceLockRow(row) {
+            if (!row || !row.lead_id || !row.project_id) {
+                throw new Error('invoice_lock upsert requires lead_id and project_id');
+            }
+
+            const updatePayload = {
+                invoice_id: row.invoice_id || null,
+                lead_name: row.lead_name || 'Unknown',
+                project_name: row.project_name || 'Unassigned',
+                project_ids: Array.isArray(row.project_ids) ? row.project_ids : [],
+                project_names: Array.isArray(row.project_names) ? row.project_names : [],
+                modules: Array.isArray(row.modules) ? row.modules : [],
+                payment_mode: row.payment_mode || 'add_25_now',
+                payment_method: row.payment_method || 'upi',
+                base_amount: row.base_amount || 0,
+                addon_amount: row.addon_amount || 0,
+                previous_locked_total: row.previous_locked_total || 0,
+                current_charge_base: row.current_charge_base || 0,
+                locked_total: row.locked_total || 0,
+                upfront_percent: row.upfront_percent || 25,
+                upfront_amount: row.upfront_amount || 0,
+                partial_percent_of_upfront: row.partial_percent_of_upfront || 0,
+                due_now_amount: row.due_now_amount || 0,
+                paid_now_amount: row.paid_now_amount || 0,
+                remaining_amount: row.remaining_amount || 0,
+                currency: row.currency || 'INR',
+                notes: row.notes || '',
+                created_at: row.created_at || new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            const { error: updateErr } = await sb
+                .from('invoice_lock')
+                .update(updatePayload)
+                .eq('lead_id', row.lead_id)
+                .eq('project_id', row.project_id);
+
+            if (updateErr) throw updateErr;
+
+            const { data: existing, error: selectErr } = await sb
+                .from('invoice_lock')
+                .select('lead_id, project_id')
+                .eq('lead_id', row.lead_id)
+                .eq('project_id', row.project_id)
+                .limit(1);
+
+            if (selectErr) throw selectErr;
+
+            if (!Array.isArray(existing) || existing.length === 0) {
+                const { error: insertErr } = await sb.from('invoice_lock').insert([{
+                    lead_id: row.lead_id,
+                    project_id: row.project_id,
+                    ...updatePayload
+                }]);
+                if (insertErr) throw insertErr;
+            }
+        }
+
         /* Push entire local DB state to Supabase (upsert-based) */
         async function syncToSupabase() {
             try {
@@ -543,8 +601,9 @@
 
                         const invoiceLockRows = Object.values(lockByPair);
                         if (invoiceLockRows.length > 0) {
-                            const { error: ile } = await sb.from('invoice_lock').upsert(invoiceLockRows, { onConflict: 'lead_id,project_id' });
-                            if (ile) throw ile;
+                            for (const row of invoiceLockRows) {
+                                await upsertInvoiceLockRow(row);
+                            }
                         }
                     } catch (invoiceErr) {
                         console.warn('[Flowra] Invoice lock sync skipped:', invoiceErr.message || invoiceErr);
@@ -1608,10 +1667,7 @@
 
         async function syncSingleInvoiceToSupabase(invoiceRecord) {
             const invoiceLockRow = mapInvoiceRecordToInvoiceLockRow(invoiceRecord);
-            const { error: upsertErr } = await sb
-                .from('invoice_lock')
-                .upsert([invoiceLockRow], { onConflict: 'lead_id,project_id' });
-            if (upsertErr) throw upsertErr;
+            await upsertInvoiceLockRow(invoiceLockRow);
 
             return 'invoice_lock';
         }
