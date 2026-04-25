@@ -120,6 +120,98 @@
         </div>
     </div>
 
+    <!-- Invoice Scheduler Modal -->
+    <div id="invoiceModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 110; justify-content: center; align-items: center;">
+        <div class="modal-content" style="width: 840px; max-width: 96%; max-height: 92vh; overflow-y: auto;">
+            <div class="flex-between" style="border-bottom: 3px solid var(--border-color); padding-bottom: 12px; margin-bottom: 20px;">
+                <h2 style="margin: 0; border: none; padding: 0;">SCHEDULE INVOICE</h2>
+                <button class="btn" onclick="closeInvoiceModal()" style="padding: 4px 8px;">X</button>
+            </div>
+
+            <div class="grid-2" style="margin-bottom: 12px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Lead</label>
+                    <input id="invoice-lead-name" type="text" disabled>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Project</label>
+                    <select id="invoice-project"></select>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-bottom: 12px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Base Total Amount</label>
+                    <input id="invoice-base-amount" type="number" min="0" step="0.01" value="0">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Add-on Amount</label>
+                    <input id="invoice-addon-amount" type="number" min="0" step="0.01" value="0">
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-bottom: 12px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Currency</label>
+                    <input id="invoice-currency" type="text" value="INR">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Payment Method</label>
+                    <select id="invoice-payment-method">
+                        <option value="upi">UPI</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="card">Card</option>
+                        <option value="cash">Cash</option>
+                        <option value="cheque">Cheque</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-bottom: 12px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Upfront Percent (editable)</label>
+                    <input id="invoice-upfront-percent" type="number" min="1" max="100" step="0.01" value="25">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Partial of Upfront (%)</label>
+                    <input id="invoice-partial-percent" type="number" min="0" max="100" step="0.01" value="50">
+                </div>
+            </div>
+
+            <label style="margin-bottom:8px;">Payment Mode</label>
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+                <button id="mode-add-25" class="btn btn-primary" type="button" onclick="setInvoicePaymentMode('add_25_now')">ADD 25% RIGHT NOW</button>
+                <button id="mode-pay-full" class="btn" type="button" onclick="setInvoicePaymentMode('pay_full_now')">PAY COMPLETELY RIGHT NOW</button>
+                <button id="mode-pay-partial" class="btn" type="button" onclick="setInvoicePaymentMode('pay_partial_of_upfront')">PAY ONLY PARTIAL OF UPFRONT</button>
+                <button id="mode-add-another" class="btn" type="button" onclick="setInvoicePaymentMode('add_another_invoice')">ADD ANOTHER INVOICE</button>
+            </div>
+
+            <div class="card" style="margin-bottom: 12px; background:#fffebc;">
+                <div style="font-weight:800; font-size:12px; text-transform:uppercase; margin-bottom:8px;">Invoice Preview</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-weight:700; font-size:13px;">
+                    <div>Locked Total: <span id="invoice-preview-locked">0</span></div>
+                    <div>Upfront Amount: <span id="invoice-preview-upfront">0</span></div>
+                    <div>Current Charge Basis: <span id="invoice-preview-charge-base">0</span></div>
+                    <div>Due Now: <span id="invoice-preview-due">0</span></div>
+                    <div>Remaining Amount: <span id="invoice-preview-remaining">0</span></div>
+                    <div>Mode: <span id="invoice-preview-mode">add_25_now</span></div>
+                    <div>Payment Method: <span id="invoice-preview-method">upi</span></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Invoice Notes</label>
+                <textarea id="invoice-notes" rows="3" placeholder="Any special terms, free revisions, milestone notes..."></textarea>
+            </div>
+
+            <div class="flex-between" style="margin-top:20px; margin-bottom:0;">
+                <button class="btn" onclick="closeInvoiceModal()">CANCEL</button>
+                <button class="btn btn-primary" onclick="submitInvoiceScheduler()">CREATE INVOICE</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MAIN APP STRUCTURE -->
     <div class="sidebar">
         <div class="brand">Flowra OS</div>
@@ -381,14 +473,22 @@
                             lead_name: i.lead_name || 'Unknown',
                             project_id: i.project_id || null,
                             project_name: i.project_name || 'Unassigned',
+                            project_ids: Array.isArray(i.project_ids) ? i.project_ids : [],
+                            project_names: Array.isArray(i.project_names) ? i.project_names : [],
                             modules: Array.isArray(i.modules) ? i.modules : [],
                             payment_mode: i.payment_mode || 'add_25_now',
+                            payment_method: i.payment_method || 'upi',
                             base_amount: i.base_amount || 0,
                             addon_amount: i.addon_amount || 0,
+                            current_charge_base: i.current_charge_base || 0,
+                            previous_locked_total: i.previous_locked_total || 0,
                             locked_total_amount: i.locked_total_amount || 0,
                             upfront_percent: i.upfront_percent || 25,
                             upfront_amount: i.upfront_amount || 0,
+                            partial_percent_of_upfront: i.partial_percent_of_upfront || 0,
                             due_now_amount: i.due_now_amount || 0,
+                            paid_now_amount: i.paid_now_amount || i.due_now_amount || 0,
+                            remaining_amount: i.remaining_amount || 0,
                             currency: i.currency || 'INR',
                             notes: i.notes || '',
                             created_at: i.created_at || new Date().toISOString()
@@ -475,7 +575,19 @@
                     const { data: invoiceData, error: invoiceErr } = await sb.from('invoices').select('*').order('created_at', { ascending: false });
                     if (invoiceErr) throw invoiceErr;
                     if (invoiceData) {
-                        DB.tables.invoices = invoiceData;
+                        DB.tables.invoices = invoiceData.map((i) => ({
+                            ...i,
+                            project_ids: Array.isArray(i.project_ids) ? i.project_ids : [],
+                            project_names: Array.isArray(i.project_names) ? i.project_names : [],
+                            modules: Array.isArray(i.modules) ? i.modules : [],
+                            payment_mode: i.payment_mode || 'add_25_now',
+                            payment_method: i.payment_method || 'upi',
+                            current_charge_base: Number.isFinite(Number(i.current_charge_base)) ? Number(i.current_charge_base) : 0,
+                            partial_percent_of_upfront: Number.isFinite(Number(i.partial_percent_of_upfront)) ? Number(i.partial_percent_of_upfront) : 0,
+                            previous_locked_total: Number.isFinite(Number(i.previous_locked_total)) ? Number(i.previous_locked_total) : 0,
+                            paid_now_amount: Number.isFinite(Number(i.paid_now_amount)) ? Number(i.paid_now_amount) : (Number(i.due_now_amount) || 0),
+                            remaining_amount: Number.isFinite(Number(i.remaining_amount)) ? Number(i.remaining_amount) : 0
+                        }));
                         DB.save();
                     }
                 } catch (e) {
@@ -1074,6 +1186,34 @@
             return Number.isFinite(n) ? n : 0;
         }
 
+        function roundMoney(v) {
+            return Number(parseMoney(v).toFixed(2));
+        }
+
+        function clampPercent(v, min, max) {
+            return Math.min(Math.max(parseMoney(v), min), max);
+        }
+
+        function normalizeInvoicePaymentMode(mode) {
+            const allowedModes = ['add_25_now', 'pay_full_now', 'pay_partial_of_upfront', 'add_another_invoice'];
+            return allowedModes.includes(mode) ? mode : 'add_25_now';
+        }
+
+        function getInvoiceModeLabel(mode) {
+            const labels = {
+                add_25_now: 'ADD 25% RIGHT NOW',
+                pay_full_now: 'PAY COMPLETELY RIGHT NOW',
+                pay_partial_of_upfront: 'PAY PARTIAL OF UPFRONT',
+                add_another_invoice: 'ADD ANOTHER INVOICE'
+            };
+            return labels[mode] || mode;
+        }
+
+        function normalizePaymentMethod(value) {
+            const methods = ['upi', 'bank_transfer', 'card', 'cash', 'cheque', 'other'];
+            return methods.includes(value) ? value : 'upi';
+        }
+
         function uniqSorted(arr) {
             return [...new Set((arr || []).filter(Boolean).map(x => String(x).trim()))].sort();
         }
@@ -1098,6 +1238,125 @@
             };
         }
 
+        let invoiceModalState = {
+            leadId: null,
+            clientName: '',
+            paymentMode: 'add_25_now',
+            paymentMethod: 'upi'
+        };
+
+        function getSelectedInvoiceProjectRef() {
+            const sel = document.getElementById('invoice-project');
+            const projectId = sel ? sel.value : '';
+            const projectName = sel && sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : 'Unassigned';
+            return {
+                selectedProjectId: projectId || null,
+                selectedProjectName: projectName || 'Unassigned'
+            };
+        }
+
+        function getInvoiceComputation() {
+            const { selectedProjectId } = getSelectedInvoiceProjectRef();
+            const paymentMode = normalizeInvoicePaymentMode(invoiceModalState.paymentMode);
+            const baseAmount = Math.max(0, roundMoney(document.getElementById('invoice-base-amount')?.value));
+            const addonAmount = Math.max(0, roundMoney(document.getElementById('invoice-addon-amount')?.value));
+            const upfrontPercent = clampPercent(document.getElementById('invoice-upfront-percent')?.value, 0, 100);
+            const partialPercent = clampPercent(document.getElementById('invoice-partial-percent')?.value, 0, 100);
+
+            const contextInvoices = (DB.tables.invoices || []).filter(i => i.lead_id === invoiceModalState.leadId && i.project_id === selectedProjectId);
+            const latestInvoice = sortNewestFirst(contextInvoices, 'created_at')[0] || null;
+            const previousLockedTotal = latestInvoice ? roundMoney(latestInvoice.locked_total_amount) : 0;
+            const hasPriorInvoice = Boolean(latestInvoice);
+
+            let currentChargeBase = roundMoney(baseAmount + addonAmount);
+            let lockedTotal = currentChargeBase;
+            if (paymentMode === 'add_another_invoice' && hasPriorInvoice) {
+                currentChargeBase = addonAmount;
+                lockedTotal = roundMoney(previousLockedTotal + addonAmount);
+            }
+
+            const upfrontAmount = roundMoney(lockedTotal * (upfrontPercent / 100));
+            const upfrontOnCurrentCharge = roundMoney(currentChargeBase * (upfrontPercent / 100));
+
+            let dueNow = upfrontAmount;
+            if (paymentMode === 'pay_full_now') {
+                dueNow = roundMoney(lockedTotal);
+            }
+            if (paymentMode === 'pay_partial_of_upfront') {
+                dueNow = roundMoney(upfrontAmount * (partialPercent / 100));
+            }
+            if (paymentMode === 'add_another_invoice') {
+                dueNow = roundMoney(upfrontOnCurrentCharge);
+            }
+
+            dueNow = Math.max(0, Math.min(roundMoney(lockedTotal), dueNow));
+            const paidNowAmount = dueNow;
+            const remainingAmount = roundMoney(Math.max(0, lockedTotal - paidNowAmount));
+
+            return {
+                selectedProjectId,
+                paymentMode,
+                baseAmount,
+                addonAmount,
+                upfrontPercent,
+                partialPercent,
+                previousLockedTotal,
+                hasPriorInvoice,
+                currentChargeBase,
+                lockedTotal,
+                upfrontAmount,
+                dueNow,
+                paidNowAmount,
+                remainingAmount
+            };
+        }
+
+        function refreshInvoicePreview() {
+            const calc = getInvoiceComputation();
+            const mode = calc.paymentMode;
+            const paymentMethod = normalizePaymentMethod(document.getElementById('invoice-payment-method')?.value);
+            invoiceModalState.paymentMethod = paymentMethod;
+            const partialInput = document.getElementById('invoice-partial-percent');
+            if (partialInput) partialInput.disabled = mode !== 'pay_partial_of_upfront';
+
+            const setText = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = String(value);
+            };
+            setText('invoice-preview-locked', calc.lockedTotal.toFixed(2));
+            setText('invoice-preview-upfront', calc.upfrontAmount.toFixed(2));
+            setText('invoice-preview-charge-base', calc.currentChargeBase.toFixed(2));
+            setText('invoice-preview-due', calc.dueNow.toFixed(2));
+            setText('invoice-preview-remaining', calc.remainingAmount.toFixed(2));
+            setText('invoice-preview-mode', getInvoiceModeLabel(mode));
+            setText('invoice-preview-method', paymentMethod.toUpperCase());
+        }
+
+        window.setInvoicePaymentMode = function(mode) {
+            invoiceModalState.paymentMode = normalizeInvoicePaymentMode(mode);
+            const modes = [
+                ['mode-add-25', 'add_25_now'],
+                ['mode-pay-full', 'pay_full_now'],
+                ['mode-pay-partial', 'pay_partial_of_upfront'],
+                ['mode-add-another', 'add_another_invoice']
+            ];
+            modes.forEach(([id, val]) => {
+                const btn = document.getElementById(id);
+                if (!btn) return;
+                if (val === invoiceModalState.paymentMode) {
+                    btn.classList.add('btn-primary');
+                } else {
+                    btn.classList.remove('btn-primary');
+                }
+            });
+            refreshInvoicePreview();
+        }
+
+        window.closeInvoiceModal = function() {
+            const modal = document.getElementById('invoiceModal');
+            if (modal) modal.style.display = 'none';
+        }
+
         async function dispatchInvoiceToN8n(invoiceRecord) {
             if (INVOICE_WEBHOOK_URL === 'YOUR_INVOICE_WEBHOOK_URL_HERE') {
                 console.warn('[Flowra] Invoice webhook URL not configured yet.');
@@ -1115,13 +1374,18 @@
                 payload.append('project_names', JSON.stringify(invoiceRecord.project_names || []));
                 payload.append('modules', JSON.stringify(invoiceRecord.modules || []));
                 payload.append('payment_mode', invoiceRecord.payment_mode);
+                payload.append('payment_method', invoiceRecord.payment_method || 'upi');
                 payload.append('base_amount', String(invoiceRecord.base_amount || 0));
                 payload.append('addon_amount', String(invoiceRecord.addon_amount || 0));
+                payload.append('current_charge_base', String(invoiceRecord.current_charge_base || 0));
+                payload.append('previous_locked_total', String(invoiceRecord.previous_locked_total || 0));
                 payload.append('locked_total_amount', String(invoiceRecord.locked_total_amount || 0));
                 payload.append('upfront_percent', String(invoiceRecord.upfront_percent || 25));
                 payload.append('upfront_amount', String(invoiceRecord.upfront_amount || 0));
                 payload.append('partial_percent_of_upfront', String(invoiceRecord.partial_percent_of_upfront || 0));
                 payload.append('due_now_amount', String(invoiceRecord.due_now_amount || 0));
+                payload.append('paid_now_amount', String(invoiceRecord.paid_now_amount || 0));
+                payload.append('remaining_amount', String(invoiceRecord.remaining_amount || 0));
                 payload.append('currency', invoiceRecord.currency || 'INR');
                 payload.append('notes', invoiceRecord.notes || '');
                 await fetch(INVOICE_WEBHOOK_URL, {
@@ -1148,80 +1412,130 @@
 
         window.openInvoiceScheduler = function(clientName = '', leadId = null) {
             const leadProjects = (DB.tables.projects || []).filter(p => p.lead_id === leadId);
-            const projectOptions = leadProjects.length > 0
-                ? leadProjects.map(p => `${p.id}|||${p.project_name || 'Unnamed Project'}`)
-                : ['none|||No Linked Project'];
+            invoiceModalState = {
+                leadId,
+                clientName: clientName || 'Unknown Client',
+                paymentMode: 'add_25_now',
+                paymentMethod: 'upi'
+            };
 
-            openModal("SCHEDULE INVOICE", [
-                {id: 'project_ref', label: 'Project', type: 'select', options: projectOptions, val: projectOptions[0]},
-                {id: 'base_amount', label: 'Base Total Amount', type: 'number', val: '0'},
-                {id: 'addon_amount', label: 'Add-on Amount', type: 'number', val: '0'},
-                {id: 'upfront_percent', label: 'Upfront Percent (editable)', type: 'number', val: '25'},
-                {id: 'payment_mode', label: 'Payment Mode', type: 'select', options: ['add_25_now', 'pay_full_now', 'pay_partial_of_upfront', 'add_another_invoice'], val: 'add_25_now'},
-                {id: 'partial_amount', label: 'Partial of Upfront (%)', type: 'number', val: '50'},
-                {id: 'currency', label: 'Currency', val: 'INR'},
-                {id: 'notes', label: 'Invoice Notes', type: 'textarea', val: ''}
-            ], async (res) => {
-                const projectRef = String(res.project_ref || 'none|||No Linked Project');
-                const refParts = projectRef.split('|||');
-                const selectedProjectId = refParts[0] === 'none' ? null : refParts[0];
-                const selectedProjectName = refParts[1] || 'Unassigned';
+            const leadInput = document.getElementById('invoice-lead-name');
+            if (leadInput) leadInput.value = invoiceModalState.clientName;
 
-                const baseAmount = parseMoney(res.base_amount);
-                const addonAmount = parseMoney(res.addon_amount);
-                const partialPercent = Math.min(Math.max(parseMoney(res.partial_amount), 0), 100);
-                const upfrontPercent = parseMoney(res.upfront_percent) > 0 ? parseMoney(res.upfront_percent) : 25;
-                const paymentMode = String(res.payment_mode || 'add_25_now');
-
-                const contextInvoices = (DB.tables.invoices || []).filter(i => i.lead_id === leadId && i.project_id === selectedProjectId);
-                const latestInvoice = sortNewestFirst(contextInvoices, 'created_at')[0] || null;
-                const previousLockedTotal = latestInvoice ? parseMoney(latestInvoice.locked_total_amount) : 0;
-
-                let lockedTotal = baseAmount + addonAmount;
-                if (paymentMode === 'add_another_invoice' && latestInvoice) {
-                    lockedTotal = previousLockedTotal + addonAmount;
+            const projectSelect = document.getElementById('invoice-project');
+            if (projectSelect) {
+                projectSelect.innerHTML = '';
+                if (leadProjects.length > 0) {
+                    leadProjects.forEach((p) => {
+                        const opt = document.createElement('option');
+                        opt.value = p.id;
+                        opt.textContent = p.project_name || 'Unnamed Project';
+                        projectSelect.appendChild(opt);
+                    });
+                } else {
+                    const opt = document.createElement('option');
+                    opt.value = '';
+                    opt.textContent = 'No Linked Project';
+                    projectSelect.appendChild(opt);
                 }
+            }
 
-                const upfrontAmount = Number((lockedTotal * (upfrontPercent / 100)).toFixed(2));
-                let dueNow = upfrontAmount;
-                if (paymentMode === 'pay_full_now') dueNow = Number(lockedTotal.toFixed(2));
-                if (paymentMode === 'pay_partial_of_upfront') {
-                    dueNow = Number((upfrontAmount * (partialPercent / 100)).toFixed(2));
-                }
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val;
+            };
+            setVal('invoice-base-amount', '0');
+            setVal('invoice-addon-amount', '0');
+            setVal('invoice-upfront-percent', '25');
+            setVal('invoice-partial-percent', '50');
+            setVal('invoice-currency', 'INR');
+            setVal('invoice-payment-method', 'upi');
+            setVal('invoice-notes', '');
 
-                const leadContext = buildLeadInvoiceModules(leadId, selectedProjectId);
-                const invoiceRecord = {
-                    id: generateId(),
-                    lead_id: leadId,
-                    lead_name: clientName || 'Unknown Client',
-                    project_id: selectedProjectId,
-                    project_name: selectedProjectName,
-                    project_ids: leadContext.projectIds,
-                    project_names: leadContext.projectNames,
-                    modules: leadContext.modules,
-                    payment_mode: paymentMode,
-                    base_amount: baseAmount,
-                    addon_amount: addonAmount,
-                    previous_locked_total: previousLockedTotal,
-                    locked_total_amount: Number(lockedTotal.toFixed(2)),
-                    upfront_percent: upfrontPercent,
-                    upfront_amount: upfrontAmount,
-                    partial_percent_of_upfront: partialPercent,
-                    due_now_amount: dueNow,
-                    currency: res.currency || 'INR',
-                    notes: res.notes || '',
-                    created_at: new Date().toISOString()
-                };
+            ['invoice-project', 'invoice-base-amount', 'invoice-addon-amount', 'invoice-upfront-percent', 'invoice-partial-percent', 'invoice-currency', 'invoice-payment-method']
+                .forEach((id) => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    el.oninput = refreshInvoicePreview;
+                    el.onchange = refreshInvoicePreview;
+                });
 
-                if (!Array.isArray(DB.tables.invoices)) DB.tables.invoices = [];
-                DB.tables.invoices.unshift(invoiceRecord);
-                DB.save();
-                await syncToSupabase();
-                await dispatchInvoiceToN8n(invoiceRecord);
-                renderAll();
-                closeModal();
-                alert(`Invoice queued. Due now: ${invoiceRecord.currency} ${invoiceRecord.due_now_amount}`);
-            });
+            window.setInvoicePaymentMode('add_25_now');
+            const modal = document.getElementById('invoiceModal');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        window.submitInvoiceScheduler = async function() {
+            const { selectedProjectId, selectedProjectName } = getSelectedInvoiceProjectRef();
+            const calc = getInvoiceComputation();
+            const leadContext = buildLeadInvoiceModules(invoiceModalState.leadId, selectedProjectId);
+            const currencyRaw = document.getElementById('invoice-currency')?.value || 'INR';
+            const currency = String(currencyRaw).trim().toUpperCase().slice(0, 8) || 'INR';
+            const paymentMethod = normalizePaymentMethod(document.getElementById('invoice-payment-method')?.value);
+            const notes = document.getElementById('invoice-notes')?.value || '';
+
+            if (!invoiceModalState.leadId) {
+                alert('This lead is missing a valid ID. Open invoice from a lead row and try again.');
+                return;
+            }
+
+            if (!selectedProjectId) {
+                alert('Please select a project before creating an invoice.');
+                return;
+            }
+
+            if (calc.lockedTotal <= 0) {
+                alert('Locked total must be greater than 0.');
+                return;
+            }
+
+            if (calc.paymentMode === 'add_another_invoice' && !calc.hasPriorInvoice) {
+                alert('No previous invoice found for this project. Use ADD 25% or PAY FULL for the first invoice.');
+                return;
+            }
+
+            if (calc.paymentMode === 'add_another_invoice' && calc.addonAmount <= 0) {
+                alert('Add-on amount must be greater than 0 for ADD ANOTHER INVOICE mode.');
+                return;
+            }
+
+            invoiceModalState.paymentMethod = paymentMethod;
+
+            const invoiceRecord = {
+                id: generateId(),
+                lead_id: invoiceModalState.leadId,
+                lead_name: invoiceModalState.clientName || 'Unknown Client',
+                project_id: selectedProjectId,
+                project_name: selectedProjectName,
+                project_ids: leadContext.projectIds,
+                project_names: leadContext.projectNames,
+                modules: leadContext.modules,
+                payment_mode: calc.paymentMode,
+                payment_method: paymentMethod,
+                base_amount: calc.baseAmount,
+                addon_amount: calc.addonAmount,
+                previous_locked_total: calc.previousLockedTotal,
+                current_charge_base: calc.currentChargeBase,
+                locked_total_amount: calc.lockedTotal,
+                upfront_percent: calc.upfrontPercent,
+                upfront_amount: calc.upfrontAmount,
+                partial_percent_of_upfront: calc.partialPercent,
+                due_now_amount: calc.dueNow,
+                paid_now_amount: calc.paidNowAmount,
+                remaining_amount: calc.remainingAmount,
+                currency,
+                notes,
+                created_at: new Date().toISOString()
+            };
+
+            if (!Array.isArray(DB.tables.invoices)) DB.tables.invoices = [];
+            DB.tables.invoices.unshift(invoiceRecord);
+            DB.save();
+            await syncToSupabase();
+            await dispatchInvoiceToN8n(invoiceRecord);
+            renderAll();
+            closeInvoiceModal();
+            alert(`Invoice queued. Due now: ${invoiceRecord.currency} ${invoiceRecord.due_now_amount.toFixed(2)} | Remaining: ${invoiceRecord.currency} ${invoiceRecord.remaining_amount.toFixed(2)} | Method: ${invoiceRecord.payment_method.toUpperCase()}`);
         }
 
         window.openScheduler = function(clientName = '', leadId = null) {
