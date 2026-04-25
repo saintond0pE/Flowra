@@ -1255,6 +1255,44 @@
             };
         }
 
+        function getLatestInvoiceContext(leadId, projectId) {
+            if (!leadId || !projectId) return null;
+            const contextInvoices = (DB.tables.invoices || []).filter((i) => i.lead_id === leadId && i.project_id === projectId);
+            return sortNewestFirst(contextInvoices, 'created_at')[0] || null;
+        }
+
+        function hydrateInvoiceFormFromHistory(leadId, projectId) {
+            const latestInvoice = getLatestInvoiceContext(leadId, projectId);
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val;
+            };
+
+            if (!latestInvoice) {
+                setVal('invoice-base-amount', '0');
+                setVal('invoice-addon-amount', '0');
+                setVal('invoice-upfront-percent', '25');
+                setVal('invoice-partial-percent', '50');
+                setVal('invoice-currency', 'INR');
+                setVal('invoice-payment-method', 'upi');
+                setVal('invoice-notes', '');
+                invoiceModalState.paymentMethod = 'upi';
+                return;
+            }
+
+            // Keep locked total sticky by default when user reopens scheduler.
+            setVal('invoice-base-amount', String(roundMoney(latestInvoice.locked_total_amount || 0)));
+            setVal('invoice-addon-amount', '0');
+            setVal('invoice-upfront-percent', String(clampPercent(latestInvoice.upfront_percent, 0, 100)));
+            setVal('invoice-partial-percent', String(clampPercent(latestInvoice.partial_percent_of_upfront, 0, 100)));
+            setVal('invoice-currency', String(latestInvoice.currency || 'INR'));
+
+            const paymentMethod = normalizePaymentMethod(latestInvoice.payment_method);
+            setVal('invoice-payment-method', paymentMethod);
+            invoiceModalState.paymentMethod = paymentMethod;
+            setVal('invoice-notes', latestInvoice.notes || '');
+        }
+
         function getInvoiceComputation() {
             const { selectedProjectId } = getSelectedInvoiceProjectRef();
             const paymentMode = normalizeInvoicePaymentMode(invoiceModalState.paymentMode);
@@ -1440,18 +1478,6 @@
                 }
             }
 
-            const setVal = (id, val) => {
-                const el = document.getElementById(id);
-                if (el) el.value = val;
-            };
-            setVal('invoice-base-amount', '0');
-            setVal('invoice-addon-amount', '0');
-            setVal('invoice-upfront-percent', '25');
-            setVal('invoice-partial-percent', '50');
-            setVal('invoice-currency', 'INR');
-            setVal('invoice-payment-method', 'upi');
-            setVal('invoice-notes', '');
-
             ['invoice-project', 'invoice-base-amount', 'invoice-addon-amount', 'invoice-upfront-percent', 'invoice-partial-percent', 'invoice-currency', 'invoice-payment-method']
                 .forEach((id) => {
                     const el = document.getElementById(id);
@@ -1459,6 +1485,18 @@
                     el.oninput = refreshInvoicePreview;
                     el.onchange = refreshInvoicePreview;
                 });
+
+            const projectSelectEl = document.getElementById('invoice-project');
+            if (projectSelectEl) {
+                projectSelectEl.onchange = () => {
+                    const selectedProjectId = projectSelectEl.value || null;
+                    hydrateInvoiceFormFromHistory(invoiceModalState.leadId, selectedProjectId);
+                    refreshInvoicePreview();
+                };
+            }
+
+            const { selectedProjectId } = getSelectedInvoiceProjectRef();
+            hydrateInvoiceFormFromHistory(invoiceModalState.leadId, selectedProjectId);
 
             window.setInvoicePaymentMode('add_25_now');
             const modal = document.getElementById('invoiceModal');
