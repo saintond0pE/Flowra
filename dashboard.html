@@ -207,7 +207,10 @@
 
             <div class="flex-between" style="margin-top:20px; margin-bottom:0;">
                 <button class="btn" onclick="closeInvoiceModal()">CANCEL</button>
-                <button class="btn btn-primary" onclick="submitInvoiceScheduler()">CREATE INVOICE</button>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn" onclick="saveInvoiceScheduler()">SAVE INVOICE</button>
+                    <button class="btn btn-primary" onclick="sendInvoiceScheduler()">SEND</button>
+                </div>
             </div>
         </div>
     </div>
@@ -380,7 +383,7 @@
         const SUPABASE_URL = "https://zdaylulmyejoswxoqedi.supabase.co";
         const SUPABASE_KEY = "sb_publishable_7if5Jz2oEMWY9W9ofy0kQw_HQjCJIae";
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const INVOICE_WEBHOOK_URL = 'YOUR_INVOICE_WEBHOOK_URL_HERE';
+        const INVOICE_WEBHOOK_URL = 'https://sdfvsd4r5.app.n8n.cloud/webhook-test/61ae570c-1099-415e-a7fe-6e92ac485c3b';
 
         /* Push entire local DB state to Supabase (upsert-based) */
         async function syncToSupabase() {
@@ -1503,7 +1506,7 @@
             if (modal) modal.style.display = 'flex';
         }
 
-        window.submitInvoiceScheduler = async function() {
+        function buildInvoiceRecordFromForm() {
             const { selectedProjectId, selectedProjectName } = getSelectedInvoiceProjectRef();
             const calc = getInvoiceComputation();
             const leadContext = buildLeadInvoiceModules(invoiceModalState.leadId, selectedProjectId);
@@ -1514,32 +1517,32 @@
 
             if (!invoiceModalState.leadId) {
                 alert('This lead is missing a valid ID. Open invoice from a lead row and try again.');
-                return;
+                return null;
             }
 
             if (!selectedProjectId) {
                 alert('Please select a project before creating an invoice.');
-                return;
+                return null;
             }
 
             if (calc.lockedTotal <= 0) {
                 alert('Locked total must be greater than 0.');
-                return;
+                return null;
             }
 
             if (calc.paymentMode === 'add_another_invoice' && !calc.hasPriorInvoice) {
                 alert('No previous invoice found for this project. Use ADD 25% or PAY FULL for the first invoice.');
-                return;
+                return null;
             }
 
             if (calc.paymentMode === 'add_another_invoice' && calc.addonAmount <= 0) {
                 alert('Add-on amount must be greater than 0 for ADD ANOTHER INVOICE mode.');
-                return;
+                return null;
             }
 
             invoiceModalState.paymentMethod = paymentMethod;
 
-            const invoiceRecord = {
+            return {
                 id: generateId(),
                 lead_id: invoiceModalState.leadId,
                 lead_name: invoiceModalState.clientName || 'Unknown Client',
@@ -1565,16 +1568,37 @@
                 notes,
                 created_at: new Date().toISOString()
             };
+        }
+
+        async function persistInvoiceRecord(invoiceRecord) {
+            if (!invoiceRecord) return;
 
             if (!Array.isArray(DB.tables.invoices)) DB.tables.invoices = [];
             DB.tables.invoices.unshift(invoiceRecord);
             DB.save();
             await syncToSupabase();
-            await dispatchInvoiceToN8n(invoiceRecord);
             renderAll();
-            closeInvoiceModal();
-            alert(`Invoice queued. Due now: ${invoiceRecord.currency} ${invoiceRecord.due_now_amount.toFixed(2)} | Remaining: ${invoiceRecord.currency} ${invoiceRecord.remaining_amount.toFixed(2)} | Method: ${invoiceRecord.payment_method.toUpperCase()}`);
         }
+
+        window.saveInvoiceScheduler = async function() {
+            const invoiceRecord = buildInvoiceRecordFromForm();
+            if (!invoiceRecord) return;
+            await persistInvoiceRecord(invoiceRecord);
+            closeInvoiceModal();
+            alert(`Invoice saved. Due now: ${invoiceRecord.currency} ${invoiceRecord.due_now_amount.toFixed(2)} | Remaining: ${invoiceRecord.currency} ${invoiceRecord.remaining_amount.toFixed(2)} | Method: ${invoiceRecord.payment_method.toUpperCase()}`);
+        }
+
+        window.sendInvoiceScheduler = async function() {
+            const invoiceRecord = buildInvoiceRecordFromForm();
+            if (!invoiceRecord) return;
+            await persistInvoiceRecord(invoiceRecord);
+            await dispatchInvoiceToN8n(invoiceRecord);
+            closeInvoiceModal();
+            alert(`Invoice sent. Due now: ${invoiceRecord.currency} ${invoiceRecord.due_now_amount.toFixed(2)} | Remaining: ${invoiceRecord.currency} ${invoiceRecord.remaining_amount.toFixed(2)} | Method: ${invoiceRecord.payment_method.toUpperCase()}`);
+        }
+
+        // Backward compatibility for older button references.
+        window.submitInvoiceScheduler = window.saveInvoiceScheduler;
 
         window.openScheduler = function(clientName = '', leadId = null) {
             openModal("SCHEDULE MEETING / DEAL CALL", [
