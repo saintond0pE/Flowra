@@ -1469,6 +1469,7 @@
             setText('invoice-preview-remaining', calc.remainingAmount.toFixed(2));
             setText('invoice-preview-mode', getInvoiceModeLabel(mode));
             setText('invoice-preview-method', paymentMethod.toUpperCase());
+            refreshInvoiceSendEligibility();
         }
 
         window.setInvoicePaymentMode = function(mode) {
@@ -1511,9 +1512,35 @@
                 sendBtn.style.opacity = '1';
                 return;
             }
-            sendBtn.disabled = false;
             sendBtn.textContent = 'SEND';
-            sendBtn.style.opacity = '1';
+            refreshInvoiceSendEligibility();
+        }
+
+        function canSendInvoiceNow() {
+            if (!invoiceModalState?.leadId) return false;
+
+            const leadName = String(document.getElementById('invoice-lead-name')?.value || '').trim();
+            const projectId = String(document.getElementById('invoice-project')?.value || '').trim();
+            const currency = String(document.getElementById('invoice-currency')?.value || '').trim();
+            const paymentMethod = String(document.getElementById('invoice-payment-method')?.value || '').trim();
+            const notes = String(document.getElementById('invoice-notes')?.value || '').trim();
+            if (!leadName || !projectId || !currency || !paymentMethod || !notes) return false;
+
+            const calc = getInvoiceComputation();
+            if (!calc || calc.lockedTotal <= 0) return false;
+            if (calc.baseAmount < 0 || calc.addonAmount < 0) return false;
+            if (calc.paymentMode === 'add_another_invoice' && (!calc.hasPriorInvoice || calc.addonAmount <= 0)) return false;
+            if (calc.paymentMode === 'pay_partial_of_upfront' && calc.partialPercent <= 0) return false;
+
+            return true;
+        }
+
+        function refreshInvoiceSendEligibility() {
+            const sendBtn = document.getElementById('invoice-send-btn');
+            if (!sendBtn) return;
+            const canSend = canSendInvoiceNow();
+            sendBtn.disabled = !canSend;
+            sendBtn.style.opacity = canSend ? '1' : '0.55';
         }
 
         async function dispatchInvoiceToN8n(invoiceRecord) {
@@ -1640,7 +1667,7 @@
                 paymentMethod: 'upi'
             };
 
-            setInvoiceSendButtonState('idle');
+            refreshInvoiceSendEligibility();
 
             const leadInput = document.getElementById('invoice-lead-name');
             if (leadInput) leadInput.value = invoiceModalState.clientName;
@@ -1663,7 +1690,7 @@
                 }
             }
 
-            ['invoice-project', 'invoice-base-amount', 'invoice-addon-amount', 'invoice-upfront-percent', 'invoice-partial-percent', 'invoice-currency', 'invoice-payment-method']
+            ['invoice-project', 'invoice-base-amount', 'invoice-addon-amount', 'invoice-upfront-percent', 'invoice-partial-percent', 'invoice-currency', 'invoice-payment-method', 'invoice-notes']
                 .forEach((id) => {
                     const el = document.getElementById(id);
                     if (!el) return;
@@ -1834,6 +1861,11 @@
         }
 
         window.sendInvoiceScheduler = async function() {
+            if (!canSendInvoiceNow()) {
+                alert('Fill all invoice fields before sending.');
+                refreshInvoiceSendEligibility();
+                return;
+            }
             const invoiceRecord = buildInstantInvoiceWebhookRecord();
             setInvoiceSendButtonState('sending');
             try {
