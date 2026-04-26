@@ -209,7 +209,7 @@
                 <button class="btn" onclick="closeInvoiceModal()">CANCEL</button>
                 <div style="display:flex; gap:8px;">
                     <button class="btn" onclick="saveInvoiceScheduler()">SAVE INVOICE</button>
-                    <button class="btn btn-primary" onclick="sendInvoiceScheduler()">SEND</button>
+                    <button id="invoice-send-btn" class="btn btn-primary" type="button" onclick="sendInvoiceScheduler()">SEND</button>
                 </div>
             </div>
         </div>
@@ -383,7 +383,7 @@
         const SUPABASE_URL = "https://zdaylulmyejoswxoqedi.supabase.co";
         const SUPABASE_KEY = "sb_publishable_7if5Jz2oEMWY9W9ofy0kQw_HQjCJIae";
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const INVOICE_WEBHOOK_URL = 'https://sdfvsd4r5.app.n8n.cloud/webhook-test/61ae570c-1099-415e-a7fe-6e92ac485c3b';
+        const INVOICE_WEBHOOK_URL = 'https://sdfvsd4r5.app.n8n.cloud/webhook/61ae570c-1099-415e-a7fe-6e92ac485c3b';
 
         function mapInvoiceRecordToInvoiceLockRow(i) {
             return {
@@ -1496,44 +1496,125 @@
             if (modal) modal.style.display = 'none';
         }
 
+        function setInvoiceSendButtonState(state = 'idle') {
+            const sendBtn = document.getElementById('invoice-send-btn');
+            if (!sendBtn) return;
+            if (state === 'sending') {
+                sendBtn.disabled = true;
+                sendBtn.textContent = 'SENDING...';
+                sendBtn.style.opacity = '0.8';
+                return;
+            }
+            if (state === 'sent') {
+                sendBtn.disabled = true;
+                sendBtn.textContent = 'SENT';
+                sendBtn.style.opacity = '1';
+                return;
+            }
+            sendBtn.disabled = false;
+            sendBtn.textContent = 'SEND';
+            sendBtn.style.opacity = '1';
+        }
+
         async function dispatchInvoiceToN8n(invoiceRecord) {
             if (INVOICE_WEBHOOK_URL === 'YOUR_INVOICE_WEBHOOK_URL_HERE') {
                 console.warn('[Flowra] Invoice webhook URL not configured yet.');
-                return;
+                return { ok: false, status: 0, message: 'Webhook URL not configured.' };
             }
             try {
-                const payload = new URLSearchParams();
-                payload.append('event', 'lead_invoice_scheduled');
-                payload.append('invoice_id', invoiceRecord.id);
-                payload.append('lead_id', invoiceRecord.lead_id || 'none');
-                payload.append('lead_name', invoiceRecord.lead_name || 'Unknown');
-                payload.append('lead_email', invoiceRecord.lead_email || '');
-                payload.append('project_id', invoiceRecord.project_id || 'none');
-                payload.append('project_name', invoiceRecord.project_name || 'Unassigned');
-                payload.append('project_ids', JSON.stringify(invoiceRecord.project_ids || []));
-                payload.append('project_names', JSON.stringify(invoiceRecord.project_names || []));
-                payload.append('modules', JSON.stringify(invoiceRecord.modules || []));
-                payload.append('payment_mode', invoiceRecord.payment_mode);
-                payload.append('payment_method', invoiceRecord.payment_method || 'upi');
-                payload.append('base_amount', String(invoiceRecord.base_amount || 0));
-                payload.append('addon_amount', String(invoiceRecord.addon_amount || 0));
-                payload.append('current_charge_base', String(invoiceRecord.current_charge_base || 0));
-                payload.append('previous_locked_total', String(invoiceRecord.previous_locked_total || 0));
-                payload.append('locked_total_amount', String(invoiceRecord.locked_total_amount || 0));
-                payload.append('upfront_percent', String(invoiceRecord.upfront_percent || 25));
-                payload.append('upfront_amount', String(invoiceRecord.upfront_amount || 0));
-                payload.append('partial_percent_of_upfront', String(invoiceRecord.partial_percent_of_upfront || 0));
-                payload.append('due_now_amount', String(invoiceRecord.due_now_amount || 0));
-                payload.append('paid_now_amount', String(invoiceRecord.paid_now_amount || 0));
-                payload.append('remaining_amount', String(invoiceRecord.remaining_amount || 0));
-                payload.append('currency', invoiceRecord.currency || 'INR');
-                payload.append('notes', invoiceRecord.notes || '');
-                await fetch(INVOICE_WEBHOOK_URL, {
-                    method: 'POST',
-                    body: payload
+                const webhookUrl = String(INVOICE_WEBHOOK_URL || '').trim();
+                const payloadObject = {
+                    event: 'lead_invoice_scheduled',
+                    invoice_id: invoiceRecord.id,
+                    lead_id: invoiceRecord.lead_id || 'none',
+                    lead_name: invoiceRecord.lead_name || 'Unknown',
+                    lead_email: invoiceRecord.lead_email || '',
+                    email: invoiceRecord.lead_email || '',
+                    project_id: invoiceRecord.project_id || 'none',
+                    project_name: invoiceRecord.project_name || 'Unassigned',
+                    project_ids: invoiceRecord.project_ids || [],
+                    project_names: invoiceRecord.project_names || [],
+                    modules: invoiceRecord.modules || [],
+                    payment_mode: invoiceRecord.payment_mode,
+                    payment_method: invoiceRecord.payment_method || 'upi',
+                    base_amount: Number(invoiceRecord.base_amount || 0),
+                    addon_amount: Number(invoiceRecord.addon_amount || 0),
+                    current_charge_base: Number(invoiceRecord.current_charge_base || 0),
+                    previous_locked_total: Number(invoiceRecord.previous_locked_total || 0),
+                    locked_total_amount: Number(invoiceRecord.locked_total_amount || 0),
+                    upfront_percent: Number(invoiceRecord.upfront_percent || 25),
+                    upfront_amount: Number(invoiceRecord.upfront_amount || 0),
+                    partial_percent_of_upfront: Number(invoiceRecord.partial_percent_of_upfront || 0),
+                    due_now_amount: Number(invoiceRecord.due_now_amount || 0),
+                    paid_now_amount: Number(invoiceRecord.paid_now_amount || 0),
+                    remaining_amount: Number(invoiceRecord.remaining_amount || 0),
+                    currency: invoiceRecord.currency || 'INR',
+                    notes: invoiceRecord.notes || ''
+                };
+
+                // Match contact-page strategy exactly: persistent hidden iframe + native form POST.
+                let iframe = document.getElementById('hidden_n8n_invoice_iframe');
+                if (!iframe) {
+                    iframe = document.createElement('iframe');
+                    iframe.name = 'hidden_n8n_invoice_iframe';
+                    iframe.id = 'hidden_n8n_invoice_iframe';
+                    iframe.style.display = 'none';
+                    document.body.appendChild(iframe);
+                }
+
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = webhookUrl;
+                form.target = 'hidden_n8n_invoice_iframe';
+                form.style.display = 'none';
+
+                Object.entries(payloadObject).forEach(([k, v]) => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = k;
+                    input.value = typeof v === 'object' ? JSON.stringify(v) : String(v);
+                    form.appendChild(input);
                 });
+
+                document.body.appendChild(form);
+                form.submit();
+                console.log('[Flowra] Fired native hidden-form trigger to n8n production webhook.');
+                try { form.remove(); } catch (_) {}
+
+                // Extra fire-and-forget attempts for max delivery reliability in strict browser environments.
+                try {
+                    const formPayload = new URLSearchParams();
+                    Object.entries(payloadObject).forEach(([k, v]) => {
+                        formPayload.append(k, typeof v === 'object' ? JSON.stringify(v) : String(v));
+                    });
+                    fetch(webhookUrl, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        body: formPayload,
+                        keepalive: true
+                    }).catch(() => {});
+                } catch (_) {}
+
+                try {
+                    if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
+                        const beaconData = new Blob([JSON.stringify(payloadObject)], { type: 'text/plain;charset=UTF-8' });
+                        navigator.sendBeacon(webhookUrl, beaconData);
+                    }
+                } catch (_) {}
+
+                return {
+                    ok: true,
+                    status: 202,
+                    message: 'Webhook dispatched via hidden form POST.'
+                };
             } catch (e) {
                 console.error('[Flowra] Invoice webhook failed:', e);
+
+                return {
+                    ok: false,
+                    status: 0,
+                    message: e.message || 'Network error while calling webhook.'
+                };
             }
         }
 
@@ -1558,6 +1639,8 @@
                 paymentMode: 'add_25_now',
                 paymentMethod: 'upi'
             };
+
+            setInvoiceSendButtonState('idle');
 
             const leadInput = document.getElementById('invoice-lead-name');
             if (leadInput) leadInput.value = invoiceModalState.clientName;
@@ -1709,14 +1792,72 @@
             alert(`Invoice saved. Due now: ${invoiceRecord.currency} ${invoiceRecord.due_now_amount.toFixed(2)} | Remaining: ${invoiceRecord.currency} ${invoiceRecord.remaining_amount.toFixed(2)} | Method: ${invoiceRecord.payment_method.toUpperCase()}`);
         }
 
+        function buildInstantInvoiceWebhookRecord() {
+            const { selectedProjectId, selectedProjectName } = getSelectedInvoiceProjectRef();
+            const calc = getInvoiceComputation();
+            const leadId = invoiceModalState?.leadId || 'none';
+            const leadName = invoiceModalState?.clientName || 'Unknown Client';
+            const leadRecord = (DB.tables.leads || []).find((l) => l.id === leadId) || null;
+            const leadContext = buildLeadInvoiceModules(leadId, selectedProjectId);
+            const currencyRaw = document.getElementById('invoice-currency')?.value || 'INR';
+            const currency = String(currencyRaw).trim().toUpperCase().slice(0, 8) || 'INR';
+            const paymentMethod = normalizePaymentMethod(document.getElementById('invoice-payment-method')?.value);
+            const notes = document.getElementById('invoice-notes')?.value || '';
+
+            return {
+                id: generateId(),
+                lead_id: leadId,
+                lead_name: leadName,
+                lead_email: leadRecord ? (leadRecord.email || '') : '',
+                project_id: selectedProjectId || 'none',
+                project_name: selectedProjectName || 'Unassigned',
+                project_ids: leadContext.projectIds || [],
+                project_names: leadContext.projectNames || [],
+                modules: leadContext.modules || [],
+                payment_mode: calc.paymentMode || invoiceModalState?.paymentMode || 'add_25_now',
+                payment_method: paymentMethod || 'upi',
+                base_amount: Number(calc.baseAmount || 0),
+                addon_amount: Number(calc.addonAmount || 0),
+                previous_locked_total: Number(calc.previousLockedTotal || 0),
+                current_charge_base: Number(calc.currentChargeBase || 0),
+                locked_total_amount: Number(calc.lockedTotal || 0),
+                upfront_percent: Number(calc.upfrontPercent || 25),
+                upfront_amount: Number(calc.upfrontAmount || 0),
+                partial_percent_of_upfront: Number(calc.partialPercent || 0),
+                due_now_amount: Number(calc.dueNow || 0),
+                paid_now_amount: Number(calc.paidNowAmount || 0),
+                remaining_amount: Number(calc.remainingAmount || 0),
+                currency,
+                notes,
+                created_at: new Date().toISOString()
+            };
+        }
+
         window.sendInvoiceScheduler = async function() {
-            const invoiceRecord = buildInvoiceRecordFromForm();
-            if (!invoiceRecord) return;
-            const synced = await persistInvoiceRecord(invoiceRecord);
-            if (!synced) return;
-            await dispatchInvoiceToN8n(invoiceRecord);
-            closeInvoiceModal();
-            alert(`Invoice sent. Due now: ${invoiceRecord.currency} ${invoiceRecord.due_now_amount.toFixed(2)} | Remaining: ${invoiceRecord.currency} ${invoiceRecord.remaining_amount.toFixed(2)} | Method: ${invoiceRecord.payment_method.toUpperCase()}`);
+            const invoiceRecord = buildInstantInvoiceWebhookRecord();
+            setInvoiceSendButtonState('sending');
+            try {
+                // Fire webhook immediately on click with no save/sync preconditions.
+                const webhookResult = await dispatchInvoiceToN8n(invoiceRecord);
+                if (!webhookResult || !webhookResult.ok) {
+                    alert(`Webhook trigger failed (${webhookResult?.status || 0}). ${webhookResult?.message || 'Please retry.'}`);
+                    setInvoiceSendButtonState('idle');
+                    return;
+                }
+
+                // Save in background; webhook trigger should not wait for DB operations.
+                persistInvoiceRecord(invoiceRecord).catch((e) => {
+                    console.error('[Flowra] Post-send invoice save failed:', e);
+                });
+
+                setInvoiceSendButtonState('sent');
+                closeInvoiceModal();
+                alert('Invoice trigger fired.');
+            } catch (e) {
+                console.error('[Flowra] Invoice send failed:', e);
+                setInvoiceSendButtonState('idle');
+                alert(`Invoice send failed: ${e.message || 'Unknown error'}`);
+            }
         }
 
         // Backward compatibility for older button references.
