@@ -603,14 +603,7 @@ The user:
 
     // Render history on load
     document.addEventListener('DOMContentLoaded', () => {
-        let history = JSON.parse(localStorage.getItem('flowra_chat_history')) || [];
-        
-        // Clean up corrupted history (e.g., last message was 'user' but 'model' failed to reply)
-        if (history.length > 0 && history[history.length - 1].role === 'user') {
-            history.pop();
-            localStorage.setItem('flowra_chat_history', JSON.stringify(history));
-        }
-
+        const history = JSON.parse(localStorage.getItem('flowra_chat_history'));
         const chatBody = document.getElementById('chat-body');
         if (history && history.length > 0) {
             // Remove the initial mock message
@@ -710,12 +703,18 @@ The user:
                  firstBubble.remove();
              }
         }
+        
+        // Save user message to history
+        chatHistory.push({ role: 'user', parts: [{ text: text }] });
+        localStorage.setItem('flowra_chat_history', JSON.stringify(chatHistory));
 
         // Check Limit
         if (chatCount >= 5) {
             const limitMsg = "You've reached the maximum number of requests for this demo.\\nFor more inquiries go to the contact page: https://flowra-alpha.vercel.app/pages/contact.html";
             chatBody.insertAdjacentHTML('beforeend', getBotBubble(limitMsg));
             chatBody.scrollTop = chatBody.scrollHeight;
+            chatHistory.push({ role: 'model', parts: [{ text: limitMsg }] });
+            localStorage.setItem('flowra_chat_history', JSON.stringify(chatHistory));
             return;
         }
 
@@ -736,48 +735,72 @@ The user:
         chatBody.insertAdjacentHTML('beforeend', typingHtml);
         chatBody.scrollTop = chatBody.scrollHeight;
 
-        // Prepare temporary API history (do not save to localStorage yet)
-        const apiHistory = [...chatHistory, { role: 'user', parts: [{ text: text }] }];
+        // Call Gemini API with retry and fallback
+        const models = ['gemini-2.5-flash', 'gemini-2.0-flash'];
+        const requestBody = JSON.stringify({
+            systemInstruction: {
+                parts: [{ text: SYSTEM_PROMPT }]
+            },
+            contents: chatHistory
+        });
 
-        // Call Gemini API
-        try {
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    systemInstruction: {
-                        parts: [{ text: SYSTEM_PROMPT }]
-                    },
-                    contents: apiHistory
-                })
-            });
+        let success = false;
+        for (const model of models) {
+            for (let attempt = 0; attempt < 2; attempt++) {
+                try {
+                    const response = await fetch(
+                        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+                        {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: requestBody
+                        }
+                    );
 
-            const data = await response.json();
-            
-            const typingEl = document.getElementById('bot-typing');
-            if(typingEl) typingEl.remove();
+                    if (response.status === 429 || response.status === 503) {
+                        console.warn(`[Flowra] ${model} returned ${response.status}, attempt ${attempt + 1}`);
+                        // Wait before retry: 2s first attempt, 4s second
+                        await new Promise(r => setTimeout(r, (attempt + 1) * 2000));
+                        continue;
+                    }
 
-            if (data.candidates && data.candidates.length > 0) {
-                const botReply = data.candidates[0].content.parts[0].text;
-                chatBody.insertAdjacentHTML('beforeend', getBotBubble(botReply));
-                chatBody.scrollTop = chatBody.scrollHeight;
-                
-                // Save both user and model message to history only on success
-                chatHistory.push({ role: 'user', parts: [{ text: text }] });
-                chatHistory.push({ role: 'model', parts: [{ text: botReply }] });
-                localStorage.setItem('flowra_chat_history', JSON.stringify(chatHistory));
-            } else {
-                console.error("Unexpected API response", data);
-                chatBody.insertAdjacentHTML('beforeend', getBotBubble("Sorry, I'm having trouble connecting right now."));
+                    const data = await response.json();
+
+                    if (!response.ok) {
+                        console.warn(`[Flowra] ${model} error:`, data.error?.message || response.status);
+                        break; // Try next model
+                    }
+
+                    const typingEl = document.getElementById('bot-typing');
+                    if (typingEl) typingEl.remove();
+
+                    if (data.candidates && data.candidates.length > 0) {
+                        const botReply = data.candidates[0].content.parts[0].text;
+                        chatBody.insertAdjacentHTML('beforeend', getBotBubble(botReply));
+                        chatBody.scrollTop = chatBody.scrollHeight;
+
+                        chatHistory.push({ role: 'model', parts: [{ text: botReply }] });
+                        localStorage.setItem('flowra_chat_history', JSON.stringify(chatHistory));
+                        success = true;
+                    }
+                    break; // Got a response, stop retrying
+                } catch (err) {
+                    console.warn(`[Flowra] Network error with ${model}, attempt ${attempt + 1}:`, err);
+                    await new Promise(r => setTimeout(r, (attempt + 1) * 2000));
+                }
             }
+            if (success) break;
+        }
 
-        } catch (err) {
-            console.error("API Error", err);
+        if (!success) {
             const typingEl = document.getElementById('bot-typing');
-            if(typingEl) typingEl.remove();
-            chatBody.insertAdjacentHTML('beforeend', getBotBubble("An error occurred. Please try again later."));
+            if (typingEl) typingEl.remove();
+            const errMsg = "Our AI assistant is temporarily overloaded. Please try again in a moment, or reach out directly at https://flowra-alpha.vercel.app/pages/contact.html";
+            chatBody.insertAdjacentHTML('beforeend', getBotBubble(errMsg));
+            chatBody.scrollTop = chatBody.scrollHeight;
+            // Refund the message count since it failed
+            chatCount--;
+            localStorage.setItem('flowra_chat_count', chatCount.toString());
         }
     }
 </script>
