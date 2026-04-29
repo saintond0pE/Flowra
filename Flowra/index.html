@@ -794,11 +794,39 @@ The user:
         if (!success) {
             const typingEl = document.getElementById('bot-typing');
             if (typingEl) typingEl.remove();
-            const errMsg = "Our AI assistant is temporarily overloaded. Please try again in a moment, or reach out directly at https://flowra-alpha.vercel.app/pages/contact.html";
-            chatBody.insertAdjacentHTML('beforeend', getBotBubble(errMsg));
-            chatBody.scrollTop = chatBody.scrollHeight;
+            // Refund the message count since it failed
             chatCount--;
             localStorage.setItem('flowra_chat_count', chatCount.toString());
+
+            // Show countdown timer bubble
+            const countdownId = 'cooldown-' + Date.now();
+            const COOLDOWN_SECS = 60;
+            const countdownHtml = `
+                <div id="${countdownId}" class="chat-bubble bot shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] bg-[#FFF9E6] text-black border-4 border-black">
+                    <div class="font-black text-xs uppercase mb-1 text-black/50 tracking-widest">Flowra AI</div>
+                    <div class="font-bold text-base leading-snug">
+                        ⏳ Rate limit reached. Please wait <span id="${countdownId}-timer" class="text-[#B19CD9] font-black">${COOLDOWN_SECS}s</span> before sending your next message.
+                    </div>
+                </div>
+            `;
+            chatBody.insertAdjacentHTML('beforeend', countdownHtml);
+            chatBody.scrollTop = chatBody.scrollHeight;
+
+            let remaining = COOLDOWN_SECS;
+            const interval = setInterval(() => {
+                remaining--;
+                const timerSpan = document.getElementById(`${countdownId}-timer`);
+                if (timerSpan) {
+                    timerSpan.textContent = `${remaining}s`;
+                }
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    const bubble = document.getElementById(countdownId);
+                    if (bubble) {
+                        bubble.querySelector('.font-bold.text-base').innerHTML = '✅ You can send your message again now!';
+                    }
+                }
+            }, 1000);
         }
     }
 </script>
