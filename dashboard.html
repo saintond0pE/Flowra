@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -115,7 +115,7 @@
 
             <div class="flex-between" style="margin-top:24px; margin-bottom:0;">
                 <button class="btn" onclick="document.getElementById('projectGeneratorModal').style.display='none'">CANCEL</button>
-                <button class="btn btn-primary" onclick="submitProjectGeneration()">✔ GENERATE CHECKLISTS</button>
+                <button class="btn btn-primary" onclick="submitProjectGeneration()">âœ” GENERATE CHECKLISTS</button>
             </div>
         </div>
     </div>
@@ -229,7 +229,7 @@
             <div class="nav-item" onclick="switchView('feedback')">Feedback & Ideas</div>
         </div>
         <div style="padding: 20px;">
-            <button class="btn" style="width:100%" onclick="renderAll()">↺ REFRESH</button>
+            <button class="btn" style="width:100%" onclick="renderAll()">â†º REFRESH</button>
         </div>
     </div>
 
@@ -292,7 +292,7 @@
                         <p style="font-weight: 700; font-size: 12px; margin-bottom: 16px; text-transform: uppercase;">Manage your schedule and close deals on autopilot.</p>
                     </div>
                     <button class="btn" style="background:var(--accent-color); color:#fff; font-size:16px; padding: 12px 24px; box-shadow: 4px 4px 0 var(--border-color); display: flex; align-items: center; gap: 8px;" onclick="triggerVoiceWebhook()">
-                        <span style="font-size: 20px;">🎙️</span> TRIGGER REVENUE VOICE
+                        <span style="font-size: 20px;">ðŸŽ™ï¸</span> TRIGGER REVENUE VOICE
                     </button>
                 </div>
                 
@@ -341,10 +341,10 @@
             <div id="view-automation" class="view-section">
                 <h2>Automation Playbooks (n8n Webhook Overrides)</h2>
                 <div class="grid-4">
-                    <button class="btn btn-large" onclick="triggerAutomation('Send Proposal')">📄 SEND PROPOSAL</button>
-                    <button class="btn btn-large" onclick="triggerAutomation('Send Follow-Up')">🔔 SEND FOLLOW-UP</button>
-                    <button class="btn btn-large" onclick="triggerAutomation('Sync DB')">💾 SYNC DATABASE</button>
-                    <button class="btn btn-large btn-primary" onclick="triggerAutomation('Trigger Onboarding')">🚀 TRIGGER ONBOARDING</button>
+                    <button class="btn btn-large" onclick="triggerAutomation('Send Proposal')">ðŸ“„ SEND PROPOSAL</button>
+                    <button class="btn btn-large" onclick="triggerAutomation('Send Follow-Up')">ðŸ”” SEND FOLLOW-UP</button>
+                    <button class="btn btn-large" onclick="triggerAutomation('Sync DB')">ðŸ’¾ SYNC DATABASE</button>
+                    <button class="btn btn-large btn-primary" onclick="triggerAutomation('Trigger Onboarding')">ðŸš€ TRIGGER ONBOARDING</button>
                 </div>
             </div>
 
@@ -623,15 +623,15 @@
         function setSyncStatus(state, msg) {
             let el = document.getElementById('sync-status');
             if (!el) return;
-            if (state === 'syncing') { el.innerText = '⟳ SYNCING...'; el.style.color = '#888'; }
-            else if (state === 'ok') { el.innerText = '✅ SYNCED'; el.style.color = 'green'; }
-            else { el.innerText = '❌ SYNC ERROR: ' + msg; el.style.color = 'red'; }
+            if (state === 'syncing') { el.innerText = 'âŸ³ SYNCING...'; el.style.color = '#888'; }
+            else if (state === 'ok') { el.innerText = 'âœ… SYNCED'; el.style.color = 'green'; }
+            else { el.innerText = 'âŒ SYNC ERROR: ' + msg; el.style.color = 'red'; }
         }
 
-        /* Load data from Supabase on startup — SAFE VERSION
+        /* Load data from Supabase on startup â€” SAFE VERSION
            Rule: localStorage is the source of truth.
            We only pull from Supabase if localStorage has NO projects.
-           We always push localStorage → Supabase on startup to keep cloud in sync. */
+           We always push localStorage â†’ Supabase on startup to keep cloud in sync. */
         async function loadFromSupabase() {
             try {
                 // Always load localStorage first
@@ -837,47 +837,47 @@
 
         /* HARDCODED MODULE & TASK HIERARCHY */
         const TASK_STRUCTURE = {
-            "🟪 CUSTOMER AUTOMATION": {
+            "ðŸŸª CUSTOMER AUTOMATION": {
                 "Website Chatbot": ["Setup chatbot", "Train on company data", "Connect to website"],
                 "WhatsApp / Call Handling": ["Setup WhatsApp flow", "Setup auto-reply"],
                 "Lead Capture System": ["Setup lead capture"],
                 "Missed Call Recovery": ["Setup fallback flow"]
             },
-            "🟦 INTERNAL OPERATIONS": {
+            "ðŸŸ¦ INTERNAL OPERATIONS": {
                 "Team Dashboard": ["Build dashboard UI"],
                 "Task Automation": ["Create task system", "Automate repetitive actions"],
                 "Workflow Automation": ["Connect database", "Setup internal tools"]
             },
-            "🟧 SALES & FOLLOW-UP": {
+            "ðŸŸ§ SALES & FOLLOW-UP": {
                 "Lead Management": ["Setup lead tracking"],
                 "Follow-up Automation": ["Auto follow-up system"],
                 "Email Automation": ["Email templates", "CRM logic"]
             },
-            "🟩 SCHEDULING & BOOKINGS": {
+            "ðŸŸ© SCHEDULING & BOOKINGS": {
                 "Booking System": ["Create booking flow"],
                 "Slot Management": ["Assign slots"],
                 "Agent Assignment": ["Connect calendar", "Auto-confirm bookings"]
             },
-            "🟥 OPERATIONS & DELIVERY": {
+            "ðŸŸ¥ OPERATIONS & DELIVERY": {
                 "Task Execution System": ["Assign delivery tasks"],
                 "Agent Flow": ["Setup notifications"],
                 "Notifications": ["Track completion"]
             },
-            "🟨 INTELLIGENCE & ALERTS": {
+            "ðŸŸ¨ INTELLIGENCE & ALERTS": {
                 "Predictive Alerts": ["Setup alerts"],
                 "Inventory Monitoring": ["Define triggers"],
                 "Usage Tracking": ["Connect data sources"]
             },
-            "📊 ANALYTICS & INSIGHTS (CORE UPGRADE)": {
-                "Lead & Sales Visibility": ["Count total leads", "Track lead status (new → contacted → closed)", "Identify uncontacted leads", "Calculate conversion rate", "Show lead movement (pipeline flow)"],
+            "ðŸ“Š ANALYTICS & INSIGHTS (CORE UPGRADE)": {
+                "Lead & Sales Visibility": ["Count total leads", "Track lead status (new â†’ contacted â†’ closed)", "Identify uncontacted leads", "Calculate conversion rate", "Show lead movement (pipeline flow)"],
                 "Operations Performance": ["Count total tasks", "Track completed vs pending", "Identify overdue tasks", "Measure response time", "Show workload distribution"]
             },
-            "🟦 ADMIN / CONTROL SYSTEM": {
+            "ðŸŸ¦ ADMIN / CONTROL SYSTEM": {
                 "Team Monitoring": ["Track tasks per member", "Track completed tasks", "Log working hours", "Show simple leaderboard", "Detect overloaded members"],
                 "Task Control": ["Assign task", "Reassign task", "Set priority", "Set deadline", "Update status"],
                 "Approval Flow (keep simple)": ["Submit for approval", "Approve / reject", "Add comment", "Log decision"]
             },
-            "🟧 INTEGRATIONS (ONLY PRACTICAL ONES)": {
+            "ðŸŸ§ INTEGRATIONS (ONLY PRACTICAL ONES)": {
                 "Data Sync (KEEP THIS)": ["Sync leads to Google Sheets", "Backup data", "Export data", "Import external data"],
                 "Tool Sync (LIMITED)": ["Connect email (basic)", "Store communication logs", "Sync basic client info"]
             }
@@ -949,7 +949,7 @@
             if(globalNotes.trim() !== "") {
                 combinedTasks.push({
                     id: generateId(),
-                    category: "⬜ CUSTOM REQUEST",
+                    category: "â¬œ CUSTOM REQUEST",
                     module: "Client Notes & Additions",
                     name: "Execute Custom Scope given by Client",
                     notes: globalNotes,
@@ -960,7 +960,7 @@
 
             // Fallback if absolutely nothing is selected
             if(combinedTasks.length === 0) {
-                combinedTasks.push({ id: generateId(), category: "⬜ CUSTOM", module: "General Setup", name: "Configure Project", notes: '', done: false, updated_at: new Date().toISOString() });
+                combinedTasks.push({ id: generateId(), category: "â¬œ CUSTOM", module: "General Setup", name: "Configure Project", notes: '', done: false, updated_at: new Date().toISOString() });
             }
 
             // Keep project ID stable per lead so all tasks for a client map to one project key.
@@ -1060,7 +1060,7 @@
                         <div style="display:flex; flex-direction:column; gap:12px;">
                             ${(proj.tasks || []).map((t) => `
                                 <div style="display:flex; flex-direction:column; padding-bottom:12px; border-bottom: 1px solid rgba(0,0,0,0.05);">
-                                    <div style="font-weight:900; font-size:10px; margin-bottom:4px; opacity:0.8;">[${t.category}] ➡ ${t.module}</div>
+                                    <div style="font-weight:900; font-size:10px; margin-bottom:4px; opacity:0.8;">[${t.category}] âž¡ ${t.module}</div>
                                     <label style="display:flex; align-items:flex-start; cursor:pointer; font-weight: 700; font-size:14px; text-decoration: ${t.done?'line-through':'none'}; opacity: ${t.done?0.5:1}">
                                         <input type="checkbox" ${t.done?'checked':''} onchange="toggleProjectTask('${proj.id}', '${t.id}')" style="width:18px; height:18px; margin-top:2px; margin-right:12px; cursor:pointer; border: 2px solid #000;">
                                         <span>${t.name}</span>
@@ -1087,7 +1087,7 @@
                     if(!proj.tasks) proj.tasks = [];
                     proj.tasks.push({
                         id: generateId(),
-                        category: '⬜ CUSTOM ADDITION',
+                        category: 'â¬œ CUSTOM ADDITION',
                         module: 'Ad-hoc Task',
                         name: res.name,
                         notes: res.notes,
