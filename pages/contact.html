@@ -149,10 +149,10 @@
             <!-- Subject Toggle -->
             <div class="grid grid-cols-2 gap-4 mb-4 md:mb-12">
                 <button id="btn-query" onclick="setMode('query')" class="toggle-btn active p-3 md:p-6 border-2 md:border-4 border-black text-sm md:text-xl font-black uppercase tracking-tighter transition-all">
-                    QUERY
+                    QUERY OR BOOKING
                 </button>
                 <button id="btn-issue" onclick="setMode('issue')" class="toggle-btn p-3 md:p-6 border-2 md:border-4 border-black text-sm md:text-xl font-black uppercase tracking-tighter transition-all">
-                    BOOKING OR ISSUES
+                    ISSUE
                 </button>
             </div>
 
@@ -271,18 +271,26 @@
             currentMode = mode;
             const queryBtn = document.getElementById('btn-query');
             const issueBtn = document.getElementById('btn-issue');
+            const messageField = document.getElementById('message-field');
             const inboxSection = document.getElementById('inbox-section');
 
             if (mode === 'query') {
                 queryBtn.classList.add('active');
                 issueBtn.classList.remove('active');
-                inboxSection.classList.add('hidden');
+                messageField.placeholder = "Describe your query or what you'd like to book...";
+                inboxSection.classList.remove('hidden');
             } else {
                 issueBtn.classList.add('active');
                 queryBtn.classList.remove('active');
+                messageField.placeholder = "Describe the issue in detail...";
                 inboxSection.classList.remove('hidden');
             }
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ensure the correct mode is set on load
+            setMode('query');
+        });
 
         async function validateForm(event) {
             event.preventDefault();
@@ -323,7 +331,7 @@
             try {
                 // Display strictly numeric string (+ prefixed for display consistency) in message
                 const displayMobilePrefix = cleanMobile ? `[MOBILE: +${numericMobileForDb}] ` : '';
-                const refinedPrefix = currentMode === 'query' ? '[QUERY]' : '[BOOKING/ISSUE]';
+                const refinedPrefix = currentMode === 'query' ? '[QUERY/BOOKING]' : '[ISSUE]';
                 const finalMessage = `${displayMobilePrefix}${refinedPrefix} ${message || 'System Notification'}`;
                 
                 // Safe temporally sortable ID so newest appears at the top: id_[timestamp]_[random]
