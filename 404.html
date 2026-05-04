@@ -205,7 +205,7 @@
             Connect webhooks & verify Voice Agent 1.0 logic.
         </div>
         <button class="w-full bg-black text-white font-black py-3 uppercase tracking-tighter hover:bg-[#ff3c00] transition-colors" onclick="triggerVoiceWebhook()">
-            ðŸŽ™ï¸ TRIGGER REVENUE VOICE
+            🎙️ TRIGGER REVENUE VOICE
         </button>
     </div>
 
@@ -229,7 +229,7 @@
         const logs = document.getElementById('voice-logs');
         const btn = event.currentTarget;
         btn.classList.add('animate-pulse-voice');
-        btn.innerText = "ðŸŽ™ï¸ LISTENING...";
+        btn.innerText = "🎙️ LISTENING...";
         
         logs.innerHTML += `<br>> [${new Date().toLocaleTimeString()}] INITIATING N8N HANDSHAKE...`;
         logs.scrollTop = logs.scrollHeight;
@@ -240,9 +240,9 @@
             mode: 'no-cors', // To avoid CORS issues in simple tests
             body: JSON.stringify({ event: 'voice_close', timestamp: new Date(), source: '404_page' })
         }).then(() => {
-             logs.innerHTML += `<br>> <span style="color:#ff3c00;">âœ” REVENUE PAYLOAD DISPATCHED</span>`;
+             logs.innerHTML += `<br>> <span style="color:#ff3c00;">✔ REVENUE PAYLOAD DISPATCHED</span>`;
         }).catch(() => {
-             logs.innerHTML += `<br>> <span style="color:#ff3c00;">âœ” SENT TO LOCAL QUEUE</span>`;
+             logs.innerHTML += `<br>> <span style="color:#ff3c00;">✔ SENT TO LOCAL QUEUE</span>`;
         });
 
         setTimeout(() => {
@@ -252,7 +252,7 @@
 
         setTimeout(() => {
             btn.classList.remove('animate-pulse-voice');
-            btn.innerText = "ðŸŽ™ï¸ TRIGGER REVENUE VOICE";
+            btn.innerText = "🎙️ TRIGGER REVENUE VOICE";
             alert('REVENUE WEBHOOK SENT TO N8N! Voice interface active.');
         }, 2000);
     }
