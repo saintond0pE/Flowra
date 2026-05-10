@@ -179,6 +179,11 @@
                 </div>
             </div>
 
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label>Invoice Payment Link</label>
+                <input id="invoice-link" type="text" placeholder="https://buy.stripe.com/...">
+            </div>
+
             <label style="margin-bottom:8px;">Payment Mode</label>
             <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
                 <button id="mode-add-25" class="btn btn-primary" type="button" onclick="setInvoicePaymentMode('add_25_now')">ADD 25% RIGHT NOW</button>
@@ -383,7 +388,6 @@
         const SUPABASE_URL = "https://zdaylulmyejoswxoqedi.supabase.co";
         const SUPABASE_KEY = "sb_publishable_7if5Jz2oEMWY9W9ofy0kQw_HQjCJIae";
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const INVOICE_WEBHOOK_URL = 'https://sdfvsd4r5.app.n8n.cloud/webhook/61ae570c-1099-415e-a7fe-6e92ac485c3b';
 
         function mapInvoiceRecordToInvoiceLockRow(i) {
             return {
@@ -411,6 +415,7 @@
                 remaining_amount: i.remaining_amount || 0,
                 currency: i.currency || 'INR',
                 notes: i.notes || '',
+                invoice_link: i.invoice_link || '',
                 created_at: i.created_at || new Date().toISOString(),
                 updated_at: new Date().toISOString()
             };
@@ -442,6 +447,7 @@
                 remaining_amount: Number(r.remaining_amount) || 0,
                 currency: r.currency || 'INR',
                 notes: r.notes || '',
+                invoice_link: r.invoice_link || '',
                 created_at: r.created_at || new Date().toISOString()
             };
         }
@@ -474,6 +480,7 @@
                 remaining_amount: row.remaining_amount || 0,
                 currency: row.currency || 'INR',
                 notes: row.notes || '',
+                invoice_link: row.invoice_link || '',
                 created_at: row.created_at || new Date().toISOString(),
                 updated_at: new Date().toISOString()
             };
@@ -555,6 +562,7 @@
                             message: l.message || '', 
                             status: l.status, 
                             number: rawNum === '' ? null : rawNum,
+                            lead_lock: l.lead_lock || null,
                             created_at: l.created_at || new Date().toISOString()
                         };
                     });
@@ -1224,7 +1232,10 @@
 
                 return `<tr>
                     <td><span class="badge" style="background:${col}; color:#fff; border:none;">${cat}</span></td>
-                    <td><strong>${lead.name}</strong></td>
+                    <td>
+                        <strong>${lead.name}</strong>
+                        ${lead.lead_lock ? `<a href="${lead.lead_lock}" target="_blank" class="badge" style="background:#000; color:#fff; text-decoration:none; margin-left:8px; font-size:9px;">🔗 LOCK</a>` : ''}
+                    </td>
                     <td>${lead.email}</td>
                     <td>${displayNumber}</td>
                     <td><span style="font-size:12px; font-weight:700;">${dMsg.substring(0,40)}${dMsg.length > 40 ? '...' : ''}</span></td>
@@ -1238,9 +1249,24 @@
             }).join(''); 
         }
         window.createNewLead = function() { 
-            openModal("ADD NEW LEAD", [{id: 'name', label: 'Full Name'}, {id: 'email', label: 'Email Address'}, {id: 'number', label: 'Mobile Number'}, {id: 'status', label: 'Initial Status', type: 'select', options: ['new', 'contacted', 'closed']}], (res) => { 
+            openModal("ADD NEW LEAD", [
+                {id: 'name', label: 'Full Name'}, 
+                {id: 'email', label: 'Email Address'}, 
+                {id: 'number', label: 'Mobile Number'}, 
+                {id: 'lead_lock', label: 'Lead Lock (Invoice Link)'},
+                {id: 'status', label: 'Initial Status', type: 'select', options: ['new', 'contacted', 'closed']}
+            ], (res) => { 
                 if(res.name) { 
-                    DB.tables.leads.unshift({ id: generateId(), name: res.name, email: res.email, number: res.number, message: "", status: res.status, created_at: new Date().toISOString() }); 
+                    DB.tables.leads.unshift({ 
+                        id: generateId(), 
+                        name: res.name, 
+                        email: res.email, 
+                        number: res.number, 
+                        lead_lock: res.lead_lock,
+                        message: "", 
+                        status: res.status, 
+                        created_at: new Date().toISOString() 
+                    }); 
                     DB.save(); renderAll(); syncToSupabase(); closeModal(); 
                 }
             }); 
@@ -1248,8 +1274,13 @@
         window.updateLeadStatus = function(id) { 
             const lead = DB.tables.leads.find(l => l.id === id); 
             if(lead) { 
-                openModal("UPDATE LEAD", [{id: 'name', label: 'Name', val: lead.name}, {id: 'number', label: 'Number', val: lead.number || lead.mobile}, {id: 'status', label: 'Status', type: 'select', options: ['new', 'contacted', 'working', 'finished', 'closed'], val: lead.status}], (res) => { 
-                    Object.assign(lead, {name: res.name, number: res.number, status: res.status}); 
+                openModal("UPDATE LEAD", [
+                    {id: 'name', label: 'Name', val: lead.name}, 
+                    {id: 'number', label: 'Number', val: lead.number || lead.mobile}, 
+                    {id: 'lead_lock', label: 'Lead Lock (Invoice Link)', val: lead.lead_lock || ''},
+                    {id: 'status', label: 'Status', type: 'select', options: ['new', 'contacted', 'working', 'finished', 'closed'], val: lead.status}
+                ], (res) => { 
+                    Object.assign(lead, {name: res.name, number: res.number, lead_lock: res.lead_lock, status: res.status}); 
                     DB.save(); renderAll(); syncToSupabase(); closeModal(); 
                 }); 
             } 
@@ -1390,6 +1421,7 @@
                 setVal('invoice-currency', 'INR');
                 setVal('invoice-payment-method', 'upi');
                 setVal('invoice-notes', '');
+                setVal('invoice-link', '');
                 invoiceModalState.paymentMethod = 'upi';
                 return;
             }
@@ -1405,6 +1437,7 @@
             setVal('invoice-payment-method', paymentMethod);
             invoiceModalState.paymentMethod = paymentMethod;
             setVal('invoice-notes', latestInvoice.notes || '');
+            setVal('invoice-link', latestInvoice.invoice_link || '');
         }
 
         function getInvoiceComputation() {
@@ -1556,107 +1589,7 @@
             sendBtn.style.opacity = canSend ? '1' : '0.55';
         }
 
-        async function dispatchInvoiceToN8n(invoiceRecord) {
-            if (INVOICE_WEBHOOK_URL === 'YOUR_INVOICE_WEBHOOK_URL_HERE') {
-                console.warn('[Flowra] Invoice webhook URL not configured yet.');
-                return { ok: false, status: 0, message: 'Webhook URL not configured.' };
-            }
-            try {
-                const webhookUrl = String(INVOICE_WEBHOOK_URL || '').trim();
-                const payloadObject = {
-                    event: 'lead_invoice_scheduled',
-                    invoice_id: invoiceRecord.id,
-                    lead_id: invoiceRecord.lead_id || 'none',
-                    lead_name: invoiceRecord.lead_name || 'Unknown',
-                    lead_email: invoiceRecord.lead_email || '',
-                    email: invoiceRecord.lead_email || '',
-                    project_id: invoiceRecord.project_id || 'none',
-                    project_name: invoiceRecord.project_name || 'Unassigned',
-                    project_ids: invoiceRecord.project_ids || [],
-                    project_names: invoiceRecord.project_names || [],
-                    modules: invoiceRecord.modules || [],
-                    payment_mode: invoiceRecord.payment_mode,
-                    payment_method: invoiceRecord.payment_method || 'upi',
-                    base_amount: Number(invoiceRecord.base_amount || 0),
-                    addon_amount: Number(invoiceRecord.addon_amount || 0),
-                    current_charge_base: Number(invoiceRecord.current_charge_base || 0),
-                    previous_locked_total: Number(invoiceRecord.previous_locked_total || 0),
-                    locked_total_amount: Number(invoiceRecord.locked_total_amount || 0),
-                    upfront_percent: Number(invoiceRecord.upfront_percent || 25),
-                    upfront_amount: Number(invoiceRecord.upfront_amount || 0),
-                    partial_percent_of_upfront: Number(invoiceRecord.partial_percent_of_upfront || 0),
-                    due_now_amount: Number(invoiceRecord.due_now_amount || 0),
-                    paid_now_amount: Number(invoiceRecord.paid_now_amount || 0),
-                    remaining_amount: Number(invoiceRecord.remaining_amount || 0),
-                    currency: invoiceRecord.currency || 'INR',
-                    notes: invoiceRecord.notes || ''
-                };
 
-                // Match contact-page strategy exactly: persistent hidden iframe + native form POST.
-                let iframe = document.getElementById('hidden_n8n_invoice_iframe');
-                if (!iframe) {
-                    iframe = document.createElement('iframe');
-                    iframe.name = 'hidden_n8n_invoice_iframe';
-                    iframe.id = 'hidden_n8n_invoice_iframe';
-                    iframe.style.display = 'none';
-                    document.body.appendChild(iframe);
-                }
-
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = webhookUrl;
-                form.target = 'hidden_n8n_invoice_iframe';
-                form.style.display = 'none';
-
-                Object.entries(payloadObject).forEach(([k, v]) => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = k;
-                    input.value = typeof v === 'object' ? JSON.stringify(v) : String(v);
-                    form.appendChild(input);
-                });
-
-                document.body.appendChild(form);
-                form.submit();
-                console.log('[Flowra] Fired native hidden-form trigger to n8n production webhook.');
-                try { form.remove(); } catch (_) {}
-
-                // Extra fire-and-forget attempts for max delivery reliability in strict browser environments.
-                try {
-                    const formPayload = new URLSearchParams();
-                    Object.entries(payloadObject).forEach(([k, v]) => {
-                        formPayload.append(k, typeof v === 'object' ? JSON.stringify(v) : String(v));
-                    });
-                    fetch(webhookUrl, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        body: formPayload,
-                        keepalive: true
-                    }).catch(() => {});
-                } catch (_) {}
-
-                try {
-                    if (typeof navigator !== 'undefined' && typeof navigator.sendBeacon === 'function') {
-                        const beaconData = new Blob([JSON.stringify(payloadObject)], { type: 'text/plain;charset=UTF-8' });
-                        navigator.sendBeacon(webhookUrl, beaconData);
-                    }
-                } catch (_) {}
-
-                return {
-                    ok: true,
-                    status: 202,
-                    message: 'Webhook dispatched via hidden form POST.'
-                };
-            } catch (e) {
-                console.error('[Flowra] Invoice webhook failed:', e);
-
-                return {
-                    ok: false,
-                    status: 0,
-                    message: e.message || 'Network error while calling webhook.'
-                };
-            }
-        }
 
         window.openScheduleAction = function(clientName = '', leadId = null) {
             openModal("SCHEDULE ACTION", [
@@ -1703,7 +1636,7 @@
                 }
             }
 
-            ['invoice-project', 'invoice-base-amount', 'invoice-addon-amount', 'invoice-upfront-percent', 'invoice-partial-percent', 'invoice-currency', 'invoice-payment-method', 'invoice-notes']
+            ['invoice-project', 'invoice-base-amount', 'invoice-addon-amount', 'invoice-upfront-percent', 'invoice-partial-percent', 'invoice-currency', 'invoice-payment-method', 'invoice-notes', 'invoice-link']
                 .forEach((id) => {
                     const el = document.getElementById(id);
                     if (!el) return;
@@ -1737,6 +1670,7 @@
             const currency = String(currencyRaw).trim().toUpperCase().slice(0, 8) || 'INR';
             const paymentMethod = normalizePaymentMethod(document.getElementById('invoice-payment-method')?.value);
             const notes = document.getElementById('invoice-notes')?.value || '';
+            const invoiceLink = document.getElementById('invoice-link')?.value || '';
 
             if (!invoiceModalState.leadId) {
                 alert('This lead is missing a valid ID. Open invoice from a lead row and try again.');
@@ -1790,6 +1724,7 @@
                 remaining_amount: calc.remainingAmount,
                 currency,
                 notes,
+                invoice_link: invoiceLink,
                 created_at: new Date().toISOString()
             };
         }
@@ -1843,6 +1778,7 @@
             const currency = String(currencyRaw).trim().toUpperCase().slice(0, 8) || 'INR';
             const paymentMethod = normalizePaymentMethod(document.getElementById('invoice-payment-method')?.value);
             const notes = document.getElementById('invoice-notes')?.value || '';
+            const invoiceLink = document.getElementById('invoice-link')?.value || '';
 
             return {
                 id: generateId(),
@@ -1869,6 +1805,7 @@
                 remaining_amount: Number(calc.remainingAmount || 0),
                 currency,
                 notes,
+                invoice_link: invoiceLink,
                 created_at: new Date().toISOString()
             };
         }
@@ -1882,26 +1819,23 @@
             const invoiceRecord = buildInstantInvoiceWebhookRecord();
             setInvoiceSendButtonState('sending');
             try {
-                // Fire webhook immediately on click with no save/sync preconditions.
-                const webhookResult = await dispatchInvoiceToN8n(invoiceRecord);
-                if (!webhookResult || !webhookResult.ok) {
-                    alert(`Webhook trigger failed (${webhookResult?.status || 0}). ${webhookResult?.message || 'Please retry.'}`);
-                    setInvoiceSendButtonState('idle');
-                    return;
-                }
-
-                // Save in background; webhook trigger should not wait for DB operations.
+                // BYPASS WEBHOOK AS PER USER REQUEST
+                console.log('[Flowra] Webhook bypassed by user request.');
+                
+                // Save in background
                 persistInvoiceRecord(invoiceRecord).catch((e) => {
                     console.error('[Flowra] Post-send invoice save failed:', e);
                 });
 
                 setInvoiceSendButtonState('sent');
-                closeInvoiceModal();
-                alert('Invoice trigger fired.');
+                setTimeout(() => {
+                    closeInvoiceModal();
+                    alert('Invoice saved to system (Webhook Bypassed).');
+                }, 500);
             } catch (e) {
-                console.error('[Flowra] Invoice send failed:', e);
+                console.error('[Flowra] Invoice operation failed:', e);
                 setInvoiceSendButtonState('idle');
-                alert(`Invoice send failed: ${e.message || 'Unknown error'}`);
+                alert(`Operation failed: ${e.message || 'Unknown error'}`);
             }
         }
 
