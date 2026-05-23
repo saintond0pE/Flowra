@@ -343,14 +343,27 @@
 
             <div class="card" style="margin-bottom: 12px; background:#fffebc;">
                 <div style="font-weight:800; font-size:12px; text-transform:uppercase; margin-bottom:8px;">Invoice Preview</div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-weight:700; font-size:13px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-weight:700; font-size:13px; margin-bottom: 12px;">
                     <div>Locked Total: <span id="invoice-preview-locked">0</span></div>
-                    <div>Upfront Amount: <span id="invoice-preview-upfront">0</span></div>
                     <div>Current Charge Basis: <span id="invoice-preview-charge-base">0</span></div>
-                    <div>Due Now: <span id="invoice-preview-due">0</span></div>
+                    <div>Paid Amount: <span id="invoice-preview-paid">0</span></div>
                     <div>Remaining Amount: <span id="invoice-preview-remaining">0</span></div>
+                    <div>Due Now: <span id="invoice-preview-due">0</span></div>
+                    <div>Payment Status: <span id="invoice-preview-payment-status">Payment Pending</span></div>
+                    <div>Invoice Status: <span id="invoice-preview-invoice-status">Sent</span></div>
                     <div>Mode: <span id="invoice-preview-mode">add_25_now</span></div>
                     <div>Payment Method: <span id="invoice-preview-method">upi</span></div>
+                </div>
+                
+                <div style="border-top: 2px solid var(--border-color); padding-top: 12px;">
+                    <div style="font-weight: 800; font-size: 10px; text-transform: uppercase; margin-bottom: 8px;">Payment Pipeline Status</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-weight: 900; font-size: 11px; text-transform: uppercase; gap: 4px;">
+                        <div id="pipeline-stage-sent" style="flex: 1; padding: 6px; border: 2px solid var(--border-color); text-align: center; background: #fff; transition: all 0.3s ease;">Invoice Sent</div>
+                        <div style="font-size: 14px; font-weight: bold; color: var(--border-color);">➔</div>
+                        <div id="pipeline-stage-partial" style="flex: 1; padding: 6px; border: 2px solid var(--border-color); text-align: center; background: #fff; transition: all 0.3s ease;">Partial Paid</div>
+                        <div style="font-size: 14px; font-weight: bold; color: var(--border-color);">➔</div>
+                        <div id="pipeline-stage-full" style="flex: 1; padding: 6px; border: 2px solid var(--border-color); text-align: center; background: #fff; transition: all 0.3s ease;">Fully Paid</div>
+                    </div>
                 </div>
             </div>
 
@@ -481,6 +494,30 @@
                     </div>
                 </div>
 
+                <!-- Revenue & Deal Pipeline Table -->
+                <div class="card" style="margin-top: 24px;">
+                    <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px; text-transform: uppercase;">💰 Revenue & Deal Pipeline</h3>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr>
+                                    <th>Client</th>
+                                    <th>Project</th>
+                                    <th>Total</th>
+                                    <th>Paid</th>
+                                    <th>Remaining</th>
+                                    <th>Invoice Status</th>
+                                    <th>Payment Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="revenue-pipeline-tbody">
+                                <!-- Populated dynamically from DB.tables.invoices -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <!-- Meeting History -->
                 <div class="card" style="margin-top: 24px; border-style: dashed;" id="meeting-history-section">
                     <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px; margin-bottom: 12px;">📋 Meeting History & Closed Deals</h3>
@@ -605,6 +642,13 @@
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         function mapInvoiceRecordToInvoiceLockRow(i) {
+            const total = Number(i.total_amount || i.locked_total_amount || 0);
+            const paid = Number(i.paid_amount || i.paid_now_amount || 0);
+            const remaining = Math.max(0, total - paid);
+            let payStatus = i.payment_status;
+            if (!payStatus) {
+                payStatus = paid === 0 ? 'Payment Pending' : (remaining > 0 ? 'Partial Payment' : 'Fully Paid');
+            }
             return {
                 lead_id: i.lead_id || null,
                 project_id: i.project_id || null,
@@ -621,13 +665,17 @@
                 addon_amount: i.addon_amount || 0,
                 previous_locked_total: i.previous_locked_total || 0,
                 current_charge_base: i.current_charge_base || 0,
-                locked_total: i.locked_total_amount || 0,
+                locked_total: total,
                 upfront_percent: i.upfront_percent || 25,
                 upfront_amount: i.upfront_amount || 0,
                 partial_percent_of_upfront: i.partial_percent_of_upfront || 0,
                 due_now_amount: i.due_now_amount || 0,
-                paid_now_amount: i.paid_now_amount || 0,
-                remaining_amount: i.remaining_amount || 0,
+                paid_now_amount: paid,
+                remaining_amount: remaining,
+                total_amount: total,
+                paid_amount: paid,
+                invoice_status: i.invoice_status || 'Sent',
+                payment_status: payStatus,
                 currency: i.currency || 'INR',
                 notes: i.notes || '',
                 invoice_link: i.invoice_link || '',
@@ -637,6 +685,13 @@
         }
 
         function mapInvoiceLockRowToLocalInvoice(r) {
+            const total = Number(r.total_amount || r.locked_total || 0);
+            const paid = Number(r.paid_amount || r.paid_now_amount || 0);
+            const remaining = Math.max(0, total - paid);
+            let payStatus = r.payment_status;
+            if (!payStatus) {
+                payStatus = paid === 0 ? 'Payment Pending' : (remaining > 0 ? 'Partial Payment' : 'Fully Paid');
+            }
             return {
                 id: r.invoice_id || generateId(),
                 lead_id: r.lead_id || null,
@@ -653,13 +708,17 @@
                 addon_amount: Number(r.addon_amount) || 0,
                 previous_locked_total: Number(r.previous_locked_total) || 0,
                 current_charge_base: Number(r.current_charge_base) || 0,
-                locked_total_amount: Number(r.locked_total) || 0,
+                locked_total_amount: total,
                 upfront_percent: Number(r.upfront_percent) || 25,
                 upfront_amount: Number(r.upfront_amount) || 0,
                 partial_percent_of_upfront: Number(r.partial_percent_of_upfront) || 0,
                 due_now_amount: Number(r.due_now_amount) || 0,
-                paid_now_amount: Number(r.paid_now_amount) || 0,
-                remaining_amount: Number(r.remaining_amount) || 0,
+                paid_now_amount: paid,
+                remaining_amount: remaining,
+                total_amount: total,
+                paid_amount: paid,
+                invoice_status: r.invoice_status || 'Sent',
+                payment_status: payStatus,
                 currency: r.currency || 'INR',
                 notes: r.notes || '',
                 invoice_link: r.invoice_link || '',
@@ -693,6 +752,10 @@
                 due_now_amount: row.due_now_amount || 0,
                 paid_now_amount: row.paid_now_amount || 0,
                 remaining_amount: row.remaining_amount || 0,
+                total_amount: row.total_amount || 0,
+                paid_amount: row.paid_amount || 0,
+                invoice_status: row.invoice_status || 'Sent',
+                payment_status: row.payment_status || 'Payment Pending',
                 currency: row.currency || 'INR',
                 notes: row.notes || '',
                 invoice_link: row.invoice_link || '',
@@ -1661,7 +1724,7 @@
         function renderAll() {
             DB.load();
             sortAllTablesNewestFirst();
-            renderHomeMetrics(); renderLeads(); renderPlanner(); renderProjects(); renderTeam(); renderKnowledge(); renderFeedback(); renderFlowTracker();
+            renderHomeMetrics(); renderLeads(); renderPlanner(); renderProjects(); renderTeam(); renderKnowledge(); renderFeedback(); renderFlowTracker(); renderRevenuePipeline();
         }
 
         function renderHomeMetrics() {
@@ -2226,17 +2289,58 @@
             const partialInput = document.getElementById('invoice-partial-percent');
             if (partialInput) partialInput.disabled = mode !== 'pay_partial_of_upfront';
 
+            const total = calc.lockedTotal;
+            const paid = calc.paidNowAmount;
+            const remaining = Math.max(0, total - paid);
+
+            let paymentStatus = 'Payment Pending';
+            if (paid > 0 && remaining > 0) paymentStatus = 'Partial Payment';
+            else if (remaining === 0) paymentStatus = 'Fully Paid';
+
             const setText = (id, value) => {
                 const el = document.getElementById(id);
                 if (el) el.innerText = String(value);
             };
-            setText('invoice-preview-locked', calc.lockedTotal.toFixed(2));
-            setText('invoice-preview-upfront', calc.upfrontAmount.toFixed(2));
+            setText('invoice-preview-locked', total.toFixed(2));
             setText('invoice-preview-charge-base', calc.currentChargeBase.toFixed(2));
+            setText('invoice-preview-paid', paid.toFixed(2));
+            setText('invoice-preview-remaining', remaining.toFixed(2));
             setText('invoice-preview-due', calc.dueNow.toFixed(2));
-            setText('invoice-preview-remaining', calc.remainingAmount.toFixed(2));
+            setText('invoice-preview-payment-status', paymentStatus);
+            setText('invoice-preview-invoice-status', 'Sent');
             setText('invoice-preview-mode', getInvoiceModeLabel(mode));
             setText('invoice-preview-method', paymentMethod.toUpperCase());
+
+            const stageSent = document.getElementById('pipeline-stage-sent');
+            const stagePartial = document.getElementById('pipeline-stage-partial');
+            const stageFull = document.getElementById('pipeline-stage-full');
+            
+            if (stageSent && stagePartial && stageFull) {
+                [stageSent, stagePartial, stageFull].forEach(el => {
+                    el.style.background = '#fff';
+                    el.style.color = '#888';
+                    el.style.borderColor = '#bbb';
+                    el.style.boxShadow = 'none';
+                });
+
+                if (paymentStatus === 'Payment Pending') {
+                    stageSent.style.background = '#ffdd00';
+                    stageSent.style.color = '#000';
+                    stageSent.style.borderColor = 'var(--border-color)';
+                    stageSent.style.boxShadow = '2px 2px 0 #000';
+                } else if (paymentStatus === 'Partial Payment') {
+                    stagePartial.style.background = '#ff8a65';
+                    stagePartial.style.color = '#fff';
+                    stagePartial.style.borderColor = 'var(--border-color)';
+                    stagePartial.style.boxShadow = '2px 2px 0 #000';
+                } else if (paymentStatus === 'Fully Paid') {
+                    stageFull.style.background = '#10B981';
+                    stageFull.style.color = '#fff';
+                    stageFull.style.borderColor = 'var(--border-color)';
+                    stageFull.style.boxShadow = '2px 2px 0 #000';
+                }
+            }
+
             refreshInvoiceSendEligibility();
         }
 
@@ -2421,6 +2525,13 @@
 
             invoiceModalState.paymentMethod = paymentMethod;
 
+            const total = Number(calc.lockedTotal || 0);
+            const paid = Number(calc.paidNowAmount || 0);
+            const remaining = Math.max(0, total - paid);
+            let payStatus = 'Payment Pending';
+            if (paid > 0 && remaining > 0) payStatus = 'Partial Payment';
+            else if (remaining === 0) payStatus = 'Fully Paid';
+
             return {
                 id: generateId(),
                 lead_id: invoiceModalState.leadId,
@@ -2437,13 +2548,17 @@
                 addon_amount: calc.addonAmount,
                 previous_locked_total: calc.previousLockedTotal,
                 current_charge_base: calc.currentChargeBase,
-                locked_total_amount: calc.lockedTotal,
+                locked_total_amount: total,
                 upfront_percent: calc.upfrontPercent,
                 upfront_amount: calc.upfrontAmount,
                 partial_percent_of_upfront: calc.partialPercent,
                 due_now_amount: calc.dueNow,
-                paid_now_amount: calc.paidNowAmount,
-                remaining_amount: calc.remainingAmount,
+                paid_now_amount: paid,
+                remaining_amount: remaining,
+                total_amount: total,
+                paid_amount: paid,
+                invoice_status: 'Sent',
+                payment_status: payStatus,
                 currency,
                 notes,
                 invoice_link: invoiceLink,
@@ -2547,6 +2662,13 @@
             const notes = document.getElementById('invoice-notes')?.value || '';
             const invoiceLink = document.getElementById('invoice-link')?.value || '';
 
+            const total = Number(calc.lockedTotal || 0);
+            const paid = Number(calc.paidNowAmount || 0);
+            const remaining = Math.max(0, total - paid);
+            let payStatus = 'Payment Pending';
+            if (paid > 0 && remaining > 0) payStatus = 'Partial Payment';
+            else if (remaining === 0) payStatus = 'Fully Paid';
+
             return {
                 id: generateId(),
                 lead_id: leadId,
@@ -2563,13 +2685,17 @@
                 addon_amount: Number(calc.addonAmount || 0),
                 previous_locked_total: Number(calc.previousLockedTotal || 0),
                 current_charge_base: Number(calc.currentChargeBase || 0),
-                locked_total_amount: Number(calc.lockedTotal || 0),
+                locked_total_amount: total,
                 upfront_percent: Number(calc.upfrontPercent || 25),
                 upfront_amount: Number(calc.upfrontAmount || 0),
                 partial_percent_of_upfront: Number(calc.partialPercent || 0),
                 due_now_amount: Number(calc.dueNow || 0),
-                paid_now_amount: Number(calc.paidNowAmount || 0),
-                remaining_amount: Number(calc.remainingAmount || 0),
+                paid_now_amount: paid,
+                remaining_amount: remaining,
+                total_amount: total,
+                paid_amount: paid,
+                invoice_status: 'Sent',
+                payment_status: payStatus,
                 currency,
                 notes,
                 invoice_link: invoiceLink,
@@ -2756,6 +2882,84 @@
                     `).join('');
                 }
             }
+        }
+
+        function renderRevenuePipeline() {
+            const tbody = document.getElementById('revenue-pipeline-tbody');
+            if (!tbody) return;
+
+            const invoices = DB.tables.invoices || [];
+            if (invoices.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; font-weight:700; opacity:0.5; padding:16px;">No invoices found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = invoices.map(i => {
+                const total = Number(i.total_amount || i.locked_total_amount || 0);
+                const paid = Number(i.paid_amount || i.paid_now_amount || 0);
+                const remaining = Math.max(0, total - paid);
+                
+                let paymentStatus = i.payment_status;
+                if (!paymentStatus) {
+                    paymentStatus = paid === 0 ? 'Payment Pending' : (remaining > 0 ? 'Partial Payment' : 'Fully Paid');
+                }
+
+                let badgeColor = '#ffdd00'; // Pending = yellow
+                let textColor = '#000';
+                if (paymentStatus === 'Partial Payment') {
+                    badgeColor = '#ff8a65'; // Partial = orange
+                    textColor = '#fff';
+                } else if (paymentStatus === 'Fully Paid') {
+                    badgeColor = '#10B981'; // Fully Paid = green
+                    textColor = '#fff';
+                }
+
+                const displayTotal = `${i.currency || 'INR'} ${total.toFixed(2)}`;
+                const displayPaid = `${i.currency || 'INR'} ${paid.toFixed(2)}`;
+                const displayRemaining = `${i.currency || 'INR'} ${remaining.toFixed(2)}`;
+
+                return `<tr>
+                    <td><strong>${i.lead_name}</strong></td>
+                    <td>${i.project_name || 'Unassigned'}</td>
+                    <td>${displayTotal}</td>
+                    <td>${displayPaid}</td>
+                    <td>${displayRemaining}</td>
+                    <td><span class="badge" style="background:#000; color:#fff; border:none;">${i.invoice_status || 'Sent'}</span></td>
+                    <td><span class="badge" style="background:${badgeColor}; color:${textColor}; border:none;">${paymentStatus}</span></td>
+                    <td><button class="btn btn-primary" style="padding:4px 8px; font-size:10px;" onclick="recordPayment('${i.id}')">RECORD PAYMENT</button></td>
+                </tr>`;
+            }).join('');
+        }
+
+        window.recordPayment = function(invoiceId) {
+            const inv = DB.tables.invoices.find(i => i.id === invoiceId);
+            if (!inv) return;
+            
+            const total = Number(inv.total_amount || inv.locked_total_amount || 0);
+            const currentPaid = Number(inv.paid_amount || inv.paid_now_amount || 0);
+
+            openModal("RECORD PAYMENT", [
+                {id: 'paid_amount', label: `Amount Paid So Far (Total: ${inv.currency || 'INR'} ${total.toFixed(2)})`, type: 'number', val: currentPaid}
+            ], (res) => {
+                const paid = Math.max(0, Number(res.paid_amount || 0));
+                const remaining = Math.max(0, total - paid);
+                
+                let paymentStatus = 'Payment Pending';
+                if (paid > 0 && remaining > 0) paymentStatus = 'Partial Payment';
+                else if (remaining === 0) paymentStatus = 'Fully Paid';
+
+                Object.assign(inv, {
+                    paid_amount: paid,
+                    paid_now_amount: paid,
+                    remaining_amount: remaining,
+                    payment_status: paymentStatus
+                });
+
+                DB.save();
+                renderAll();
+                syncToSupabase();
+                closeModal();
+            });
         }
 
         window.deleteMeeting = function(meetingId) {
