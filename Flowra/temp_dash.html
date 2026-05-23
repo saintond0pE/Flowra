@@ -382,10 +382,40 @@
         function closeModal() { document.getElementById('customModal').style.display = 'none'; }
 
 
+        function cleanCategory(name) {
+            if (!name) return name;
+            return name
+                .replace(/ðŸŸª/g, '🟪')
+                .replace(/ðŸŸ¦/g, '🟦')
+                .replace(/ðŸŸ§/g, '🟧')
+                .replace(/ðŸŸ©/g, '🟩')
+                .replace(/ðŸŸ¥/g, '🟥')
+                .replace(/ðŸŸ¨/g, '🟨')
+                .replace(/ðŸ“Š/g, '📊');
+        }
+
         /* DB MOCKING SYSTEM (Local Storage) */
         const DB = {
             tables: { leads: [], projects: [], team: [], docs: [], feedback: [] },
-            load: () => { const saved = localStorage.getItem('flowra_mock_db'); if (saved) { DB.tables = JSON.parse(saved); } else { DB.seed(); } },
+            load: () => { 
+                const saved = localStorage.getItem('flowra_mock_db'); 
+                if (saved) { 
+                    DB.tables = JSON.parse(saved); 
+                    if (DB.tables.projects) {
+                        DB.tables.projects.forEach(p => {
+                            if (p.tasks) {
+                                p.tasks.forEach(t => {
+                                    if (t.category) {
+                                        t.category = cleanCategory(t.category);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                } else { 
+                    DB.seed(); 
+                } 
+            },
             save: () => { localStorage.setItem('flowra_mock_db', JSON.stringify(DB.tables)); },
             seed: () => {
                 DB.tables = {
@@ -403,47 +433,47 @@
 
         /* HARDCODED MODULE & TASK HIERARCHY */
         const TASK_STRUCTURE = {
-            "ðŸŸª CUSTOMER AUTOMATION": {
+            "🟪 CUSTOMER AUTOMATION": {
                 "Website Chatbot": ["Setup chatbot", "Train on company data", "Connect to website"],
                 "WhatsApp / Call Handling": ["Setup WhatsApp flow", "Setup auto-reply"],
                 "Lead Capture System": ["Setup lead capture"],
                 "Missed Call Recovery": ["Setup fallback flow"]
             },
-            "ðŸŸ¦ INTERNAL OPERATIONS": {
+            "🟦 INTERNAL OPERATIONS": {
                 "Team Dashboard": ["Build dashboard UI"],
                 "Task Automation": ["Create task system", "Automate repetitive actions"],
                 "Workflow Automation": ["Connect database", "Setup internal tools"]
             },
-            "ðŸŸ§ SALES & FOLLOW-UP": {
+            "🟧 SALES & FOLLOW-UP": {
                 "Lead Management": ["Setup lead tracking"],
                 "Follow-up Automation": ["Auto follow-up system"],
                 "Email Automation": ["Email templates", "CRM logic"]
             },
-            "ðŸŸ© SCHEDULING & BOOKINGS": {
+            "🟩 SCHEDULING & BOOKINGS": {
                 "Booking System": ["Create booking flow"],
                 "Slot Management": ["Assign slots"],
                 "Agent Assignment": ["Connect calendar", "Auto-confirm bookings"]
             },
-            "ðŸŸ¥ OPERATIONS & DELIVERY": {
+            "🟥 OPERATIONS & DELIVERY": {
                 "Task Execution System": ["Assign delivery tasks"],
                 "Agent Flow": ["Setup notifications"],
                 "Notifications": ["Track completion"]
             },
-            "ðŸŸ¨ INTELLIGENCE & ALERTS": {
+            "🟨 INTELLIGENCE & ALERTS": {
                 "Predictive Alerts": ["Setup alerts"],
                 "Inventory Monitoring": ["Define triggers"],
                 "Usage Tracking": ["Connect data sources"]
             },
-            "ðŸ“Š ANALYTICS & INSIGHTS (CORE UPGRADE)": {
+            "📊 ANALYTICS & INSIGHTS (CORE UPGRADE)": {
                 "Lead & Sales Visibility": ["Count total leads", "Track lead status (new → contacted → closed)", "Identify uncontacted leads", "Calculate conversion rate", "Show lead movement (pipeline flow)"],
                 "Operations Performance": ["Count total tasks", "Track completed vs pending", "Identify overdue tasks", "Measure response time", "Show workload distribution"]
             },
-            "ðŸŸ¦ ADMIN / CONTROL SYSTEM": {
+            "🟦 ADMIN / CONTROL SYSTEM": {
                 "Team Monitoring": ["Track tasks per member", "Track completed tasks", "Log working hours", "Show simple leaderboard", "Detect overloaded members"],
                 "Task Control": ["Assign task", "Reassign task", "Set priority", "Set deadline", "Update status"],
                 "Approval Flow (keep simple)": ["Submit for approval", "Approve / reject", "Add comment", "Log decision"]
             },
-            "ðŸŸ§ INTEGRATIONS (ONLY PRACTICAL ONES)": {
+            "🟧 INTEGRATIONS (ONLY PRACTICAL ONES)": {
                 "Data Sync (KEEP THIS)": ["Sync leads to Google Sheets", "Backup data", "Export data", "Import external data"],
                 "Tool Sync (LIMITED)": ["Connect email (basic)", "Store communication logs", "Sync basic client info"]
             }
