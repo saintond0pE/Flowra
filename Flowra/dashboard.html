@@ -217,9 +217,51 @@
             <div id="view-knowledge" class="view-section">
                 <div class="flex-between">
                     <h2>Knowledge Base</h2>
-                    <button class="btn btn-primary" onclick="addKnowledgeDoc()">+ ADD DOC</button>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn" id="kb-tab-notes" onclick="switchKBTab('notes')" style="background:var(--text-color); color:var(--surface-color);">📝 NOTES</button>
+                        <button class="btn" id="kb-tab-docs" onclick="switchKBTab('docs')">📄 DOCS</button>
+                    </div>
                 </div>
-                <div class="grid-3" id="knowledge-grid"></div>
+
+                <!-- Notes Sub-View -->
+                <div id="kb-view-notes">
+                    <div class="card" style="border-color: var(--accent-color); margin-bottom: 24px;">
+                        <h3 style="margin-bottom: 16px;">✏️ Quick Note</h3>
+                        <div class="form-group">
+                            <label>Note Title</label>
+                            <input type="text" id="kb-note-title" placeholder="e.g. Meeting recap, Client requirements...">
+                        </div>
+                        <div class="form-group">
+                            <label>Note Body</label>
+                            <textarea id="kb-note-body" rows="5" placeholder="Write your note here..."></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="addKnowledgeNote()">💾 SAVE NOTE</button>
+                    </div>
+                    <h3 style="margin-bottom: 12px;">Saved Notes</h3>
+                    <div class="grid-3" id="knowledge-notes-grid"></div>
+                </div>
+
+                <!-- Docs Sub-View -->
+                <div id="kb-view-docs" style="display:none;">
+                    <div class="card" style="border-color: var(--accent-color); margin-bottom: 24px;">
+                        <h3 style="margin-bottom: 16px;">📎 Upload Document</h3>
+                        <div class="form-group">
+                            <label>Select Document File</label>
+                            <input type="file" id="kb-doc-file" accept=".txt,.md,.pdf,.csv,.doc,.docx,.json,.html" style="padding:8px; cursor:pointer;">
+                        </div>
+                        <div class="form-group">
+                            <label>Or Paste Document Content Directly</label>
+                            <textarea id="kb-doc-paste" rows="6" placeholder="Paste your document content here..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Document Title (auto-filled from file name)</label>
+                            <input type="text" id="kb-doc-title" placeholder="e.g. Onboarding Guide v2">
+                        </div>
+                        <button class="btn btn-primary" onclick="addKnowledgeDoc()">📤 UPLOAD & SAVE DOC</button>
+                    </div>
+                    <h3 style="margin-bottom: 12px;">Saved Documents</h3>
+                    <div class="grid-3" id="knowledge-docs-grid"></div>
+                </div>
             </div>
             
             <!-- 8. Feedback -->
@@ -714,7 +756,174 @@
                 </tr>
             `).join(''); 
         }
-        function renderKnowledge() { document.getElementById('knowledge-grid').innerHTML = DB.tables.docs.map(doc => `<div class="card"><h3>${doc.title}</h3><p style="font-size:13px; border-left: 3px solid var(--accent-color); padding-left: 12px; background: #fff8f5">${doc.content.substring(0,60)}...</p></div>`).join(''); }
+        /* KNOWLEDGE BASE TAB SWITCHER */
+        function switchKBTab(tab) {
+            document.getElementById('kb-view-notes').style.display = tab === 'notes' ? 'block' : 'none';
+            document.getElementById('kb-view-docs').style.display = tab === 'docs' ? 'block' : 'none';
+            const notesBtn = document.getElementById('kb-tab-notes');
+            const docsBtn = document.getElementById('kb-tab-docs');
+            if (tab === 'notes') {
+                notesBtn.style.background = 'var(--text-color)'; notesBtn.style.color = 'var(--surface-color)';
+                docsBtn.style.background = 'var(--surface-color)'; docsBtn.style.color = 'var(--text-color)';
+            } else {
+                docsBtn.style.background = 'var(--text-color)'; docsBtn.style.color = 'var(--surface-color)';
+                notesBtn.style.background = 'var(--surface-color)'; notesBtn.style.color = 'var(--text-color)';
+            }
+        }
+
+        /* KNOWLEDGE BASE: ADD NOTE */
+        window.addKnowledgeNote = function() {
+            const title = document.getElementById('kb-note-title').value.trim();
+            const body = document.getElementById('kb-note-body').value.trim();
+            if (!title) { alert('Please enter a note title.'); return; }
+            if (!body) { alert('Please enter note content.'); return; }
+            DB.tables.docs.push({
+                id: generateId(),
+                title: title,
+                content: body,
+                type: 'note',
+                created_at: new Date().toISOString()
+            });
+            DB.save(); syncToSupabase(); renderKnowledge();
+            document.getElementById('kb-note-title').value = '';
+            document.getElementById('kb-note-body').value = '';
+        }
+
+        /* KNOWLEDGE BASE: ADD DOC (file upload or paste → saves to feedback table in Supabase) */
+        window.addKnowledgeDoc = async function() {
+            const fileInput = document.getElementById('kb-doc-file');
+            const pasteArea = document.getElementById('kb-doc-paste');
+            let titleInput = document.getElementById('kb-doc-title');
+            let docContent = '';
+            let docTitle = titleInput.value.trim();
+
+            // Read from file if selected
+            if (fileInput.files && fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                if (!docTitle) docTitle = file.name;
+                try {
+                    docContent = await file.text();
+                } catch(e) {
+                    alert('Could not read file. Please paste content instead.');
+                    return;
+                }
+            } else if (pasteArea.value.trim()) {
+                docContent = pasteArea.value.trim();
+            }
+
+            if (!docContent) { alert('Please select a file or paste document content.'); return; }
+            if (!docTitle) docTitle = 'Untitled Document';
+
+            // Save locally as a doc entry
+            const docEntry = {
+                id: generateId(),
+                title: docTitle,
+                content: docContent,
+                type: 'doc',
+                created_at: new Date().toISOString()
+            };
+            DB.tables.docs.push(docEntry);
+            DB.save();
+
+            // Also push to Supabase feedback table
+            try {
+                const feedbackRow = {
+                    id: docEntry.id,
+                    type: 'document',
+                    description: '[DOC: ' + docTitle + '] ' + docContent.substring(0, 500),
+                    created_at: docEntry.created_at
+                };
+                const { error } = await sb.from('feedback').upsert([feedbackRow], { onConflict: 'id' });
+                if (error) {
+                    console.error('[Flowra] Doc → feedback sync error:', error);
+                    alert('Doc saved locally but Supabase sync failed: ' + (error.message || JSON.stringify(error)));
+                } else {
+                    console.log('[Flowra] Doc synced to feedback table:', docTitle);
+                }
+            } catch(e) {
+                console.error('[Flowra] Doc Supabase push error:', e);
+                alert('Doc saved locally but could not connect to Supabase.');
+            }
+
+            renderKnowledge();
+            // Clear inputs
+            fileInput.value = '';
+            pasteArea.value = '';
+            titleInput.value = '';
+        }
+
+        /* Auto-fill doc title from file name */
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('kb-doc-file');
+            if (fileInput) {
+                fileInput.addEventListener('change', () => {
+                    if (fileInput.files && fileInput.files.length > 0) {
+                        const titleField = document.getElementById('kb-doc-title');
+                        if (titleField && !titleField.value.trim()) {
+                            titleField.value = fileInput.files[0].name;
+                        }
+                    }
+                });
+            }
+        });
+
+        function renderKnowledge() {
+            const notes = (DB.tables.docs || []).filter(d => d.type === 'note' || !d.type);
+            const docs = (DB.tables.docs || []).filter(d => d.type === 'doc');
+
+            document.getElementById('knowledge-notes-grid').innerHTML = notes.length === 0
+                ? '<div class="card" style="grid-column: 1/-1; text-align:center; font-weight:700; opacity:0.5;">No notes yet. Create your first note above.</div>'
+                : notes.map(doc => `<div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                        <h3 style="margin-bottom:8px;">📝 ${doc.title}</h3>
+                        <button class="btn" style="padding:2px 6px; font-size:10px;" onclick="deleteKBItem('${doc.id}')">✕</button>
+                    </div>
+                    <p style="font-size:13px; border-left: 3px solid var(--accent-color); padding: 8px 12px; background: #fff8f5; white-space:pre-wrap; flex:1;">${doc.content.length > 120 ? doc.content.substring(0,120) + '...' : doc.content}</p>
+                    <div style="font-size:10px; font-weight:700; margin-top:8px; opacity:0.5;">${doc.created_at ? new Date(doc.created_at).toLocaleDateString() : ''}</div>
+                </div>`).join('');
+
+            document.getElementById('knowledge-docs-grid').innerHTML = docs.length === 0
+                ? '<div class="card" style="grid-column: 1/-1; text-align:center; font-weight:700; opacity:0.5;">No documents yet. Upload or paste a document above.</div>'
+                : docs.map(doc => `<div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                        <h3 style="margin-bottom:8px;">📄 ${doc.title}</h3>
+                        <button class="btn" style="padding:2px 6px; font-size:10px;" onclick="deleteKBItem('${doc.id}')">✕</button>
+                    </div>
+                    <p style="font-size:13px; border-left: 3px solid #3b82f6; padding: 8px 12px; background: #f0f7ff; white-space:pre-wrap; flex:1;">${doc.content.length > 120 ? doc.content.substring(0,120) + '...' : doc.content}</p>
+                    <div style="font-size:10px; font-weight:700; margin-top:8px; opacity:0.5;">${doc.created_at ? new Date(doc.created_at).toLocaleDateString() : ''}</div>
+                </div>`).join('');
+        }
+
+        window.deleteKBItem = function(id) {
+            if (!confirm('Delete this item?')) return;
+            DB.tables.docs = (DB.tables.docs || []).filter(d => d.id !== id);
+            DB.save(); syncToSupabase(); renderKnowledge();
+        }
+
+        /* FEEDBACK: Submit to local + Supabase */
+        window.submitFeedback = async function() {
+            const input = document.getElementById('feedback-input');
+            const text = input.value.trim();
+            if (!text) { alert('Please enter feedback.'); return; }
+            const entry = {
+                id: generateId(),
+                type: 'idea',
+                description: text,
+                created_at: new Date().toISOString()
+            };
+            DB.tables.feedback.push(entry);
+            DB.save();
+
+            // Push to Supabase feedback table
+            try {
+                const { error } = await sb.from('feedback').upsert([entry], { onConflict: 'id' });
+                if (error) console.error('[Flowra] Feedback sync error:', error);
+            } catch(e) { console.error('[Flowra] Feedback push error:', e); }
+
+            renderFeedback();
+            input.value = '';
+        }
+
         function renderFeedback() { document.getElementById('feedback-table-body').innerHTML = DB.tables.feedback.slice().reverse().map(f => `<tr><td><span class="badge">${f.type}</span></td><td>${f.description}</td></tr>`).join(''); }
         window.triggerAutomation = function(action) { alert(`Webhook Payload ready for: ${action}`); }
         
