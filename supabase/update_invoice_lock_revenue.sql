@@ -1,12 +1,12 @@
 -- SQL migration script to update invoice_lock table for revenue tracking
 
--- Add required database columns if not present
+-- 1. Add new columns to the existing table if they do not exist
 alter table public.invoice_lock add column if not exists total_amount numeric default 0;
 alter table public.invoice_lock add column if not exists paid_amount numeric default 0;
 alter table public.invoice_lock add column if not exists invoice_status text default 'Sent';
 alter table public.invoice_lock add column if not exists payment_status text default 'Payment Pending';
 
--- Recreate view to include these new fields
+-- 2. Recreate view to include these new fields along with all existing fields (invoice_link, free_edit_mode, etc.)
 create or replace view public.v_invoice_lock_payload as
 select
   il.lead_id,
@@ -31,13 +31,15 @@ select
   il.due_now_amount,
   il.paid_now_amount,
   il.remaining_amount,
+  il.currency,
+  il.notes,
+  il.invoice_link,
+  il.free_edit_mode,
   -- NEW FIELDS:
   il.total_amount,
   il.paid_amount,
   il.invoice_status,
   il.payment_status,
-  il.currency,
-  il.notes,
   il.created_at,
   il.updated_at
 from public.invoice_lock il
