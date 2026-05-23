@@ -6,8 +6,11 @@ alter table public.invoice_lock add column if not exists paid_amount numeric def
 alter table public.invoice_lock add column if not exists invoice_status text default 'Sent';
 alter table public.invoice_lock add column if not exists payment_status text default 'Payment Pending';
 
--- 2. Recreate view to include these new fields along with all existing fields (invoice_link, free_edit_mode, etc.)
-create or replace view public.v_invoice_lock_payload as
+-- 2. Drop the existing view first to avoid column order/naming mismatch errors
+drop view if exists public.v_invoice_lock_payload;
+
+-- 3. Create the view fresh with the correct column signature
+create view public.v_invoice_lock_payload as
 select
   il.lead_id,
   il.project_id,
