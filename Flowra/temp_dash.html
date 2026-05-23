@@ -329,14 +329,26 @@
 
             <!-- 2. Leads -->
             <div id="view-leads" class="view-section">
-                <div class="flex-between">
-                    <h2>Leads Repository</h2>
+                <div class="flex-between" style="margin-bottom: 24px;">
+                    <h2>Leads & Clients Repository</h2>
                     <button class="btn btn-primary" onclick="createNewLead()">+ ADD LEAD</button>
                 </div>
-                <table>
-                    <thead><tr><th>Name</th><th>Email</th><th>Mobile</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead>
-                    <tbody id="leads-table-body"></tbody>
-                </table>
+
+                <div style="margin-bottom: 32px;">
+                    <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px; text-transform: uppercase;">⚡ Prospects & Leads</h3>
+                    <table>
+                        <thead><tr><th>Name</th><th>Email</th><th>Mobile</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="leads-prospects-table-body"></tbody>
+                    </table>
+                </div>
+
+                <div>
+                    <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px; text-transform: uppercase;">💼 Converted Clients</h3>
+                    <table>
+                        <thead><tr><th>Name</th><th>Email</th><th>Mobile</th><th>Message</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="leads-clients-table-body"></tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- 3. Projects -->
@@ -441,6 +453,32 @@
                     }));
                     const { error: le } = await sb.from('leads').upsert(leadRows, { onConflict: 'id' });
                     if (le) throw le;
+
+                    // Sync converted clients (status working, finished, closed) to clients table
+                    const clientRows = DB.tables.leads
+                        .filter(l => ['working', 'finished', 'closed'].includes(l.status))
+                        .map(l => ({
+                            id: l.id,
+                            lead_id: l.id,
+                            name: l.name,
+                            email: l.email,
+                            number: l.mobile || '',
+                            status: l.status,
+                            created_at: l.created_at || new Date().toISOString(),
+                            converted_at: new Date().toISOString()
+                        }));
+                    if (clientRows.length > 0) {
+                        const { error: ce } = await sb.from('clients').upsert(clientRows, { onConflict: 'id' });
+                        if (ce) console.warn('[Flowra] Converted clients sync to Supabase clients table failed:', ce.message || ce);
+                    }
+
+                    // Remove from clients table if status is no longer a converted client
+                    const nonClientIds = DB.tables.leads
+                        .filter(l => !['working', 'finished', 'closed'].includes(l.status))
+                        .map(l => l.id);
+                    if (nonClientIds.length > 0) {
+                        await sb.from('clients').delete().in('id', nonClientIds);
+                    }
                 }
                 setSyncStatus('ok');
             } catch(err) {
@@ -1102,9 +1140,30 @@
         }
 
         // LEADS 
-        function renderLeads() { document.getElementById('leads-table-body').innerHTML = DB.tables.leads.map(lead => `<tr><td><strong>${lead.name}</strong></td><td>${lead.email}</td><td>${lead.mobile || '---'}</td><td><span class="badge" style="white-space:pre-wrap">${lead.message.substring(0,30)}</span></td><td><span class="badge" style="background:${lead.status==='new'?'#ffdd00': lead.status==='closed'?'#ccffcc':'#ddddff'}">${lead.status}</span></td><td><button class="btn" onclick="updateLeadStatus(${lead.id})">Edit</button></td></tr>`).join(''); }
-        window.createNewLead = function() { openModal("ADD NEW LEAD", [{id: 'name', label: 'Full Name'}, {id: 'email', label: 'Email Address'}, {id: 'mobile', label: 'Mobile Number'}, {id: 'status', label: 'Initial Status', type: 'select', options: ['new', 'contacted', 'closed']}], (res) => { if(res.name) { DB.tables.leads.push({ id: generateId(), name: res.name, email: res.email, mobile: res.mobile, message: "", status: res.status }); DB.save(); renderAll(); closeModal(); }}); }
-        window.updateLeadStatus = function(id) { const lead = DB.tables.leads.find(l => l.id === id); if(lead) { openModal("UPDATE LEAD", [{id: 'name', label: 'Name', val: lead.name}, {id: 'mobile', label: 'Mobile Number', val: lead.mobile}, {id: 'status', label: 'Status', type: 'select', options: ['new', 'contacted', 'closed'], val: lead.status}], (res) => { Object.assign(lead, {name: res.name, mobile: res.mobile, status: res.status}); DB.save(); renderAll(); closeModal(); }); } }
+        function renderLeads() {
+            const allLeads = DB.tables.leads || [];
+            const prospects = allLeads.filter(l => !['working', 'finished', 'closed'].includes(l.status));
+            const clients = allLeads.filter(l => ['working', 'finished', 'closed'].includes(l.status));
+
+            const mapLeadToHtml = (lead) => `<tr>
+                <td><strong>${lead.name}</strong></td>
+                <td>${lead.email}</td>
+                <td>${lead.mobile || '---'}</td>
+                <td><span class="badge" style="white-space:pre-wrap">${(lead.message || '').substring(0,30)}</span></td>
+                <td><span class="badge" style="background:${lead.status==='new'?'#ffdd00': lead.status==='working'?'#ff3c00': lead.status==='finished'?'#10B981': lead.status==='closed'?'#ccffcc':'#ddddff'}; color:${['working','finished'].includes(lead.status)?'#fff':'#000'}">${lead.status}</span></td>
+                <td><button class="btn" onclick="updateLeadStatus('${lead.id}')">Edit</button></td>
+            </tr>`;
+
+            document.getElementById('leads-prospects-table-body').innerHTML = prospects.length === 0
+                ? '<tr><td colspan="6" style="text-align:center; font-weight:700; opacity:0.5; padding:16px;">No active prospects.</td></tr>'
+                : prospects.map(mapLeadToHtml).join('');
+
+            document.getElementById('leads-clients-table-body').innerHTML = clients.length === 0
+                ? '<tr><td colspan="6" style="text-align:center; font-weight:700; opacity:0.5; padding:16px;">No converted clients yet.</td></tr>'
+                : clients.map(mapLeadToHtml).join('');
+        }
+        window.createNewLead = function() { openModal("ADD NEW LEAD", [{id: 'name', label: 'Full Name'}, {id: 'email', label: 'Email Address'}, {id: 'mobile', label: 'Mobile Number'}, {id: 'status', label: 'Initial Status', type: 'select', options: ['new', 'contacted', 'closed']}], (res) => { if(res.name) { DB.tables.leads.push({ id: generateId(), name: res.name, email: res.email, mobile: res.mobile, message: "", status: res.status }); DB.save(); renderAll(); syncToSupabase(); closeModal(); }}); }
+        window.updateLeadStatus = function(id) { const lead = DB.tables.leads.find(l => l.id === id); if(lead) { openModal("UPDATE LEAD", [{id: 'name', label: 'Name', val: lead.name}, {id: 'mobile', label: 'Mobile Number', val: lead.mobile}, {id: 'status', label: 'Status', type: 'select', options: ['new', 'contacted', 'working', 'finished', 'closed'], val: lead.status}], (res) => { Object.assign(lead, {name: res.name, mobile: res.mobile, status: res.status}); DB.save(); renderAll(); syncToSupabase(); closeModal(); }); } }
 
         // TEAM LEADERBOARD & KNOWLEDGE
         function renderTeam() { 

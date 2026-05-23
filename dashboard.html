@@ -427,14 +427,26 @@
 
             <!-- 2. Leads -->
             <div id="view-leads" class="view-section">
-                <div class="flex-between">
-                    <h2>Leads Repository</h2>
+                <div class="flex-between" style="margin-bottom: 24px;">
+                    <h2>Leads & Clients Repository</h2>
                     <button class="btn btn-primary" onclick="createNewLead()">+ ADD LEAD</button>
                 </div>
-                <table>
-                    <thead><tr><th>Category</th><th>Name</th><th>Email</th><th>Number</th><th>Message Snippet</th><th>Status</th><th>Actions</th></tr></thead>
-                    <tbody id="leads-table-body"></tbody>
-                </table>
+                
+                <div style="margin-bottom: 32px;">
+                    <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px; text-transform: uppercase;">⚡ Prospects & Leads</h3>
+                    <table>
+                        <thead><tr><th>Category</th><th>Name</th><th>Email</th><th>Number</th><th>Message Snippet</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="leads-prospects-table-body"></tbody>
+                    </table>
+                </div>
+
+                <div>
+                    <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px; text-transform: uppercase;">💼 Converted Clients</h3>
+                    <table>
+                        <thead><tr><th>Category</th><th>Name</th><th>Email</th><th>Number</th><th>Message Snippet</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="leads-clients-table-body"></tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- 3. Projects -->
@@ -771,6 +783,36 @@
                     });
                     const { error: le } = await sb.from('leads').upsert(leadRows, { onConflict: 'id' });
                     if (le) throw le;
+
+                    // Sync converted clients (status working, finished, closed) to clients table
+                    const clientRows = DB.tables.leads
+                        .filter(l => ['working', 'finished', 'closed'].includes(l.status))
+                        .map(l => {
+                            const val = l.number || l.mobile || '';
+                            const rawNum = String(val).trim();
+                            return {
+                                id: l.id,
+                                lead_id: l.id,
+                                name: l.name,
+                                email: l.email,
+                                number: rawNum === '' ? null : rawNum,
+                                status: l.status,
+                                created_at: l.created_at || new Date().toISOString(),
+                                converted_at: new Date().toISOString()
+                            };
+                        });
+                    if (clientRows.length > 0) {
+                        const { error: ce } = await sb.from('clients').upsert(clientRows, { onConflict: 'id' });
+                        if (ce) console.warn('[Flowra] Converted clients sync to Supabase clients table failed:', ce.message || ce);
+                    }
+
+                    // Remove from clients table if status is no longer a converted client
+                    const nonClientIds = DB.tables.leads
+                        .filter(l => !['working', 'finished', 'closed'].includes(l.status))
+                        .map(l => l.id);
+                    if (nonClientIds.length > 0) {
+                        await sb.from('clients').delete().in('id', nonClientIds);
+                    }
                 }
 
                 // Upsert feedback registry
@@ -1659,8 +1701,12 @@
 
         // LEADS 
         function renderLeads() { 
-            const leads = (DB.tables.leads || []).slice(0, 15);
-            document.getElementById('leads-table-body').innerHTML = leads.map(lead => {
+            const allLeads = DB.tables.leads || [];
+            
+            const prospects = allLeads.filter(l => !['working', 'finished', 'closed'].includes(l.status));
+            const clients = allLeads.filter(l => ['working', 'finished', 'closed'].includes(l.status));
+
+            const mapLeadToHtml = (lead) => {
                 const msg = lead.message || '';
                 
                 // Optimized category routing
@@ -1735,7 +1781,15 @@
                         <button class="btn" style="padding: 4px 8px; font-size:10px;" onclick="updateLeadStatus('${lead.id}')">EDIT</button>
                     </div></td>
                 </tr>`;
-            }).join(''); 
+            };
+
+            document.getElementById('leads-prospects-table-body').innerHTML = prospects.length === 0
+                ? '<tr><td colspan="7" style="text-align:center; font-weight:700; opacity:0.5; padding:16px;">No active prospects.</td></tr>'
+                : prospects.map(mapLeadToHtml).join('');
+                
+            document.getElementById('leads-clients-table-body').innerHTML = clients.length === 0
+                ? '<tr><td colspan="7" style="text-align:center; font-weight:700; opacity:0.5; padding:16px;">No converted clients yet. Click START on a prospect to convert.</td></tr>'
+                : clients.map(mapLeadToHtml).join('');
         }
         window.createNewLead = function() { 
             openModal("ADD NEW LEAD", [
