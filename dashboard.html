@@ -70,70 +70,153 @@
         #customModal, #projectGeneratorModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
         .modal-content { background: var(--surface-color); border: 4px solid var(--border-color); padding: 32px; box-shadow: 8px 8px 0 var(--accent-color); width: 450px; max-width: 90%; animation: slideUp 0.2s ease-out; max-height: 90vh; overflow-y: auto;}
 
-        /* Live Operations Styles */
-        .live-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background: var(--accent-color);
-            border-radius: 50%;
-            margin-right: 8px;
-            animation: blink 1s infinite;
-        }
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.2; }
-        }
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .activity-card {
-            background: var(--surface-color);
-            border: 3px solid var(--border-color);
-            padding: 16px;
-            box-shadow: 3px 3px 0 var(--border-color);
-            transition: transform 0.1s, box-shadow 0.1s;
+        /* Business Flow Tracker Rail Styling */
+        .flow-tracker-rail {
+            width: 320px;
+            min-width: 320px;
+            background: #ffffff;
+            border-right: 3px solid var(--border-color);
             display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            animation: slideIn 0.4s ease-out;
-            cursor: default;
+            flex-direction: column;
+            height: 100vh;
+            z-index: 9;
+            overflow: hidden;
         }
-        .activity-card:hover {
+        .flow-header {
+            padding: 24px;
+            border-bottom: 3px solid var(--border-color);
+            background: #fbfbfb;
+        }
+        .flow-header h2 {
+            font-size: 16px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+            border: none;
+            padding: 0;
+        }
+        .flow-subtitle {
+            font-size: 10px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            line-height: 1.4;
+        }
+        .flow-timeline {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            position: relative;
+            background: #f4f4f4;
+        }
+        .flow-card {
+            display: flex;
+            gap: 16px;
+            position: relative;
+        }
+        .flow-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            width: 20px;
+        }
+        .flow-bullet {
+            width: 14px;
+            height: 14px;
+            background: #ffffff;
+            border: 3px solid var(--border-color);
+            box-shadow: 2px 2px 0 var(--border-color);
+            z-index: 2;
+            border-radius: 0px;
+        }
+        .flow-bullet.active-pulse {
+            background: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(255, 60, 0, 0.2);
+            animation: flowPulse 2s infinite;
+        }
+        @keyframes flowPulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0px rgba(255, 60, 0, 0.4); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(255, 60, 0, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0px rgba(255, 60, 0, 0); }
+        }
+        .flow-line {
+            position: absolute;
+            top: 14px;
+            bottom: -30px;
+            width: 3px;
+            background: var(--border-color);
+            z-index: 1;
+        }
+        .flow-card:last-child .flow-line {
+            display: none;
+        }
+        .flow-card-content {
+            flex: 1;
+            background: #ffffff;
+            border: 3px solid var(--border-color);
+            padding: 12px;
+            box-shadow: 4px 4px 0 var(--border-color);
+            transition: all 0.1s;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            animation: cardFadeIn 0.3s ease-out;
+        }
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .flow-card-content:hover {
             transform: translate(-2px, -2px);
-            box-shadow: 5px 5px 0 var(--border-color);
+            box-shadow: 6px 6px 0 var(--border-color);
         }
-        .activity-card.important {
-            border-color: var(--accent-color);
-            box-shadow: 3px 3px 0 var(--accent-color);
+        .flow-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .activity-card.important:hover {
-            box-shadow: 5px 5px 0 var(--accent-color);
+        .flow-badge {
+            font-size: 8px;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: 2px solid var(--border-color);
+            padding: 2px 6px;
         }
+        .flow-badge.badge-project { background: #ffebeb; color: var(--border-color); }
+        .flow-badge.badge-lead { background: #f0f7ff; color: var(--border-color); }
+        .flow-badge.badge-meeting { background: #fffbe6; color: var(--border-color); }
+        .flow-badge.badge-task { background: #eafaf1; color: var(--border-color); }
+        .flow-badge.badge-automation { background: #fbf0ff; color: var(--border-color); }
+        .flow-badge.badge-invoice { background: #fff2e6; color: var(--border-color); }
 
-        /* Responsive stack for Live Operations section */
-        @media (max-width: 768px) {
-            #live-operations-section .grid-4 {
-                grid-template-columns: 1fr !important;
-            }
-            .activity-card {
-                flex-direction: column;
-                gap: 12px;
-            }
-            .activity-card > div:last-child {
-                align-items: flex-start !important;
-                margin-left: 0 !important;
-                flex-direction: row !important;
-                justify-content: space-between;
-                width: 100%;
-            }
+        .flow-time {
+            font-size: 9px;
+            font-weight: 700;
+            opacity: 0.6;
+        }
+        .flow-card-title {
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.3;
+            color: var(--text-color);
+        }
+        .flow-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            padding-top: 6px;
+            margin-top: 2px;
+        }
+        .flow-status {
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
@@ -301,6 +384,17 @@
         </div>
     </div>
 
+    <!-- Business Flow Tracker Rail -->
+    <div class="flow-tracker-rail">
+        <div class="flow-header">
+            <h2>Business Flow Tracker</h2>
+            <p class="flow-subtitle">Track real operational movement across projects, leads, meetings, tasks, invoices, and automations.</p>
+        </div>
+        <div class="flow-timeline" id="flow-timeline-container">
+            <!-- Stacked operational cards loaded dynamically -->
+        </div>
+    </div>
+
     <div class="main">
         <div class="topbar">
             <h1 id="page-title">Command Center</h1>
@@ -322,49 +416,6 @@
                     <div class="card stat-card"><span class="stat-value" id="metric-tasks-today">0</span><span class="stat-label">Active Workspaces</span></div>
                 </div>
                 
-                <!-- LIVE OPERATIONS SECTION -->
-                <div id="live-operations-section" style="margin-top: 32px; margin-bottom: 32px;">
-                    <div class="flex-between" style="align-items: center; margin-bottom: 12px; position: relative;">
-                        <div>
-                            <h2 style="margin: 0; border: none; padding-bottom: 0; display: inline-flex; align-items: center;">
-                                LIVE OPERATIONS
-                            </h2>
-                            <p style="font-size: 13px; font-weight: 700; opacity: 0.6; margin-top: 4px;">
-                                Real-time operational activity across projects, automations, communication, invoices, and workflows.
-                            </p>
-                        </div>
-                        <div style="display: flex; align-items: center; background: #fff; border: 3px solid var(--border-color); padding: 6px 12px; font-weight: 800; font-size: 12px; box-shadow: 2px 2px 0 var(--border-color);">
-                            <span class="live-dot"></span>
-                            LIVE FEED
-                        </div>
-                    </div>
-
-                    <!-- Live Status Strip -->
-                    <div class="grid-4" style="grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 16px;">
-                        <div class="card stat-card" style="padding: 16px; min-height: unset; margin-bottom: 0;">
-                            <span class="stat-value" id="live-metric-automations" style="font-size: 28px; line-height: 1;">0</span>
-                            <span class="stat-label" style="font-size: 10px; margin-top: 4px;">Active Automations</span>
-                        </div>
-                        <div class="card stat-card" style="padding: 16px; min-height: unset; margin-bottom: 0;">
-                            <span class="stat-value" id="live-metric-messages" style="font-size: 28px; line-height: 1;">0</span>
-                            <span class="stat-label" style="font-size: 10px; margin-top: 4px;">Messages Sent Today</span>
-                        </div>
-                        <div class="card stat-card" style="padding: 16px; min-height: unset; margin-bottom: 0;">
-                            <span class="stat-value" id="live-metric-followups" style="font-size: 28px; line-height: 1;">0</span>
-                            <span class="stat-label" style="font-size: 10px; margin-top: 4px;">Pending Follow-Ups</span>
-                        </div>
-                        <div class="card stat-card" style="padding: 16px; min-height: unset; margin-bottom: 0;">
-                            <span class="stat-value" id="live-metric-leads" style="font-size: 28px; line-height: 1;">0</span>
-                            <span class="stat-label" style="font-size: 10px; margin-top: 4px;">Leads Captured Today</span>
-                        </div>
-                    </div>
-
-                    <!-- Scrollable Activity Feed -->
-                    <div id="live-activity-feed" style="max-height: 380px; overflow-y: auto; border: 3px solid var(--border-color); background: #fafafa; padding: 16px; display: flex; flex-direction: column; gap: 12px; box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);">
-                        <!-- Activity items will be inserted dynamically -->
-                    </div>
-                </div>
-
                 <div class="flex-between">
                     <h2>Recent Actionable Tasks</h2>
                 </div>
@@ -997,9 +1048,9 @@
 
         /* DB MOCKING SYSTEM (Local Storage) */
         const DB = {
-            tables: { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [], invoices: [] },
+            tables: { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [], invoices: [], automations: [] },
             ensureShape: () => {
-                const defaults = { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [], invoices: [] };
+                const defaults = { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [], invoices: [], automations: [] };
                 DB.tables = { ...defaults, ...(DB.tables || {}) };
                 Object.keys(defaults).forEach((k) => {
                     if (!Array.isArray(DB.tables[k])) DB.tables[k] = defaults[k];
@@ -1027,7 +1078,7 @@
             },
             save: () => { DB.ensureShape(); localStorage.setItem('flowra_mock_db', JSON.stringify(DB.tables)); },
             seed: () => {
-                DB.tables = { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [], invoices: [] };
+                DB.tables = { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [], invoices: [], automations: [] };
                 DB.save();
             }
         };
@@ -1198,6 +1249,16 @@
 
             // Trigger n8n Automation on Project Generation for Invoice/Task scaling
             try {
+                if (!DB.tables.automations) DB.tables.automations = [];
+                DB.tables.automations.push({
+                    id: generateId(),
+                    title: 'Project creation workflow executed',
+                    related_entity: client,
+                    status: 'Successful',
+                    timestamp: new Date().toISOString()
+                });
+                DB.save();
+
                 const projectPayload = new URLSearchParams();
                 projectPayload.append('event', 'dev_project_created');
                 projectPayload.append('project_id', projectIdForPayload);
@@ -1344,10 +1405,221 @@
            OTHER DASHBOARD LOGIC
            -------------------------------------- */
 
+        function formatRelativeTime(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins === 1) return '1 minute ago';
+            if (diffMins < 60) return diffMins + ' minutes ago';
+            
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours === 1) return '1 hour ago';
+            if (diffHours < 24) return diffHours + ' hours ago';
+            
+            const diffDays = Math.floor(diffHours / 24);
+            if (diffDays === 1) return 'Yesterday';
+            return diffDays + ' days ago';
+        }
+
+        function getFlowTrackerEvents() {
+            let events = [];
+
+            // 1. Projects
+            (DB.tables.projects || []).forEach(p => {
+                if (p.created_at) {
+                    events.push({
+                        id: 'proj_create_' + p.id,
+                        module_type: 'PROJECT',
+                        title: 'Workspace activated',
+                        related_entity: p.client_name + ' - ' + p.project_name,
+                        status: 'Active',
+                        timestamp: p.created_at
+                    });
+                }
+                // Project Tasks
+                (p.tasks || []).forEach(t => {
+                    if (t.done && t.updated_at) {
+                        events.push({
+                            id: 'task_done_' + t.id,
+                            module_type: 'TASK',
+                            title: t.name,
+                            related_entity: p.client_name,
+                            status: 'Completed',
+                            timestamp: t.updated_at
+                        });
+                    }
+                });
+            });
+
+            // 2. Leads
+            (DB.tables.leads || []).forEach(l => {
+                if (l.created_at) {
+                    events.push({
+                        id: 'lead_create_' + l.id,
+                        module_type: 'LEAD',
+                        title: 'New inquiry captured',
+                        related_entity: l.name,
+                        status: l.status === 'new' ? 'Awaiting follow-up' : l.status.toUpperCase(),
+                        timestamp: l.created_at
+                    });
+                }
+            });
+
+            // 3. Meetings
+            (DB.tables.meetings || []).forEach(m => {
+                if (m.time) {
+                    const isPast = new Date(m.time).getTime() < Date.now();
+                    let leadName = 'Client';
+                    if (m.lead_id) {
+                        const lead = (DB.tables.leads || []).find(l => l.id === m.lead_id);
+                        if (lead) leadName = lead.name;
+                    }
+                    events.push({
+                        id: 'meet_' + m.id,
+                        module_type: 'MEETING',
+                        title: m.title,
+                        related_entity: leadName,
+                        status: isPast ? 'Completed' : 'Scheduled',
+                        timestamp: new Date(m.time).toISOString()
+                    });
+                }
+            });
+
+            // 4. Invoices
+            (DB.tables.invoices || []).forEach(i => {
+                if (i.created_at) {
+                    events.push({
+                        id: 'inv_create_' + i.id,
+                        module_type: 'INVOICE',
+                        title: `Invoice created (${i.payment_mode || 'Standard'})`,
+                        related_entity: i.lead_name + ' - ' + i.project_name,
+                        status: 'Sent',
+                        timestamp: i.created_at
+                    });
+                    if (i.paid_now_amount > 0) {
+                        events.push({
+                            id: 'inv_pay_' + i.id,
+                            module_type: 'INVOICE',
+                            title: `Payment received (${i.currency || 'INR'} ${i.paid_now_amount})`,
+                            related_entity: i.lead_name,
+                            status: 'Paid',
+                            timestamp: i.created_at
+                        });
+                    }
+                }
+            });
+
+            // 5. Automations
+            (DB.tables.automations || []).forEach(a => {
+                if (a.timestamp) {
+                    events.push({
+                        id: 'auto_' + a.id,
+                        module_type: 'AUTOMATION',
+                        title: a.title,
+                        related_entity: a.related_entity || 'System',
+                        status: a.status || 'Successful',
+                        timestamp: a.timestamp
+                    });
+                }
+            });
+
+            // Sort events by timestamp descending (newest first)
+            events.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+            // If empty, fall back to mock data
+            if (events.length === 0) {
+                const now = new Date();
+                events = [
+                    {
+                        id: 'mock_1',
+                        module_type: 'PROJECT',
+                        title: 'Workspace activated',
+                        related_entity: 'Raga Designers',
+                        status: 'Active',
+                        timestamp: new Date(now.getTime() - 2 * 60000).toISOString()
+                    },
+                    {
+                        id: 'mock_2',
+                        module_type: 'LEAD',
+                        title: 'New inquiry captured',
+                        related_entity: 'Elevate Consulting',
+                        status: 'Awaiting follow-up',
+                        timestamp: new Date(now.getTime() - 5 * 60000).toISOString()
+                    },
+                    {
+                        id: 'mock_3',
+                        module_type: 'MEETING',
+                        title: 'Discovery call booked',
+                        related_entity: 'Third Eye Blind Productions',
+                        status: 'Scheduled',
+                        timestamp: new Date(now.getTime() - 11 * 60000).toISOString()
+                    },
+                    {
+                        id: 'mock_4',
+                        module_type: 'TASK',
+                        title: 'Homepage automation approved by Chira',
+                        related_entity: 'Chira',
+                        status: 'Completed',
+                        timestamp: new Date(now.getTime() - 16 * 60000).toISOString()
+                    },
+                    {
+                        id: 'mock_5',
+                        module_type: 'AUTOMATION',
+                        title: 'Invoice reminder workflow executed',
+                        related_entity: 'Techasoft Pvt Ltd',
+                        status: 'Successful',
+                        timestamp: new Date(now.getTime() - 22 * 60000).toISOString()
+                    }
+                ];
+            }
+
+            return events;
+        }
+
+        function renderFlowTracker() {
+            const container = document.getElementById('flow-timeline-container');
+            if (!container) return;
+
+            const events = getFlowTrackerEvents();
+            
+            container.innerHTML = events.map((ev, index) => {
+                const isNewest = index === 0;
+                let badgeClass = 'badge-' + ev.module_type.toLowerCase();
+                
+                return `
+                    <div class="flow-card">
+                        <div class="flow-node">
+                            <div class="flow-bullet ${isNewest ? 'active-pulse' : ''}"></div>
+                            <div class="flow-line"></div>
+                        </div>
+                        <div class="flow-card-content">
+                            <div class="flow-card-meta">
+                                <span class="flow-badge ${badgeClass}">[${ev.module_type}]</span>
+                                <span class="flow-time">${formatRelativeTime(ev.timestamp)}</span>
+                            </div>
+                            <div class="flow-card-title">${ev.title}</div>
+                            <div class="flow-card-footer">
+                                <span style="font-size: 10px; font-weight: 700; opacity: 0.8; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    ${ev.related_entity}
+                                </span>
+                                <span class="flow-status" style="color: ${ev.status === 'Completed' || ev.status === 'Successful' || ev.status === 'Paid' ? '#10B981' : 'var(--text-color)'}">
+                                    ${ev.status}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         function renderAll() {
             DB.load();
             sortAllTablesNewestFirst();
-            renderHomeMetrics(); renderLeads(); renderPlanner(); renderProjects(); renderTeam(); renderKnowledge(); renderFeedback();
+            renderHomeMetrics(); renderLeads(); renderPlanner(); renderProjects(); renderTeam(); renderKnowledge(); renderFeedback(); renderFlowTracker();
         }
 
         function renderHomeMetrics() {
@@ -1701,7 +1973,19 @@
         }
 
         function renderFeedback() { document.getElementById('feedback-table-body').innerHTML = DB.tables.feedback.map(f => `<tr><td><span class="badge">${f.type}</span></td><td>${f.description}</td></tr>`).join(''); }
-        window.triggerAutomation = function(action) { alert(`Webhook Payload ready for: ${action}`); }
+        window.triggerAutomation = function(action) { 
+            if (!DB.tables.automations) DB.tables.automations = [];
+            DB.tables.automations.push({
+                id: generateId(),
+                title: `${action} playbook executed`,
+                related_entity: 'Manual Webhook',
+                status: 'Successful',
+                timestamp: new Date().toISOString()
+            });
+            DB.save();
+            renderAll();
+            alert(`Webhook Payload ready for: ${action}`); 
+        }
         
         window.triggerVoiceWebhook = function() {
             const logs = document.getElementById('voice-logs');
@@ -2122,6 +2406,16 @@
         async function triggerInvoiceWebhook(invoiceRecord) {
             if (!invoiceRecord) return;
             try {
+                if (!DB.tables.automations) DB.tables.automations = [];
+                DB.tables.automations.push({
+                    id: generateId(),
+                    title: 'Invoice automation triggered',
+                    related_entity: invoiceRecord.lead_name,
+                    status: 'Successful',
+                    timestamp: new Date().toISOString()
+                });
+                DB.save();
+
                 const payload = new URLSearchParams();
                 payload.append('event', 'invoice_submitted');
                 
@@ -2419,231 +2713,6 @@
             }
         }
         
-        /* ======================================
-           LIVE OPERATIONS REAL-TIME SIMULATOR
-           ====================================== */
-        const LIVE_ACTIVITY_TYPES = {
-            'Lead Captured': { icon: '📥', color: 'var(--accent-color)' },
-            'Invoice Sent': { icon: '📄', color: 'var(--text-color)' },
-            'Payment Received': { icon: '💰', color: '#10B981' },
-            'Meeting Scheduled': { icon: '🗓️', color: '#8B5CF6' },
-            'Task Completed': { icon: '✅', color: '#059669' },
-            'Automation Triggered': { icon: '⚡', color: 'var(--accent-color)' },
-            'WhatsApp Message Sent': { icon: '💬', color: '#25D366' },
-            'Follow-up Created': { icon: '🔔', color: '#F59E0B' },
-            'Client Added': { icon: '👤', color: '#3B82F6' },
-            'Workflow Updated': { icon: '⚙️', color: '#6B7280' }
-        };
-
-        const MOCK_CLIENTS = [
-            'Webzplot Digital Solutions',
-            'Raga Designers',
-            'Techasoft Pvt Ltd',
-            'Third Eye Blind Productions',
-            'Acme Corporation',
-            'Global Systems Inc',
-            'Apex Logistics',
-            'Velocity Media Group',
-            'Quantum Dynamics',
-            'Elevate Consulting Ltd'
-        ];
-
-        const MOCK_DETAILS = {
-            'Lead Captured': [
-                'New inquiry received via landing page',
-                'Chatbot lead qualified with phone details',
-                'Inbound callback request registered',
-                'Contact form submission received'
-            ],
-            'Invoice Sent': [
-                'Invoice #INV-204 generated and sent',
-                'Invoice #INV-205 dispatched via automated email',
-                'Milestone billing invoice generated',
-                'Quarterly retainer invoice submitted'
-            ],
-            'Payment Received': [
-                'Upfront payment cleared via UPI',
-                'Invoice payment processed successfully',
-                'Subscription auto-renewal payment received',
-                'Direct bank transfer verified'
-            ],
-            'Meeting Scheduled': [
-                'Discovery call booked via scheduler',
-                'Technical scoping call confirmed',
-                'Retainer review meeting scheduled',
-                'Follow-up sync calendar invite sent'
-            ],
-            'Task Completed': [
-                'Deployment of conversational agent concluded',
-                'Database migration checklist ticked off',
-                'Setup automated follow-up sequences completed',
-                'Google Sheet sync integration verified'
-            ],
-            'Automation Triggered': [
-                'Welcome sequence workflow activated',
-                'n8n Webhook override webhook sent',
-                'Slack notifications webhook dispatched',
-                'Data backup cron sync completed'
-            ],
-            'WhatsApp Message Sent': [
-                'Initial onboarding greeting sent',
-                'Meeting reminder ping delivered',
-                'Invoice receipt confirmation pinged',
-                'Project update status dispatch'
-            ],
-            'Follow-up Created': [
-                'Auto follow-up task added to pipeline',
-                'Review prompt scheduled for tomorrow',
-                'Re-engagement campaign task created',
-                'Contract approval follow-up scheduled'
-            ],
-            'Client Added': [
-                'Client portal workspace initialized',
-                'Client profile created in Leads database',
-                'New account manager assigned',
-                'Client SLA agreement logged'
-            ],
-            'Workflow Updated': [
-                'Lead assignment logic optimized',
-                'n8n webhook endpoint updated',
-                'Automated template revised',
-                'Trigger parameters configured'
-            ]
-        };
-
-        const liveMetrics = {
-            automations: 24,
-            messages: 142,
-            followups: 8,
-            leads: 14
-        };
-
-        function initLiveOperations() {
-            // Count up metrics on load
-            animateValue("live-metric-automations", 0, liveMetrics.automations, 1000);
-            animateValue("live-metric-messages", 0, liveMetrics.messages, 1000);
-            animateValue("live-metric-followups", 0, liveMetrics.followups, 1000);
-            animateValue("live-metric-leads", 0, liveMetrics.leads, 1000);
-
-            // Populate initial activities
-            const feed = document.getElementById('live-activity-feed');
-            if (!feed) return;
-            feed.innerHTML = '';
-
-            const initialActivities = [
-                { type: 'Lead Captured', client: 'Webzplot Digital Solutions', details: 'New inquiry received via landing page', time: '2 minutes ago', important: true },
-                { type: 'Automation Triggered', client: 'Raga Designers', details: 'Welcome sequence workflow activated', time: '5 minutes ago', important: false },
-                { type: 'Invoice Sent', client: 'Techasoft Pvt Ltd', details: 'Invoice #INV-204 generated and sent', time: '12 minutes ago', important: false },
-                { type: 'Meeting Scheduled', client: 'Third Eye Blind Productions', details: 'Discovery call booked via scheduler', time: '18 minutes ago', important: true },
-                { type: 'Payment Received', client: 'Acme Corporation', details: 'Upfront payment cleared via UPI', time: '24 minutes ago', important: true }
-            ];
-
-            initialActivities.forEach(act => {
-                const card = createActivityCard(act.type, act.client, act.details, act.time, act.important);
-                feed.appendChild(card);
-            });
-
-            // Start simulated real-time ticks
-            setTimeout(simulateLiveActivity, 4000);
-        }
-
-        function createActivityCard(type, client, details, timeStr, important = false) {
-            const config = LIVE_ACTIVITY_TYPES[type] || { icon: '📋', color: 'var(--text-color)' };
-            const card = document.createElement('div');
-            card.className = 'activity-card' + (important ? ' important' : '');
-            
-            card.innerHTML = `
-                <div style="display: flex; gap: 12px; align-items: flex-start; flex: 1;">
-                    <span style="font-size: 20px; padding: 6px; background: #f0f0f0; border: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center;">
-                        ${config.icon}
-                    </span>
-                    <div style="flex: 1;">
-                        <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
-                            <span style="font-weight: 900; font-size: 11px; text-transform: uppercase; background: ${config.color}; color: ${config.color === 'var(--text-color)' ? '#fff' : '#111'}; padding: 2px 6px; border: 1px solid var(--border-color);">
-                                ${type}
-                            </span>
-                            <span style="font-weight: 800; font-size: 12px; color: var(--text-color);">
-                                ${client}
-                            </span>
-                        </div>
-                        <p style="font-size: 13px; font-weight: 700; margin-top: 4px; color: #444;">
-                            ${details}
-                        </p>
-                    </div>
-                </div>
-                <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px; margin-left: 12px;">
-                    <span style="font-size: 10px; font-weight: 700; opacity: 0.6; white-space: nowrap;">
-                        ${timeStr}
-                    </span>
-                    <span style="display: flex; align-items: center; font-size: 9px; font-weight: 900; color: var(--accent-color);">
-                        <span class="live-dot" style="margin-right: 4px; width: 6px; height: 6px;"></span>
-                        LIVE
-                    </span>
-                </div>
-            `;
-            return card;
-        }
-
-        function pushLiveActivity(type, client, details, important = false) {
-            const feed = document.getElementById('live-activity-feed');
-            if (!feed) return;
-
-            const card = createActivityCard(type, client, details, 'Just now', important);
-            feed.insertBefore(card, feed.firstChild);
-
-            // Prune feed if more than 15 items
-            while (feed.children.length > 15) {
-                feed.removeChild(feed.lastChild);
-            }
-
-            // Increment specific metrics
-            if (type === 'Automation Triggered') {
-                liveMetrics.automations++;
-                document.getElementById('live-metric-automations').innerText = liveMetrics.automations;
-            } else if (type === 'WhatsApp Message Sent') {
-                liveMetrics.messages++;
-                document.getElementById('live-metric-messages').innerText = liveMetrics.messages;
-            } else if (type === 'Follow-up Created') {
-                liveMetrics.followups++;
-                document.getElementById('live-metric-followups').innerText = liveMetrics.followups;
-            } else if (type === 'Lead Captured') {
-                liveMetrics.leads++;
-                document.getElementById('live-metric-leads').innerText = liveMetrics.leads;
-            }
-        }
-
-        function simulateLiveActivity() {
-            const types = Object.keys(LIVE_ACTIVITY_TYPES);
-            const randomType = types[Math.floor(Math.random() * types.length)];
-            const randomClient = MOCK_CLIENTS[Math.floor(Math.random() * MOCK_CLIENTS.length)];
-            const detailsList = MOCK_DETAILS[randomType];
-            const randomDetails = detailsList[Math.floor(Math.random() * detailsList.length)];
-            
-            // Randomly flag important (30% chance)
-            const important = Math.random() < 0.3;
-
-            pushLiveActivity(randomType, randomClient, randomDetails, important);
-
-            // Schedule next simulation (between 4 and 8 seconds)
-            const nextInterval = 4000 + Math.random() * 4000;
-            setTimeout(simulateLiveActivity, nextInterval);
-        }
-
-        function animateValue(id, start, end, duration) {
-            const obj = document.getElementById(id);
-            if (!obj) return;
-            let startTimestamp = null;
-            const step = (timestamp) => {
-                if (!startTimestamp) startTimestamp = timestamp;
-                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                obj.innerText = Math.floor(progress * (end - start) + start);
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                }
-            };
-            window.requestAnimationFrame(step);
-        }
-        
         window.onload = async () => {
             const sessionData = localStorage.getItem('flowra_session');
             if (sessionData) {
@@ -2660,7 +2729,6 @@
             const fromCloud = await loadFromSupabase();
             if (!fromCloud) DB.load();
             renderAll();
-            initLiveOperations();
 
             // Handle URL parameters or hash to open specific tab on page load
             const urlParams = new URLSearchParams(window.location.search);
