@@ -8,13 +8,13 @@
         (function() {
             try {
                 const sessionStr = localStorage.getItem('flowra_session');
-                if (!sessionStr) { window.location.href = '/login.html?redirect=/dashboard-experimental.html'; return; }
+                if (!sessionStr) { window.location.href = '/login.html?redirect=/dashboard-marketing.html'; return; }
                 const session = JSON.parse(sessionStr);
                 const now = new Date().getTime();
                 if (!session.email || !session.expiry || now > session.expiry) {
-                    window.location.href = '/login.html?redirect=/dashboard-experimental.html';
+                    window.location.href = '/login.html?redirect=/dashboard-marketing.html';
                 }
-            } catch (e) { window.location.href = '/login.html?redirect=/dashboard-experimental.html'; }
+            } catch (e) { window.location.href = '/login.html?redirect=/dashboard-marketing.html'; }
         })();
     </script>
     <style>
