@@ -1,0 +1,3216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flowra OS Dashboard</title>
+    <script>
+        (function() {
+            try {
+                const sessionStr = localStorage.getItem('flowra_session');
+                if (!sessionStr) { window.location.href = '/login.html?redirect=/dashboard-experimental.html'; return; }
+                const session = JSON.parse(sessionStr);
+                const now = new Date().getTime();
+                if (!session.email || !session.expiry || now > session.expiry) {
+                    window.location.href = '/login.html?redirect=/dashboard-experimental.html';
+                }
+            } catch (e) { window.location.href = '/login.html?redirect=/dashboard-experimental.html'; }
+        })();
+    </script>
+    <style>
+        /* CSS reset & variables */
+        :root {
+            --bg-color: #f4f4f4;
+            --surface-color: #ffffff;
+            --border-color: #111111;
+            --text-color: #111111;
+            --accent-color: #B19CD9;
+            --font-family: 'Inter', -apple-system, sans-serif;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font-family); }
+        body { background-color: var(--bg-color); color: var(--text-color); display: flex; height: 100vh; overflow: hidden; }
+        .sidebar { width: 250px; background: var(--surface-color); border-right: 3px solid var(--border-color); display: flex; flex-direction: column; z-index: 10; padding-bottom: 20px;}
+        .brand { padding: 24px; font-size: 24px; font-weight: 900; border-bottom: 3px solid var(--border-color); text-transform: uppercase; letter-spacing: -1px; background: var(--accent-color); color: #fff; }
+        .nav-menu { flex: 1; padding: 16px 0; overflow-y: auto; }
+        .nav-item { padding: 14px 24px; font-weight: 700; font-size: 13px; cursor: pointer; text-transform: uppercase; border-bottom: 1px solid rgba(0,0,0,0.1); transition: all 0.1s; }
+        .nav-item:hover { background: rgba(0,0,0,0.05); padding-left: 28px; }
+        .nav-item.active { background: var(--text-color); color: var(--surface-color); padding-left: 28px; }
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--bg-color); position: relative; }
+        .topbar { height: 75px; border-bottom: 3px solid var(--border-color); background: var(--surface-color); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; z-index: 8; }
+        .topbar h1 { font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: -0.5px; }
+        .content-wrap { flex: 1; padding: 32px; overflow-y: auto; }
+        .view-section { display: none; max-width: 1200px; margin: 0 auto; }
+        .view-section.active { display: block; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        h2 { font-size: 24px; font-weight: 800; margin-bottom: 16px; text-transform: uppercase; border-bottom: 3px solid var(--border-color); padding-bottom: 8px;}
+        h3 { font-size: 18px; font-weight: 800; margin-bottom: 12px;}
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(minmax(200px, 1fr)); gap: 24px; margin-bottom: 24px; }
+        .card { background: var(--surface-color); border: 3px solid var(--border-color); padding: 24px; box-shadow: 4px 4px 0 var(--border-color); margin-bottom: 24px; transition: transform 0.1s; display: flex; flex-direction: column; }
+        .card:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--border-color); }
+        .stat-card { text-align: center; padding: 32px 16px; justify-content: center; align-items: center;}
+        .stat-value { font-size: 42px; font-weight: 900; color: var(--accent-color); display: block; margin-bottom: 8px; letter-spacing: -1px; }
+        .stat-label { font-size: 12px; font-weight: 700; text-transform: uppercase; }
+        .btn { background: var(--surface-color); border: 3px solid var(--border-color); padding: 10px 16px; font-family: var(--font-family); font-weight: 800; text-transform: uppercase; font-size: 12px; cursor: pointer; box-shadow: 3px 3px 0 var(--border-color); transition: transform 0.1s, box-shadow 0.1s; }
+        .btn:active { transform: translate(3px, 3px); box-shadow: 0px 0px 0 var(--border-color); }
+        .btn-primary { background: var(--accent-color); color: #fff; border-color: var(--border-color); }
+        .btn-large { padding: 24px; font-size: 16px; width: 100%; display: block; margin-bottom: 16px; }
+        table { width: 100%; border-collapse: collapse; border: 3px solid var(--border-color); background: var(--surface-color); box-shadow: 4px 4px 0 var(--border-color); margin-bottom: 24px; }
+        th, td { padding: 14px 16px; text-align: left; border-bottom: 2px solid var(--border-color); font-size: 14px; vertical-align: top;}
+        th { background: #eee; color: var(--border-color); font-weight: 800; text-transform: uppercase; font-size: 12px; }
+        .badge { display: inline-block; padding: 4px 8px; font-size: 10px; font-weight: 800; text-transform: uppercase; border: 2px solid var(--border-color); background: #fff; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-weight: 800; font-size: 12px; text-transform: uppercase; margin-bottom: 8px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 3px solid var(--border-color); font-family: var(--font-family); font-size: 14px; background: var(--bg-color); transition: background 0.2s; }
+        input:focus, select:focus, textarea:focus { outline: none; background: var(--surface-color); border-color: var(--accent-color); }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        
+        /* Modals */
+        #customModal, #projectGeneratorModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
+        .modal-content { background: var(--surface-color); border: 4px solid var(--border-color); padding: 32px; box-shadow: 8px 8px 0 var(--accent-color); width: 450px; max-width: 90%; animation: slideUp 0.2s ease-out; max-height: 90vh; overflow-y: auto;}
+
+        /* Business Flow Tracker Rail Styling */
+        .flow-tracker-rail {
+            width: 320px;
+            min-width: 320px;
+            background: #ffffff;
+            border-right: 3px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            z-index: 9;
+            overflow: hidden;
+        }
+        .flow-header {
+            padding: 24px;
+            border-bottom: 3px solid var(--border-color);
+            background: #fbfbfb;
+        }
+        .flow-header h2 {
+            font-size: 16px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: -0.5px;
+            margin-bottom: 6px;
+            border: none;
+            padding: 0;
+        }
+        .flow-subtitle {
+            font-size: 10px;
+            font-weight: 700;
+            color: #666;
+            text-transform: uppercase;
+            line-height: 1.4;
+        }
+        .flow-timeline {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            position: relative;
+            background: #f4f4f4;
+        }
+        .flow-card {
+            display: flex;
+            gap: 16px;
+            position: relative;
+        }
+        .flow-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            width: 20px;
+        }
+        .flow-bullet {
+            width: 14px;
+            height: 14px;
+            background: #ffffff;
+            border: 3px solid var(--border-color);
+            box-shadow: 2px 2px 0 var(--border-color);
+            z-index: 2;
+            border-radius: 0px;
+        }
+        .flow-bullet.active-pulse {
+            background: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(255, 60, 0, 0.2);
+            animation: flowPulse 2s infinite;
+        }
+        @keyframes flowPulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0px rgba(255, 60, 0, 0.4); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(255, 60, 0, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0px rgba(255, 60, 0, 0); }
+        }
+        .flow-line {
+            position: absolute;
+            top: 14px;
+            bottom: -30px;
+            width: 3px;
+            background: var(--border-color);
+            z-index: 1;
+        }
+        .flow-card:last-child .flow-line {
+            display: none;
+        }
+        .flow-card-content {
+            flex: 1;
+            background: #ffffff;
+            border: 3px solid var(--border-color);
+            padding: 12px;
+            box-shadow: 4px 4px 0 var(--border-color);
+            transition: all 0.1s;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            animation: cardFadeIn 0.3s ease-out;
+        }
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .flow-card-content:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--border-color);
+        }
+        .flow-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .flow-badge {
+            font-size: 8px;
+            font-weight: 900;
+            text-transform: uppercase;
+            border: 2px solid var(--border-color);
+            padding: 2px 6px;
+        }
+        .flow-badge.badge-project { background: #ffebeb; color: var(--border-color); }
+        .flow-badge.badge-lead { background: #f0f7ff; color: var(--border-color); }
+        .flow-badge.badge-meeting { background: #fffbe6; color: var(--border-color); }
+        .flow-badge.badge-task { background: #eafaf1; color: var(--border-color); }
+        .flow-badge.badge-automation { background: #fbf0ff; color: var(--border-color); }
+        .flow-badge.badge-invoice { background: #fff2e6; color: var(--border-color); }
+
+        .flow-time {
+            font-size: 9px;
+            font-weight: 700;
+            opacity: 0.6;
+        }
+        .flow-card-title {
+            font-size: 12px;
+            font-weight: 800;
+            line-height: 1.3;
+            color: var(--text-color);
+        }
+        .flow-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            padding-top: 6px;
+            margin-top: 2px;
+        }
+        .flow-status {
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Generic Single Input Modal -->
+    <div id="customModal">
+        <div class="modal-content">
+            <div class="flex-between" style="border-bottom: 3px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px;">
+                <h2 style="margin: 0; border: none; padding: 0;" id="modalTitle">TITLE</h2>
+                <button class="btn" onclick="closeModal()" style="padding: 4px 8px;">X</button>
+            </div>
+            <div id="modalBody"></div>
+            <div class="flex-between" style="margin-top:24px; margin-bottom:0;">
+                <button class="btn" onclick="closeModal()">CANCEL</button>
+                <button class="btn btn-primary" id="modalSubmit">SAVE TO SYSTEM</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mega Project Generator Modal -->
+    <div id="projectGeneratorModal">
+        <div class="modal-content" style="width: 800px; max-width: 95%;">
+            <div class="flex-between" style="border-bottom: 3px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px;">
+                <h2 style="margin: 0; border: none; padding: 0;">WORKSPACE GENERATOR</h2>
+                <button class="btn" onclick="document.getElementById('projectGeneratorModal').style.display='none'" style="padding: 4px 8px;">X</button>
+            </div>
+            
+            <div class="grid-2">
+                <div class="form-group"><label>Client Name & Details</label><input type="text" id="gen-client" placeholder="e.g. Acme Corp"></div>
+                <div class="form-group"><label>Project Target / Goal</label><input type="text" id="gen-title" placeholder="e.g. Voice Agent 1.0"></div>
+            </div>
+
+            <label style="margin-bottom:12px; font-size:14px;">1. Select Modules to Auto-Generate Checklists:</label>
+            <div id="category-module-picker" style="background:#fff; border: 3px solid var(--border-color); max-height: 300px; overflow-y: auto; padding: 16px; margin-bottom: 24px;">
+                <!-- Generated dynamically -->
+            </div>
+
+            <div class="form-group">
+                <label>2. Additional Custom Notes / Exceptions</label>
+                <textarea id="gen-notes" rows="3" placeholder="Paste any specific meeting notes, custom deliverables, or anomalies here to automatically add them to the checklist project board..."></textarea>
+            </div>
+
+            <div class="flex-between" style="margin-top:24px; margin-bottom:0;">
+                <button class="btn" onclick="document.getElementById('projectGeneratorModal').style.display='none'">CANCEL</button>
+                <button class="btn btn-primary" onclick="submitProjectGeneration()">✔ GENERATE CHECKLISTS</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Invoice Scheduler Modal -->
+    <div id="invoiceModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 110; justify-content: center; align-items: center;">
+        <div class="modal-content" style="width: 840px; max-width: 96%; max-height: 92vh; overflow-y: auto;">
+            <div class="flex-between" style="border-bottom: 3px solid var(--border-color); padding-bottom: 12px; margin-bottom: 20px;">
+                <h2 style="margin: 0; border: none; padding: 0;">SCHEDULE INVOICE</h2>
+                <button class="btn" onclick="closeInvoiceModal()" style="padding: 4px 8px;">X</button>
+            </div>
+
+            <div class="grid-2" style="margin-bottom: 12px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Lead</label>
+                    <input id="invoice-lead-name" type="text" disabled>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Project</label>
+                    <select id="invoice-project"></select>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-bottom: 12px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Base Total Amount</label>
+                    <input id="invoice-base-amount" type="number" min="0" step="0.01" value="0">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Add-on Amount</label>
+                    <input id="invoice-addon-amount" type="number" min="0" step="0.01" value="0">
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-bottom: 12px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Currency</label>
+                    <input id="invoice-currency" type="text" value="INR">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Payment Method</label>
+                    <select id="invoice-payment-method">
+                        <option value="upi">UPI</option>
+                        <option value="bank_transfer">Bank Transfer</option>
+                        <option value="card">Card</option>
+                        <option value="cash">Cash</option>
+                        <option value="cheque">Cheque</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-bottom: 12px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Upfront Percent (editable)</label>
+                    <input id="invoice-upfront-percent" type="number" min="1" max="100" step="0.01" value="25">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Partial of Upfront (%)</label>
+                    <input id="invoice-partial-percent" type="number" min="0" max="100" step="0.01" value="50">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 12px;">
+                <label>Invoice Payment Link</label>
+                <input id="invoice-link" type="text" placeholder="https://buy.stripe.com/...">
+            </div>
+
+            <label style="margin-bottom:8px;">Payment Mode</label>
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
+                <button id="mode-add-25" class="btn btn-primary" type="button" onclick="setInvoicePaymentMode('add_25_now')">ADD 25% RIGHT NOW</button>
+                <button id="mode-pay-full" class="btn" type="button" onclick="setInvoicePaymentMode('pay_full_now')">PAY COMPLETELY RIGHT NOW</button>
+                <button id="mode-pay-partial" class="btn" type="button" onclick="setInvoicePaymentMode('pay_partial_of_upfront')">PAY ONLY PARTIAL OF UPFRONT</button>
+                <button id="mode-add-another" class="btn" type="button" onclick="setInvoicePaymentMode('add_another_invoice')">ADD ANOTHER INVOICE</button>
+            </div>
+
+            <div class="card" style="margin-bottom: 12px; background:#fffebc;">
+                <div style="font-weight:800; font-size:12px; text-transform:uppercase; margin-bottom:8px;">Invoice Preview</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-weight:700; font-size:13px; margin-bottom: 12px;">
+                    <div>Locked Total: <span id="invoice-preview-locked">0</span></div>
+                    <div>Current Charge Basis: <span id="invoice-preview-charge-base">0</span></div>
+                    <div>Paid Amount: <span id="invoice-preview-paid">0</span></div>
+                    <div>Remaining Amount: <span id="invoice-preview-remaining">0</span></div>
+                    <div>Due Now: <span id="invoice-preview-due">0</span></div>
+                    <div>Payment Status: <span id="invoice-preview-payment-status">Payment Pending</span></div>
+                    <div>Invoice Status: <span id="invoice-preview-invoice-status">Sent</span></div>
+                    <div>Mode: <span id="invoice-preview-mode">add_25_now</span></div>
+                    <div>Payment Method: <span id="invoice-preview-method">upi</span></div>
+                </div>
+                
+                <div style="border-top: 2px solid var(--border-color); padding-top: 12px;">
+                    <div style="font-weight: 800; font-size: 10px; text-transform: uppercase; margin-bottom: 8px;">Payment Pipeline Status</div>
+                    <div style="display: flex; align-items: center; justify-content: space-between; font-weight: 900; font-size: 11px; text-transform: uppercase; gap: 4px;">
+                        <div id="pipeline-stage-sent" style="flex: 1; padding: 6px; border: 2px solid var(--border-color); text-align: center; background: #fff; transition: all 0.3s ease;">Invoice Sent</div>
+                        <div style="font-size: 14px; font-weight: bold; color: var(--border-color);">➔</div>
+                        <div id="pipeline-stage-partial" style="flex: 1; padding: 6px; border: 2px solid var(--border-color); text-align: center; background: #fff; transition: all 0.3s ease;">Partial Paid</div>
+                        <div style="font-size: 14px; font-weight: bold; color: var(--border-color);">➔</div>
+                        <div id="pipeline-stage-full" style="flex: 1; padding: 6px; border: 2px solid var(--border-color); text-align: center; background: #fff; transition: all 0.3s ease;">Fully Paid</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Invoice Notes</label>
+                <textarea id="invoice-notes" rows="3" placeholder="Any special terms, free revisions, milestone notes..."></textarea>
+            </div>
+
+            <div class="flex-between" style="margin-top:20px; margin-bottom:0;">
+                <button class="btn" onclick="closeInvoiceModal()">CANCEL</button>
+                <button id="invoice-send-btn" class="btn btn-primary" type="button" onclick="sendInvoiceScheduler()" style="flex:1; margin-left:12px;">SUBMIT & SEND INVOICE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP STRUCTURE -->
+    <div class="sidebar">
+        <div class="brand">Flowra Sandbox</div>
+        <div class="nav-menu">
+            <div class="nav-item active" onclick="switchView('home')">Command Center</div>
+            <div class="nav-item" onclick="switchView('projects')">Active Projects</div>
+            <div class="nav-item" onclick="switchView('leads')">Leads & Clients</div>
+            <div class="nav-item" onclick="switchView('planner')">Meetings & Deals</div>
+            <div class="nav-item" onclick="switchView('team')">Team Ops</div>
+            <div class="nav-item" onclick="switchView('automation')">n8n Automation</div>
+            <div class="nav-item" onclick="switchView('knowledge')">Knowledge Base</div>
+            <div class="nav-item" onclick="switchView('feedback')">Feedback & Ideas</div>
+        </div>
+        <div style="padding: 20px;">
+            <button class="btn" style="width:100%" onclick="renderAll()">⟲ REFRESH</button>
+        </div>
+    </div>
+
+    <!-- Business Flow Tracker Rail -->
+    <div class="flow-tracker-rail">
+        <div class="flow-header">
+            <h2>Business Flow Tracker</h2>
+            <p class="flow-subtitle">Track real operational movement across projects, leads, meetings, tasks, invoices, and automations.</p>
+        </div>
+        <div class="flow-timeline" id="flow-timeline-container">
+            <!-- Stacked operational cards loaded dynamically -->
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="topbar">
+            <h1 id="page-title">Command Center</h1>
+            <div>
+                <span id="sync-status" style="font-weight:800; font-size:11px; margin-right:16px;"></span>
+                <span id="admin-email" style="font-weight:800; font-size:12px; margin-right:16px;">LOCAL_MODE</span>
+                <button class="btn btn-primary" onclick="openProjectGenerator()">+ DEV PROJECT</button>
+                <button class="btn" style="margin-left: 8px;" onclick="if(window.logout) window.logout()">LOGOUT</button>
+            </div>
+        </div>
+
+        <div class="content-wrap">
+            <!-- 1. Command Center -->
+            <div id="view-home" class="view-section active">
+                <div class="grid-4" style="grid-template-columns: repeat(4, 1fr);">
+                    <div class="card stat-card"><span class="stat-value" id="metric-leads-count">0</span><span class="stat-label">Total Leads</span></div>
+                    <div class="card stat-card"><span class="stat-value" id="metric-pending-count">0</span><span class="stat-label">Pending Tasks</span></div>
+                    <div class="card stat-card"><span class="stat-value" id="metric-completed-count">0</span><span class="stat-label">Completed Tasks</span></div>
+                    <div class="card stat-card"><span class="stat-value" id="metric-tasks-today">0</span><span class="stat-label">Active Workspaces</span></div>
+                </div>
+                
+                <div class="flex-between">
+                    <h2>Recent Actionable Tasks</h2>
+                </div>
+                <table>
+                    <thead><tr><th>Project</th><th>Category / Module</th><th>Task Detail</th><th>Status</th></tr></thead>
+                    <tbody id="home-recent-tasks-body"></tbody>
+                </table>
+            </div>
+
+            <!-- 2. Leads -->
+            <div id="view-leads" class="view-section">
+                <div class="flex-between" style="margin-bottom: 24px;">
+                    <h2>Leads & Clients Repository</h2>
+                    <button class="btn btn-primary" onclick="createNewLead()">+ ADD LEAD</button>
+                </div>
+                
+                <div style="margin-bottom: 32px;">
+                    <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px; text-transform: uppercase;">⚡ Prospects & Leads</h3>
+                    <table>
+                        <thead><tr><th>Category</th><th>Name</th><th>Email</th><th>Number</th><th>Message Snippet</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="leads-prospects-table-body"></tbody>
+                    </table>
+                </div>
+
+                <div>
+                    <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px; text-transform: uppercase;">💼 Converted Clients</h3>
+                    <table>
+                        <thead><tr><th>Category</th><th>Name</th><th>Email</th><th>Number</th><th>Message Snippet</th><th>Status</th><th>Actions</th></tr></thead>
+                        <tbody id="leads-clients-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. Projects -->
+            <div id="view-projects" class="view-section">
+                <div class="flex-between">
+                    <h2>Client Project Workspaces</h2>
+                    <button class="btn btn-primary" onclick="openProjectGenerator()">+ NEW PROJECT</button>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 24px;" id="projects-grid"></div>
+            </div>
+
+            <!-- 4. Meetings & Deals Planner -->
+            <div id="view-planner" class="view-section">
+                <div class="flex-between">
+                    <div>
+                        <h2>Meetings & Deal Closing Planner</h2>
+                        <p style="font-weight: 700; font-size: 12px; margin-bottom: 16px; text-transform: uppercase;">Manage your schedule and close deals on autopilot.</p>
+                    </div>
+                </div>
+                
+                <div class="grid-2">
+                    <div class="card" id="active-meeting-card" style="background:#fffebc; border-color: var(--accent-color);">
+                        <!-- Rendered dynamically by renderPlanner() -->
+                    </div>
+                    
+                    <div class="card">
+                        <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px;">Upcoming Deal Calls</h3>
+                        <ul id="meetings-list" style="list-style: none; padding: 0; margin-top: 16px; display: flex; flex-direction: column; gap: 12px;">
+                            <!-- Dynamic meetings populated here -->
+                        </ul>
+                        <button class="btn" style="margin-top: 16px; width: 100%;" onclick="openScheduler()">+ SCHEDULE NEW DEAL</button>
+                    </div>
+                </div>
+
+                <!-- Revenue & Deal Pipeline Table -->
+                <div class="card" style="margin-top: 24px;">
+                    <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px; text-transform: uppercase;">💰 Revenue & Deal Pipeline</h3>
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr>
+                                    <th>Client</th>
+                                    <th>Project</th>
+                                    <th>Total</th>
+                                    <th>Paid</th>
+                                    <th>Remaining</th>
+                                    <th>Invoice Status</th>
+                                    <th>Payment Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="revenue-pipeline-tbody">
+                                <!-- Populated dynamically from DB.tables.invoices -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Meeting History -->
+                <div class="card" style="margin-top: 24px; border-style: dashed;" id="meeting-history-section">
+                    <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px; margin-bottom: 12px;">📋 Meeting History & Closed Deals</h3>
+                    <ul id="past-meetings-list" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 10px;">
+                        <!-- Past meetings rendered here -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 5. Team Ops Leaderboard -->
+            <div id="view-team" class="view-section">
+                <h2>Team Leaderboard</h2>
+                <div class="card" style="background: var(--accent-color); color: var(--bg-color);">
+                    <div style="font-weight: 800;">Top performers are automatically ranked based on project task completion.</div>
+                </div>
+                <table>
+                    <thead><tr><th>Rank</th><th>Agent / Member</th><th>Tasks Completed</th><th>Status</th></tr></thead>
+                    <tbody id="team-table-body"></tbody>
+                </table>
+            </div>
+
+            <!-- 6. Automation Hub -->
+            <div id="view-automation" class="view-section">
+                <div class="flex-between" style="margin-bottom: 16px;">
+                    <div>
+                        <h2>Automation Playbooks</h2>
+                        <p style="font-weight: 700; font-size: 12px; text-transform: uppercase;">n8n Webhook triggers for active pipelines.</p>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                    <button class="btn btn-large" onclick="triggerAutomation('Send Proposal')" style="padding: 20px; font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 4px 4px 0 var(--border-color);">
+                        <span style="font-size: 28px;">📄</span>
+                        SEND PROPOSAL
+                    </button>
+                    <button class="btn btn-large" onclick="triggerAutomation('Send Follow-Up')" style="padding: 20px; font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 4px 4px 0 var(--border-color);">
+                        <span style="font-size: 28px;">🔔</span>
+                        SEND FOLLOW-UP
+                    </button>
+                    <button class="btn btn-large" onclick="syncToSupabase().then(() => alert('Force sync complete.'))" style="padding: 20px; font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 4px 4px 0 var(--border-color); background: var(--surface-color);">
+                        <span style="font-size: 28px;">☁️</span>
+                        FORCE SYNC TO CLOUD
+                    </button>
+                </div>
+            </div>
+
+            <!-- 7. Knowledge Base -->
+            <div id="view-knowledge" class="view-section">
+                <div class="flex-between">
+                    <h2>Knowledge Base</h2>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn" id="kb-tab-notes" onclick="switchKBTab('notes')" style="background:var(--text-color); color:var(--surface-color);">📝 NOTES</button>
+                        <button class="btn" id="kb-tab-docs" onclick="switchKBTab('docs')">📄 DOCS</button>
+                    </div>
+                </div>
+
+                <!-- Notes Sub-View -->
+                <div id="kb-view-notes">
+                    <div class="card" style="border-color: var(--accent-color); margin-bottom: 24px;">
+                        <h3 style="margin-bottom: 16px;">✏️ Quick Note</h3>
+                        <div class="form-group">
+                            <label>Note Title</label>
+                            <input type="text" id="kb-note-title" placeholder="e.g. Meeting recap, Client requirements...">
+                        </div>
+                        <div class="form-group">
+                            <label>Note Body</label>
+                            <textarea id="kb-note-body" rows="5" placeholder="Write your note here..."></textarea>
+                        </div>
+                        <button class="btn btn-primary" onclick="addKnowledgeNote()">💾 SAVE NOTE</button>
+                    </div>
+                    <h3 style="margin-bottom: 12px;">Saved Notes</h3>
+                    <div class="grid-3" id="knowledge-notes-grid"></div>
+                </div>
+
+                <!-- Docs Sub-View -->
+                <div id="kb-view-docs" style="display:none;">
+                    <div class="card" style="border-color: var(--accent-color); margin-bottom: 24px;">
+                        <h3 style="margin-bottom: 16px;">📎 Upload Document</h3>
+                        <div class="form-group">
+                            <label>Select Document File</label>
+                            <input type="file" id="kb-doc-file" accept=".txt,.md,.pdf,.csv,.doc,.docx,.json,.html" style="padding:8px; cursor:pointer;">
+                        </div>
+                        <div class="form-group">
+                            <label>Or Paste Document Content Directly</label>
+                            <textarea id="kb-doc-paste" rows="6" placeholder="Paste your document content here..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Document Title (auto-filled from file name)</label>
+                            <input type="text" id="kb-doc-title" placeholder="e.g. Onboarding Guide v2">
+                        </div>
+                        <button class="btn btn-primary" onclick="addKnowledgeDoc()">📤 UPLOAD & SAVE DOC</button>
+                    </div>
+                    <h3 style="margin-bottom: 12px;">Saved Documents</h3>
+                    <div class="grid-3" id="knowledge-docs-grid"></div>
+                </div>
+            </div>
+            
+            <!-- 8. Feedback -->
+            <div id="view-feedback" class="view-section">
+                <h2>System Registry</h2>
+                <div class="card">
+                    <div class="form-group">
+                        <textarea id="feedback-input" rows="3" placeholder="Add idea..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="submitFeedback()">SUBMIT TO DB</button>
+                </div>
+                <table>
+                    <thead><tr><th>Type</th><th>Description</th></tr></thead>
+                    <tbody id="feedback-table-body"></tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- UI Logic Engine -->
+    <script>
+        /* ======================================
+           SUPABASE CLIENT
+           ====================================== */
+        const SUPABASE_URL = "https://zdaylulmyejoswxoqedi.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_7if5Jz2oEMWY9W9ofy0kQw_HQjCJIae";
+        // Mock Supabase Client for isolated sandbox mode (mock/fake operational data only)
+        const sb = {
+            from: (tableName) => {
+                const query = {
+                    select: () => query,
+                    order: () => query,
+                    limit: () => query,
+                    eq: () => query,
+                    in: () => query,
+                    update: () => query,
+                    insert: () => query,
+                    upsert: () => query,
+                    delete: () => query,
+                    then: (onFulfilled) => {
+                        return Promise.resolve({ data: [], error: null }).then(onFulfilled);
+                    }
+                };
+                return query;
+            }
+        };
+
+        function mapInvoiceRecordToInvoiceLockRow(i) {
+            const total = Number(i.total_amount || i.locked_total_amount || 0);
+            const paid = Number(i.paid_amount || i.paid_now_amount || 0);
+            const remaining = Math.max(0, total - paid);
+            let payStatus = i.payment_status;
+            if (!payStatus) {
+                payStatus = paid === 0 ? 'Payment Pending' : (remaining > 0 ? 'Partial Payment' : 'Fully Paid');
+            }
+            return {
+                lead_id: i.lead_id || null,
+                project_id: i.project_id || null,
+                invoice_id: i.id || null,
+                lead_name: i.lead_name || 'Unknown',
+                lead_email: i.lead_email || '',
+                project_name: i.project_name || 'Unassigned',
+                project_ids: Array.isArray(i.project_ids) ? i.project_ids : [],
+                project_names: Array.isArray(i.project_names) ? i.project_names : [],
+                modules: Array.isArray(i.modules) ? i.modules : [],
+                payment_mode: i.payment_mode || 'add_25_now',
+                payment_method: i.payment_method || 'upi',
+                base_amount: i.base_amount || 0,
+                addon_amount: i.addon_amount || 0,
+                previous_locked_total: i.previous_locked_total || 0,
+                current_charge_base: i.current_charge_base || 0,
+                locked_total: total,
+                upfront_percent: i.upfront_percent || 25,
+                upfront_amount: i.upfront_amount || 0,
+                partial_percent_of_upfront: i.partial_percent_of_upfront || 0,
+                due_now_amount: i.due_now_amount || 0,
+                paid_now_amount: paid,
+                remaining_amount: remaining,
+                total_amount: total,
+                paid_amount: paid,
+                invoice_status: i.invoice_status || 'Sent',
+                payment_status: payStatus,
+                currency: i.currency || 'INR',
+                notes: i.notes || '',
+                invoice_link: i.invoice_link || '',
+                created_at: i.created_at || new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+        }
+
+        function mapInvoiceLockRowToLocalInvoice(r) {
+            const total = Number(r.total_amount || r.locked_total || 0);
+            const paid = Number(r.paid_amount || r.paid_now_amount || 0);
+            const remaining = Math.max(0, total - paid);
+            let payStatus = r.payment_status;
+            if (!payStatus) {
+                payStatus = paid === 0 ? 'Payment Pending' : (remaining > 0 ? 'Partial Payment' : 'Fully Paid');
+            }
+            return {
+                id: r.invoice_id || generateId(),
+                lead_id: r.lead_id || null,
+                lead_name: r.lead_name || 'Unknown',
+                lead_email: r.lead_email || '',
+                project_id: r.project_id || null,
+                project_name: r.project_name || 'Unassigned',
+                project_ids: Array.isArray(r.project_ids) ? r.project_ids : (r.project_id ? [r.project_id] : []),
+                project_names: Array.isArray(r.project_names) ? r.project_names : [],
+                modules: Array.isArray(r.modules) ? r.modules : [],
+                payment_mode: r.payment_mode || 'add_25_now',
+                payment_method: r.payment_method || 'upi',
+                base_amount: Number(r.base_amount) || 0,
+                addon_amount: Number(r.addon_amount) || 0,
+                previous_locked_total: Number(r.previous_locked_total) || 0,
+                current_charge_base: Number(r.current_charge_base) || 0,
+                locked_total_amount: total,
+                upfront_percent: Number(r.upfront_percent) || 25,
+                upfront_amount: Number(r.upfront_amount) || 0,
+                partial_percent_of_upfront: Number(r.partial_percent_of_upfront) || 0,
+                due_now_amount: Number(r.due_now_amount) || 0,
+                paid_now_amount: paid,
+                remaining_amount: remaining,
+                total_amount: total,
+                paid_amount: paid,
+                invoice_status: r.invoice_status || 'Sent',
+                payment_status: payStatus,
+                currency: r.currency || 'INR',
+                notes: r.notes || '',
+                invoice_link: r.invoice_link || '',
+                created_at: r.created_at || new Date().toISOString()
+            };
+        }
+
+        async function upsertInvoiceLockRow(row) {
+            if (!row || !row.lead_id || !row.project_id) {
+                throw new Error('invoice_lock upsert requires lead_id and project_id');
+            }
+
+            const updatePayload = {
+                invoice_id: row.invoice_id || null,
+                lead_name: row.lead_name || 'Unknown',
+                lead_email: row.lead_email || '',
+                project_name: row.project_name || 'Unassigned',
+                project_ids: Array.isArray(row.project_ids) ? row.project_ids : [],
+                project_names: Array.isArray(row.project_names) ? row.project_names : [],
+                modules: Array.isArray(row.modules) ? row.modules : [],
+                payment_mode: row.payment_mode || 'add_25_now',
+                payment_method: row.payment_method || 'upi',
+                base_amount: row.base_amount || 0,
+                addon_amount: row.addon_amount || 0,
+                previous_locked_total: row.previous_locked_total || 0,
+                current_charge_base: row.current_charge_base || 0,
+                locked_total: row.locked_total || 0,
+                upfront_percent: row.upfront_percent || 25,
+                upfront_amount: row.upfront_amount || 0,
+                partial_percent_of_upfront: row.partial_percent_of_upfront || 0,
+                due_now_amount: row.due_now_amount || 0,
+                paid_now_amount: row.paid_now_amount || 0,
+                remaining_amount: row.remaining_amount || 0,
+                total_amount: row.total_amount || 0,
+                paid_amount: row.paid_amount || 0,
+                invoice_status: row.invoice_status || 'Sent',
+                payment_status: row.payment_status || 'Payment Pending',
+                currency: row.currency || 'INR',
+                notes: row.notes || '',
+                invoice_link: row.invoice_link || '',
+                created_at: row.created_at || new Date().toISOString(),
+                updated_at: new Date().toISOString()
+            };
+
+            const { error: updateErr } = await sb
+                .from('invoice_lock')
+                .update(updatePayload)
+                .eq('lead_id', row.lead_id)
+                .eq('project_id', row.project_id);
+
+            if (updateErr) throw updateErr;
+
+            const { data: existing, error: selectErr } = await sb
+                .from('invoice_lock')
+                .select('lead_id, project_id')
+                .eq('lead_id', row.lead_id)
+                .eq('project_id', row.project_id)
+                .limit(1);
+
+            if (selectErr) throw selectErr;
+
+            if (!Array.isArray(existing) || existing.length === 0) {
+                const { error: insertErr } = await sb.from('invoice_lock').insert([{
+                    lead_id: row.lead_id,
+                    project_id: row.project_id,
+                    ...updatePayload
+                }]);
+                if (insertErr) throw insertErr;
+            }
+        }
+
+        /* Push entire local DB state to Supabase (upsert-based) */
+        async function syncToSupabase() {
+            try {
+                setSyncStatus('syncing');
+                // Upsert projects
+                if (DB.tables.projects.length > 0) {
+                    const projRows = DB.tables.projects.map(p => ({
+                        id: p.id,
+                        client_name: p.client_name,
+                        project_name: p.project_name,
+                        lead_id: p.lead_id || null,
+                        created_at: p.created_at || new Date().toISOString()
+                    }));
+                    const { error: pe } = await sb.from('projects').upsert(projRows, { onConflict: 'id' });
+                    if (pe) throw pe;
+
+                    // Upsert all tasks
+                    let allTasks = [];
+                    DB.tables.projects.forEach(p => {
+                        (p.tasks || []).forEach(t => {
+                            allTasks.push({
+                                id: t.id,
+                                project_id: p.id,
+                                category: t.category,
+                                module: t.module,
+                                name: t.name,
+                                notes: t.notes || '',
+                                done: t.done,
+                                updated_at: t.updated_at || new Date().toISOString()
+                            });
+                        });
+                    });
+                    if (allTasks.length > 0) {
+                        const { error: te } = await sb.from('tasks').upsert(allTasks, { onConflict: 'id' });
+                        if (te) throw te;
+                    }
+                }
+
+                // Upsert leads
+                if (DB.tables.leads.length > 0) {
+                    const leadRows = DB.tables.leads.map(l => {
+                        const val = l.number || l.mobile || '';
+                        const rawNum = String(val).trim();
+                        return {
+                            id: l.id, 
+                            name: l.name, 
+                            email: l.email, 
+                            message: l.message || '', 
+                            status: l.status, 
+                            number: rawNum === '' ? null : rawNum,
+                            lead_lock: l.lead_lock || null,
+                            created_at: l.created_at || new Date().toISOString()
+                        };
+                    });
+                    const { error: le } = await sb.from('leads').upsert(leadRows, { onConflict: 'id' });
+                    if (le) throw le;
+
+                    // Sync converted clients (status working, finished, closed) to clients table
+                    const clientRows = DB.tables.leads
+                        .filter(l => ['working', 'finished', 'closed'].includes(l.status))
+                        .map(l => {
+                            const val = l.number || l.mobile || '';
+                            const rawNum = String(val).trim();
+                            return {
+                                id: l.id,
+                                lead_id: l.id,
+                                name: l.name,
+                                email: l.email,
+                                number: rawNum === '' ? null : rawNum,
+                                status: l.status,
+                                created_at: l.created_at || new Date().toISOString(),
+                                converted_at: new Date().toISOString()
+                            };
+                        });
+                    if (clientRows.length > 0) {
+                        const { error: ce } = await sb.from('clients').upsert(clientRows, { onConflict: 'id' });
+                        if (ce) console.warn('[Flowra] Converted clients sync to Supabase clients table failed:', ce.message || ce);
+                    }
+
+                    // Remove from clients table if status is no longer a converted client
+                    const nonClientIds = DB.tables.leads
+                        .filter(l => !['working', 'finished', 'closed'].includes(l.status))
+                        .map(l => l.id);
+                    if (nonClientIds.length > 0) {
+                        await sb.from('clients').delete().in('id', nonClientIds);
+                    }
+                }
+
+                // Upsert feedback registry
+                if ((DB.tables.feedback || []).length > 0) {
+                    const feedbackRows = DB.tables.feedback.map(f => ({
+                        id: f.id,
+                        type: f.type || 'idea',
+                        description: f.description || '',
+                        created_at: f.created_at || new Date().toISOString()
+                    }));
+                    const { error: fe } = await sb.from('feedback').upsert(feedbackRows, { onConflict: 'id' });
+                    if (fe) throw fe;
+                }
+
+                // Upsert team logs (if present)
+                if ((DB.tables.team || []).length > 0) {
+                    const teamRows = DB.tables.team.map(t => ({
+                        id: t.id,
+                        member: t.member || 'Unknown',
+                        hours: t.hours == null || t.hours === '' ? null : t.hours,
+                        status: t.status || 'active',
+                        created_at: t.created_at || new Date().toISOString()
+                    }));
+                    const { error: tle } = await sb.from('team_logs').upsert(teamRows, { onConflict: 'id' });
+                    if (tle) throw tle;
+                }
+
+                // Upsert invoice locks (single latest lock per lead+project)
+                if ((DB.tables.invoices || []).length > 0) {
+                    try {
+                        const newestFirst = sortNewestFirst(DB.tables.invoices || [], 'created_at');
+                        const lockByPair = {};
+                        newestFirst.forEach((i) => {
+                            const leadId = i && i.lead_id ? String(i.lead_id) : '';
+                            const projectId = i && i.project_id ? String(i.project_id) : '';
+                            if (!leadId || !projectId) return;
+                            const key = `${leadId}__${projectId}`;
+                            if (!lockByPair[key]) {
+                                lockByPair[key] = mapInvoiceRecordToInvoiceLockRow(i);
+                            }
+                        });
+
+                        const invoiceLockRows = Object.values(lockByPair);
+                        if (invoiceLockRows.length > 0) {
+                            for (const row of invoiceLockRows) {
+                                await upsertInvoiceLockRow(row);
+                            }
+                        }
+                    } catch (invoiceErr) {
+                        console.warn('[Flowra] Invoice lock sync skipped:', invoiceErr.message || invoiceErr);
+                    }
+                }
+
+                setSyncStatus('ok');
+            } catch(err) {
+                console.error('[Flowra] Supabase sync error:', err);
+                setSyncStatus('error', err.message || JSON.stringify(err));
+            }
+        }
+
+        function setSyncStatus(state, msg) {
+            let el = document.getElementById('sync-status');
+            if (!el) return;
+            if (state === 'syncing') { el.innerText = '⟳ SYNCING...'; el.style.color = '#888'; }
+            else if (state === 'ok') { el.innerText = '✅ SYNCED'; el.style.color = 'green'; }
+            else { el.innerText = 'âŒ SYNC ERROR: ' + msg; el.style.color = 'red'; }
+        }
+
+        /* Load data from Supabase on startup — SAFE VERSION
+           Rule: localStorage is the source of truth.
+           We only pull from Supabase if localStorage has NO projects.
+           We always push localStorage → Supabase on startup to keep cloud in sync. */
+        async function loadFromSupabase() {
+            try {
+                // Always load localStorage first
+                DB.load();
+
+                // 1. ALWAYS Fetch leads independently from Supabase
+                try {
+                    // Ensure local representation sorts by created_at safely so oldest goes bottom
+                    const leadFetch = await sb.from('leads').select('*').order('created_at', { ascending: false });
+                    let leads_data = [];
+                    if (leadFetch.error) {
+                        console.warn('[Flowra] Lead sorting failed, retrying unsorted...');
+                        const retryFetch = await sb.from('leads').select('*');
+                        leads_data = retryFetch.data;
+                    } else {
+                        leads_data = leadFetch.data;
+                    }
+                    
+                    if (leads_data && leads_data.length > 0) {
+                        DB.tables.leads = leads_data;
+                        DB.save();
+                        console.log('[Flowra] Leads synced from Supabase:', leads_data.length);
+                    }
+                } catch (e) { 
+                    console.error('[Flowra] Leads fetch crash:', e); 
+                }
+
+                // 1b. ALWAYS Fetch feedback independently from Supabase (newest first)
+                try {
+                    const { data: feedbackData, error: feedbackErr } = await sb.from('feedback').select('*').order('created_at', { ascending: false });
+                    if (feedbackErr) throw feedbackErr;
+                    if (feedbackData) {
+                        DB.tables.feedback = feedbackData;
+                        DB.save();
+                    }
+                } catch (e) {
+                    console.warn('[Flowra] Feedback fetch skipped:', e.message || e);
+                }
+
+                // 1c. ALWAYS Fetch team logs independently from Supabase (newest first)
+                try {
+                    const { data: teamData, error: teamErr } = await sb.from('team_logs').select('*').order('created_at', { ascending: false });
+                    if (teamErr) throw teamErr;
+                    if (teamData) {
+                        DB.tables.team = teamData;
+                        DB.save();
+                    }
+                } catch (e) {
+                    console.warn('[Flowra] Team logs fetch skipped:', e.message || e);
+                }
+
+                // 1d. ALWAYS Fetch invoice_lock independently from Supabase
+                try {
+                    const { data: invoiceLockData, error: invoiceLockErr } = await sb.from('invoice_lock').select('*');
+                    if (invoiceLockErr) throw invoiceLockErr;
+                    if (invoiceLockData) {
+                        DB.tables.invoices = invoiceLockData.map(mapInvoiceLockRowToLocalInvoice);
+                        DB.save();
+                    }
+                } catch (e) {
+                    console.warn('[Flowra] Invoice lock fetch skipped:', e.message || e);
+                }
+
+                // 2. Project/Task Logic: Local storage is source of truth for workspace activity
+                const hasLocalData = DB.tables.projects && DB.tables.projects.length > 0;
+
+                if (hasLocalData) {
+                    sortAllTablesNewestFirst();
+                    DB.save();
+                    syncToSupabase(); // Sync back to Supabase in background
+                    return true;
+                }
+
+                // Fetch Projects/Tasks from Cloud only if local is empty
+                try {
+                    const { data: projects } = await sb.from('projects').select('*').order('created_at', { ascending: false });
+                    const { data: tasks } = await sb.from('tasks').select('*').order('updated_at', { ascending: false });
+                    
+                    if (projects && projects.length > 0) {
+                        const projMap = {};
+                        projects.forEach(p => { projMap[p.id] = { ...p, tasks: [] }; });
+                        if (tasks) tasks.forEach(t => { if (projMap[t.project_id]) projMap[t.project_id].tasks.push(t); });
+                        DB.tables.projects = Object.values(projMap).map(p => ({
+                            ...p,
+                            tasks: sortNewestFirst(p.tasks || [], 'updated_at')
+                        }));
+                        sortAllTablesNewestFirst();
+                        DB.save();
+                    }
+                    return true;
+                } catch (e) { 
+                    console.warn('[Flowra] Cloud fetch failed:', e.message); 
+                }
+            } catch(err) {
+                console.error('[Flowra] Supabase load error:', err.message);
+            }
+            return false;
+        }
+
+        /* Generate safe unique string IDs to avoid Number precision bugs in inline HTML handlers.
+           Uses timestamp prefix so newest ID lexically sorts at the top */
+        function generateId() { return 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 5); }
+
+        function parseIdTimestamp(id) {
+            if (!id || typeof id !== 'string' || !id.startsWith('id_')) return 0;
+            const parts = id.split('_');
+            if (parts.length < 2) return 0;
+            const parsed = parseInt(parts[1], 36);
+            return Number.isFinite(parsed) ? parsed : 0;
+        }
+
+        function normalizeDateValue(value) {
+            if (!value) return 0;
+            const ms = new Date(value).getTime();
+            return Number.isFinite(ms) ? ms : 0;
+        }
+
+        function sortNewestFirst(items, dateField) {
+            if (!Array.isArray(items)) return [];
+            return items.slice().sort((a, b) => {
+                const aDate = normalizeDateValue(a && a[dateField]);
+                const bDate = normalizeDateValue(b && b[dateField]);
+                if (aDate !== bDate) return bDate - aDate;
+
+                const aIdTs = parseIdTimestamp(a && a.id);
+                const bIdTs = parseIdTimestamp(b && b.id);
+                if (aIdTs !== bIdTs) return bIdTs - aIdTs;
+
+                const aId = String((a && a.id) || '');
+                const bId = String((b && b.id) || '');
+                return bId.localeCompare(aId);
+            });
+        }
+
+        function sortAllTablesNewestFirst() {
+            DB.tables.leads = sortNewestFirst(DB.tables.leads || [], 'created_at');
+            DB.tables.projects = sortNewestFirst(DB.tables.projects || [], 'created_at').map(p => ({
+                ...p,
+                tasks: sortNewestFirst(p.tasks || [], 'updated_at')
+            }));
+            DB.tables.feedback = sortNewestFirst(DB.tables.feedback || [], 'created_at');
+            DB.tables.team = sortNewestFirst(DB.tables.team || [], 'created_at');
+            DB.tables.invoices = sortNewestFirst(DB.tables.invoices || [], 'created_at');
+        }
+
+        /* UI Switching */
+        function switchView(viewId) {
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            // Find nav item by onclick value
+            let foundNavItem = null;
+            document.querySelectorAll('.nav-menu .nav-item').forEach(el => {
+                if (el.getAttribute('onclick') && el.getAttribute('onclick').includes(`switchView('${viewId}')`)) {
+                    foundNavItem = el;
+                }
+            });
+            
+            if (foundNavItem) {
+                foundNavItem.classList.add('active');
+                document.getElementById('page-title').innerText = foundNavItem.innerText;
+            } else if (typeof event !== 'undefined' && event && event.currentTarget && event.currentTarget.classList) {
+                event.currentTarget.classList.add('active');
+                if (event.currentTarget.innerText) {
+                    document.getElementById('page-title').innerText = event.currentTarget.innerText;
+                }
+            }
+            
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            const targetSection = document.getElementById('view-' + viewId);
+            if (targetSection) targetSection.classList.add('active');
+        }
+
+        /* MODAL ENGINE */
+        function openModal(title, fields, onSubmit) {
+            document.getElementById('modalTitle').innerText = title;
+            const body = document.getElementById('modalBody');
+            body.innerHTML = fields.map(f => `
+                <div class="form-group">
+                    <label>${f.label}</label>
+                    ${f.type === 'textarea' ? `<textarea id="mod_${f.id}" rows="4">${f.val || ''}</textarea>` : f.type === 'select' ? `<select id="mod_${f.id}">${f.options.map(o => `<option value="${o}" ${f.val===o?'selected':''}>${o.toUpperCase()}</option>`).join('')}</select>` : `<input type="${f.type || 'text'}" id="mod_${f.id}" value="${f.val || ''}">`}
+                </div>
+            `).join('');
+            document.getElementById('customModal').style.display = 'flex';
+            document.getElementById('modalSubmit').onclick = () => {
+                const results = {}; fields.forEach(f => results[f.id] = document.getElementById('mod_' + f.id).value);
+                onSubmit(results); 
+            };
+        }
+        function closeModal() { document.getElementById('customModal').style.display = 'none'; }
+
+
+        function cleanCategory(name) {
+            if (!name) return name;
+            return name
+                .replace(/ðŸŸª/g, '🟪')
+                .replace(/ðŸŸ¦/g, '🟦')
+                .replace(/ðŸŸ§/g, '🟧')
+                .replace(/ðŸŸ©/g, '🟩')
+                .replace(/ðŸŸ¥/g, '🟥')
+                .replace(/ðŸŸ¨/g, '🟨')
+                .replace(/ðŸ“Š/g, '📊');
+        }
+
+        /* DB MOCKING SYSTEM (Local Storage) */
+        const DB = {
+            tables: { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [], invoices: [], automations: [] },
+            ensureShape: () => {
+                const defaults = { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [], invoices: [], automations: [] };
+                DB.tables = { ...defaults, ...(DB.tables || {}) };
+                Object.keys(defaults).forEach((k) => {
+                    if (!Array.isArray(DB.tables[k])) DB.tables[k] = defaults[k];
+                });
+                if (DB.tables.projects) {
+                    DB.tables.projects.forEach(p => {
+                        if (p.tasks) {
+                            p.tasks.forEach(t => {
+                                if (t.category) {
+                                    t.category = cleanCategory(t.category);
+                                }
+                            });
+                        }
+                    });
+                }
+            },
+            load: () => {
+                const saved = localStorage.getItem('flowra_mock_db_experimental');
+                if (saved) {
+                    DB.tables = JSON.parse(saved);
+                } else {
+                    DB.seed();
+                }
+                DB.ensureShape();
+            },
+            save: () => { DB.ensureShape(); localStorage.setItem('flowra_mock_db_experimental', JSON.stringify(DB.tables)); },
+            seed: () => {
+                DB.tables = {
+                    leads: [
+                        {
+                            id: "lead_re_1",
+                            name: "Sarah Jenkins (Buyer)",
+                            email: "sarah.jenkins@re.com",
+                            number: "+1 555-0192",
+                            status: "working",
+                            message: "[BUYER ENQUIRY] Looking for a 3-bedroom townhouse in suburban area.",
+                            created_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString()
+                        },
+                        {
+                            id: "lead_re_2",
+                            name: "David Miller (Seller)",
+                            email: "david.miller@re.com",
+                            number: "+1 555-0143",
+                            status: "working",
+                            message: "[PROPERTY LISTING] Urgent sale of 2-bedroom downtown condo.",
+                            created_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString()
+                        },
+                        {
+                            id: "lead_agency_1",
+                            name: "Vivid Branding Co",
+                            email: "hello@vividbranding.co",
+                            number: "+91 98765 43210",
+                            status: "working",
+                            message: "[AGENCY INQUIRY] Complete rebrand project including logo, assets, and design system.",
+                            created_at: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString()
+                        },
+                        {
+                            id: "lead_agency_2",
+                            name: "Nova Apparel",
+                            email: "contact@novaapparel.io",
+                            number: "+91 87654 32109",
+                            status: "new",
+                            message: "[QUERY] Request for Webflow custom Shopify integrated website.",
+                            created_at: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString()
+                        }
+                    ],
+                    projects: [
+                        {
+                            id: "proj_re_1",
+                            client_name: "Sarah Jenkins",
+                            project_name: "Sarah Jenkins - Home Acquisition",
+                            lead_id: "lead_re_1",
+                            created_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(),
+                            tasks: [
+                                { id: "t_re_1", category: "🏡 REAL ESTATE WORKFLOW", module: "Search & Showings", name: "Select townhouses matching criteria", notes: "Focus on suburbs with good school districts", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString() },
+                                { id: "t_re_2", category: "🏡 REAL ESTATE WORKFLOW", module: "Search & Showings", name: "Schedule home showings", notes: "Book for this weekend", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString() },
+                                { id: "t_re_3", category: "🏡 REAL ESTATE WORKFLOW", module: "Contracting & Escrow", name: "Draft and submit offer", notes: "Offer submitted at 5% below asking price", done: false, updated_at: new Date().toISOString() },
+                                { id: "t_re_4", category: "🏡 REAL ESTATE WORKFLOW", module: "Contracting & Escrow", name: "Open escrow & deposit earnest money", notes: "", done: false, updated_at: new Date().toISOString() },
+                                { id: "t_re_5", category: "🏡 REAL ESTATE WORKFLOW", module: "Closing & Transfer", name: "Arrange home inspection & appraisal", notes: "", done: false, updated_at: new Date().toISOString() }
+                            ]
+                        },
+                        {
+                            id: "proj_re_2",
+                            client_name: "David Miller",
+                            project_name: "David Miller - Property Listing",
+                            lead_id: "lead_re_2",
+                            created_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
+                            tasks: [
+                                { id: "t_re_6", category: "🏡 REAL ESTATE WORKFLOW", module: "Listing & Marketing", name: "Sign Listing Agreement & Disclosures", notes: "Standard 6% agent commission", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString() },
+                                { id: "t_re_7", category: "🏡 REAL ESTATE WORKFLOW", module: "Listing & Marketing", name: "Professional staging & photography", notes: "Scheduled for tomorrow afternoon", done: false, updated_at: new Date().toISOString() },
+                                { id: "t_re_8", category: "🏡 REAL ESTATE WORKFLOW", module: "Listing & Marketing", name: "Upload listing to MLS & syndication", notes: "", done: false, updated_at: new Date().toISOString() }
+                            ]
+                        },
+                        {
+                            id: "proj_agency_1",
+                            client_name: "Vivid Branding Co",
+                            project_name: "Vivid Branding - Logo & Guidelines",
+                            lead_id: "lead_agency_1",
+                            created_at: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString(),
+                            tasks: [
+                                { id: "t_ag_1", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Discovery & Briefing", name: "Conduct client kickoff call", notes: "Discuss style direction and brand pillars", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString() },
+                                { id: "t_ag_2", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Discovery & Briefing", name: "Create mood boards & style scape", notes: "Presented 3 options, client chose option B", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString() },
+                                { id: "t_ag_3", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Design & Copy", name: "Draft logo concepts (3 variations)", notes: "Working on modern brutalist style options", done: false, updated_at: new Date().toISOString() },
+                                { id: "t_ag_4", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Client Revisions", name: "Collect feedback round 1 & edit", notes: "", done: false, updated_at: new Date().toISOString() },
+                                { id: "t_ag_5", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Handover & Support", name: "Export logo package & guideline PDF", notes: "", done: false, updated_at: new Date().toISOString() }
+                            ]
+                        }
+                    ],
+                    meetings: [
+                        {
+                            id: "meet_1",
+                            title: "Sarah Jenkins - Home Showings",
+                            datetime: new Date(Date.now() + 2 * 24 * 3600 * 1000).toISOString().slice(0, 16),
+                            description: "Review property details and visit the suburban townhouses.",
+                            status: "Scheduled",
+                            created_at: new Date().toISOString()
+                        },
+                        {
+                            id: "meet_2",
+                            title: "Nova Apparel - Discovery Call",
+                            datetime: new Date(Date.now() + 1 * 24 * 3600 * 1000).toISOString().slice(0, 16),
+                            description: "Go through requirements for Shopify Webflow site.",
+                            status: "Scheduled",
+                            created_at: new Date().toISOString()
+                        }
+                    ],
+                    team: [],
+                    docs: [
+                        {
+                            id: "doc_1",
+                            name: "Real Estate Operations Guide.pdf",
+                            notes: "Internal SOPs for listing properties, scheduling viewings, and coordinating closings.",
+                            type: "Operations Guide",
+                            created_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString()
+                        },
+                        {
+                            id: "doc_2",
+                            name: "Creative Agency Playbook.pdf",
+                            notes: "Standard guidelines for creative briefing, mood boarding, revision rounds, and client handovers.",
+                            type: "Playbook",
+                            created_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString()
+                        }
+                    ],
+                    feedback: [
+                        {
+                            id: "fb_1",
+                            type: "Suggestion",
+                            description: "Add SMS notifications for showing schedules to real estate leads.",
+                            created_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString()
+                        }
+                    ],
+                    invoices: [
+                        {
+                            id: "inv_re_1",
+                            lead_id: "lead_re_1",
+                            lead_name: "Sarah Jenkins (Buyer)",
+                            project_name: "Sarah Jenkins - Home Acquisition",
+                            currency: "INR",
+                            base_amount: 250000,
+                            addon_amount: 0,
+                            total_amount: 250000,
+                            paid_amount: 100000,
+                            remaining_amount: 150000,
+                            invoice_status: "Sent",
+                            payment_status: "Partial Payment",
+                            due_now_amount: 100000,
+                            upfront_percent: 40,
+                            payment_method: "upi",
+                            notes: "Downpayment for escrow opening.",
+                            invoice_link: "https://flowra.io/invoices/inv_re_1"
+                        },
+                        {
+                            id: "inv_ag_1",
+                            lead_id: "lead_agency_1",
+                            lead_name: "Vivid Branding Co",
+                            project_name: "Vivid Branding - Logo & Guidelines",
+                            currency: "INR",
+                            base_amount: 120000,
+                            addon_amount: 30000,
+                            total_amount: 150000,
+                            paid_amount: 150000,
+                            remaining_amount: 0,
+                            invoice_status: "Sent",
+                            payment_status: "Fully Paid",
+                            due_now_amount: 150000,
+                            upfront_percent: 100,
+                            payment_method: "bank_transfer",
+                            notes: "100% upfront branding fee.",
+                            invoice_link: "https://flowra.io/invoices/inv_ag_1"
+                        },
+                        {
+                            id: "inv_ag_2",
+                            lead_id: "lead_agency_2",
+                            lead_name: "Nova Apparel",
+                            project_name: "Nova Apparel - Webflow E-Commerce",
+                            currency: "INR",
+                            base_amount: 200000,
+                            addon_amount: 0,
+                            total_amount: 200000,
+                            paid_amount: 0,
+                            remaining_amount: 200000,
+                            invoice_status: "Sent",
+                            payment_status: "Payment Pending",
+                            due_now_amount: 50000,
+                            upfront_percent: 25,
+                            payment_method: "upi",
+                            notes: "Awaiting retainer deposit.",
+                            invoice_link: "https://flowra.io/invoices/inv_ag_2"
+                        }
+                    ],
+                    automations: []
+                };
+                DB.save();
+            }
+        };
+
+        window.resetDemoData = function() { DB.seed(); renderAll(); closeModal(); document.getElementById('projectGeneratorModal').style.display='none';}
+
+        /* HARDCODED MODULE & TASK HIERARCHY */
+        const TASK_STRUCTURE = {
+            "🏡 REAL ESTATE WORKFLOW": {
+                "Listing & Marketing": ["Sign Listing Agreement & Disclosures", "Professional staging & photography", "Upload listing to MLS & syndication"],
+                "Search & Showings": ["Select townhouses matching criteria", "Schedule home showings", "Conduct virtual property tours"],
+                "Contracting & Escrow": ["Draft and submit purchase offer", "Open escrow & deposit earnest money", "Review seller disclosures"],
+                "Closing & Transfer": ["Arrange home inspection & appraisal", "Review Closing Disclosure", "Sign deed transfer & settle funds"]
+            },
+            "🎨 CREATIVE AGENCY WORKFLOW": {
+                "Discovery & Briefing": ["Conduct client kickoff call", "Create mood boards & style scape", "Finalize design brief"],
+                "Design & Copy": ["Draft logo concepts (3 variations)", "Draft brand identity guidebook", "Write homepage copy"],
+                "Client Revisions": ["Collect feedback round 1 & edit", "Collect feedback round 2 & edit"],
+                "Handover & Support": ["Export logo package & assets", "Deliver style guidelines PDF", "Conduct handoff meeting"]
+            },
+            "🟪 CUSTOMER AUTOMATION": {
+                "Website Chatbot": ["Setup chatbot", "Train on company data", "Connect to website"],
+                "WhatsApp / Call Handling": ["Setup WhatsApp flow", "Setup auto-reply"],
+                "Lead Capture System": ["Setup lead capture"],
+                "Missed Call Recovery": ["Setup fallback flow"]
+            },
+            "🟦 INTERNAL OPERATIONS": {
+                "Team Dashboard": ["Build dashboard UI"],
+                "Task Automation": ["Create task system", "Automate repetitive actions"],
+                "Workflow Automation": ["Connect database", "Setup internal tools"]
+            },
+            "🟧 SALES & FOLLOW-UP": {
+                "Lead Management": ["Setup lead tracking"],
+                "Follow-up Automation": ["Auto follow-up system"],
+                "Email Automation": ["Email templates", "CRM logic"]
+            },
+            "🟩 SCHEDULING & BOOKINGS": {
+                "Booking System": ["Create booking flow"],
+                "Slot Management": ["Assign slots"],
+                "Agent Assignment": ["Connect calendar", "Auto-confirm bookings"]
+            },
+            "🟥 OPERATIONS & DELIVERY": {
+                "Task Execution System": ["Assign delivery tasks"],
+                "Agent Flow": ["Setup notifications"],
+                "Notifications": ["Track completion"]
+            },
+            "🟨 INTELLIGENCE & ALERTS": {
+                "Predictive Alerts": ["Setup alerts"],
+                "Inventory Monitoring": ["Define triggers"],
+                "Usage Tracking": ["Connect data sources"]
+            },
+            "📊 ANALYTICS & INSIGHTS (CORE UPGRADE)": {
+                "Lead & Sales Visibility": ["Count total leads", "Track lead status (new → contacted → closed)", "Identify uncontacted leads", "Calculate conversion rate", "Show lead movement (pipeline flow)"],
+                "Operations Performance": ["Count total tasks", "Track completed vs pending", "Identify overdue tasks", "Measure response time", "Show workload distribution"]
+            },
+            "🟦 ADMIN / CONTROL SYSTEM": {
+                "Team Monitoring": ["Track tasks per member", "Track completed tasks", "Log working hours", "Show simple leaderboard", "Detect overloaded members"],
+                "Task Control": ["Assign task", "Reassign task", "Set priority", "Set deadline", "Update status"],
+                "Approval Flow (keep simple)": ["Submit for approval", "Approve / reject", "Add comment", "Log decision"]
+            },
+            "🟧 INTEGRATIONS (ONLY PRACTICAL ONES)": {
+                "Data Sync (KEEP THIS)": ["Sync leads to Google Sheets", "Backup data", "Export data", "Import external data"],
+                "Tool Sync (LIMITED)": ["Connect email (basic)", "Store communication logs", "Sync basic client info"]
+            }
+        };
+
+        /* --------------------------------------
+           PROJECT GENERATION ENGINE 
+           -------------------------------------- */
+
+        let activeLeadIdForGen = null;
+        window.openProjectGenerator = function(clientName = '', leadId = null) {
+            activeLeadIdForGen = leadId;
+            document.getElementById('gen-client').value = clientName || '';
+            document.getElementById('gen-title').value = '';
+            document.getElementById('gen-notes').value = '';
+            
+            let html = '';
+            Object.keys(TASK_STRUCTURE).forEach((cat) => {
+                const modules = TASK_STRUCTURE[cat];
+                html += `
+                    <div style="margin-bottom: 24px;">
+                        <h3 style="background:#eee; padding:8px; border:2px solid #111; font-size:14px; margin-bottom:12px;">${cat}</h3>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; padding-left:12px;">
+                            ${Object.keys(modules).map(mod => `
+                                <label style="display:flex; align-items:center; cursor:pointer; font-size:13px; font-weight:700;">
+                                    <input type="checkbox" class="proj-mod-checkbox" value="${cat}|||${mod}" style="width:16px; height:16px; margin-right:8px; border:2px solid #000;">
+                                    ${mod}
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>`;
+            });
+
+            document.getElementById('category-module-picker').innerHTML = html;
+            document.getElementById('projectGeneratorModal').style.display = 'flex';
+        }
+
+        window.submitProjectGeneration = function() {
+            const client = document.getElementById('gen-client').value || 'Unknown Client';
+            const title = document.getElementById('gen-title').value || 'Custom Workspace';
+            const globalNotes = document.getElementById('gen-notes').value;
+
+            let combinedTasks = [];
+            
+            // Generate tasks from checked modules
+            const checkboxes = document.querySelectorAll('.proj-mod-checkbox');
+            checkboxes.forEach(chk => {
+                if(chk.checked) {
+                    const parts = chk.value.split("|||");
+                    const cat = parts[0];
+                    const mod = parts[1];
+                    const defaultTasks = TASK_STRUCTURE[cat][mod];
+                    
+                    defaultTasks.forEach(taskName => {
+                        combinedTasks.push({
+                            id: generateId(),
+                            category: cat,
+                            module: mod,
+                            name: taskName,
+                            notes: '',
+                            done: false,
+                            updated_at: new Date().toISOString()
+                        });
+                    });
+                }
+            });
+
+            // Handle additional notes provided during generation
+            if(globalNotes.trim() !== "") {
+                combinedTasks.push({
+                    id: generateId(),
+                    category: "⬜ CUSTOM REQUEST",
+                    module: "Client Notes & Additions",
+                    name: "Execute Custom Scope given by Client",
+                    notes: globalNotes,
+                    done: false,
+                    updated_at: new Date().toISOString()
+                });
+            }
+
+            // Fallback if absolutely nothing is selected
+            if(combinedTasks.length === 0) {
+                combinedTasks.push({ id: generateId(), category: "⬜ CUSTOM", module: "General Setup", name: "Configure Project", notes: '', done: false, updated_at: new Date().toISOString() });
+            }
+
+            // Keep project ID stable per lead so all tasks for a client map to one project key.
+            let projectIdForPayload = null;
+            if (activeLeadIdForGen) {
+                const existingLeadProject = DB.tables.projects.find(p => p.lead_id === activeLeadIdForGen);
+                if (existingLeadProject) {
+                    projectIdForPayload = existingLeadProject.id;
+                    existingLeadProject.client_name = client;
+                    existingLeadProject.project_name = title;
+                    existingLeadProject.lead_id = activeLeadIdForGen;
+                    if (!Array.isArray(existingLeadProject.tasks)) existingLeadProject.tasks = [];
+                    existingLeadProject.tasks = existingLeadProject.tasks.concat(combinedTasks);
+                } else {
+                    projectIdForPayload = activeLeadIdForGen;
+                    DB.tables.projects.unshift({
+                        id: projectIdForPayload,
+                        client_name: client,
+                        project_name: title,
+                        tasks: combinedTasks,
+                        lead_id: activeLeadIdForGen,
+                        created_at: new Date().toISOString()
+                    });
+                }
+            } else {
+                projectIdForPayload = generateId();
+                DB.tables.projects.unshift({
+                    id: projectIdForPayload,
+                    client_name: client,
+                    project_name: title,
+                    tasks: combinedTasks,
+                    lead_id: null,
+                    created_at: new Date().toISOString()
+                });
+            }
+
+            // Trigger n8n Automation on Project Generation for Invoice/Task scaling
+            try {
+                if (!DB.tables.automations) DB.tables.automations = [];
+                DB.tables.automations.push({
+                    id: generateId(),
+                    title: 'Project creation workflow executed',
+                    related_entity: client,
+                    status: 'Successful',
+                    timestamp: new Date().toISOString()
+                });
+                DB.save();
+
+                const projectPayload = new URLSearchParams();
+                projectPayload.append('event', 'dev_project_created');
+                projectPayload.append('project_id', projectIdForPayload);
+                projectPayload.append('lead_id', activeLeadIdForGen || 'none');
+                projectPayload.append('client_name', client);
+                projectPayload.append('project_name', title);
+                projectPayload.append('tasks_json', JSON.stringify(combinedTasks));
+
+                fetch('YOUR_NEW_WEBHOOK_URL_HERE', {
+                    method: 'POST',
+                    body: projectPayload
+                }).catch(e => console.error("Webhook error:", e));
+            } catch(e) {
+                console.error(e);
+            }
+
+            // If this was started from a lead, update the lead status
+            if (activeLeadIdForGen) {
+                const lead = DB.tables.leads.find(l => l.id === activeLeadIdForGen);
+                if (lead) lead.status = 'working';
+                activeLeadIdForGen = null; 
+            }
+
+            DB.save(); syncToSupabase(); renderAll();
+            document.getElementById('projectGeneratorModal').style.display = 'none';
+        }
+
+        /* --------------------------------------
+           PROJECT CHECKLIST UI
+           -------------------------------------- */
+
+        function renderProjects() {
+            document.getElementById('projects-grid').innerHTML = DB.tables.projects.map(proj => {
+                let tasks = proj.tasks || [];
+                let total = tasks.length;
+                let done = tasks.filter(t => t.done).length;
+                let progress = total > 0 ? Math.round((done / total) * 100) : 0;
+
+                return `
+                <div class="card" style="position: relative;">
+                    <div class="flex-between" style="padding-right: 80px;">
+                        <div>
+                            <span style="font-weight:900; text-transform:uppercase; font-size:12px;">CLIENT: ${proj.client_name}</span>
+                            <h3 style="margin-bottom:0; font-size: 24px;">${proj.project_name}</h3>
+                        </div>
+                        <span style="font-weight:900; font-size:32px; color: ${progress===100?'#ff3c00':'var(--text-color)'}">${progress}%</span>
+                    </div>
+                    
+                    <div style="border: 4px solid var(--border-color); height: 28px; width: 100%; margin: 16px 0 24px 0; background: var(--bg-color); position: relative;">
+                        <div style="background: var(--accent-color); width: ${progress}%; height: 100%; border-right: ${progress > 0 && progress < 100 ? '4px solid var(--border-color)' : 'none'}; transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+                    </div>
+                    
+                    <div style="background:#fffebc; border: 3px solid var(--border-color); padding: 16px;">
+                        <div class="flex-between" style="border-bottom: 2px solid rgba(0,0,0,0.1); padding-bottom: 8px; margin-bottom:16px;">
+                            <h4 style="font-size:13px; text-transform:uppercase;">Execution Checklist:</h4>
+                            <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px;" onclick="addCustomTask('${proj.id}')">+ ADD AD-HOC TASK</button>
+                        </div>
+                        
+                        <div style="display:flex; flex-direction:column; gap:12px;">
+                            ${(proj.tasks || []).map((t) => `
+                                <div style="display:flex; flex-direction:column; padding-bottom:12px; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                                    <div style="font-weight:900; font-size:10px; margin-bottom:4px; opacity:0.8;">[${t.category}] ➡ ${t.module}</div>
+                                    <label style="display:flex; align-items:flex-start; cursor:pointer; font-weight: 700; font-size:14px; text-decoration: ${t.done?'line-through':'none'}; opacity: ${t.done?0.5:1}">
+                                        <input type="checkbox" ${t.done?'checked':''} onchange="toggleProjectTask('${proj.id}', '${t.id}')" style="width:18px; height:18px; margin-top:2px; margin-right:12px; cursor:pointer; border: 2px solid #000;">
+                                        <span>${t.name}</span>
+                                    </label>
+                                    ${t.notes ? `<div style="font-size:11px; font-weight:700; color:var(--accent-color); margin-left:30px; margin-top:4px; white-space: pre-wrap;">NOTES: ${t.notes}</div>` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        window.addCustomTask = function(projId) {
+            const proj = DB.tables.projects.find(p => p.id === projId);
+            if(!proj) return;
+
+            openModal("ADD AD-HOC TASK", [
+                {id: 'name', label: 'Actionable Task Name'},
+                {id: 'notes', label: 'Notes (e.g. from client meeting)', type: 'textarea'}
+            ], (res) => {
+                // Ensure name isn't blank
+                if(res.name && res.name.trim() !== '') {
+                    if(!proj.tasks) proj.tasks = [];
+                    proj.tasks.push({
+                        id: generateId(),
+                        category: '⬜ CUSTOM ADDITION',
+                        module: 'Ad-hoc Task',
+                        name: res.name,
+                        notes: res.notes,
+                        done: false,
+                        updated_at: new Date().toISOString()
+                    });
+                    DB.save(); syncToSupabase(); renderAll(); closeModal();
+                } else {
+                    alert('Task Name cannot be blank.');
+                }
+            });
+        }
+
+        window.toggleProjectTask = function(projId, taskId) {
+            const proj = DB.tables.projects.find(p => p.id === projId);
+            if(proj) {
+                if(!proj.tasks) proj.tasks = [];
+                const t = proj.tasks.find(x => x.id === taskId);
+                if(t) { 
+                    t.done = !t.done; 
+                    t.updated_at = new Date().toISOString();
+                    
+                    // Leaderboard Tracking: Record WHO completed this task
+                    if (t.done) {
+                        try {
+                            const session = JSON.parse(localStorage.getItem('flowra_session') || '{}');
+                            t.completed_by = session.email || 'Unknown Agent';
+                        } catch(e) { t.completed_by = 'Unknown Agent'; }
+                    } else {
+                        t.completed_by = null;
+                    }
+
+                    // AUTO-UPDATE ASSOCIATED LEAD STATUS
+                    if (proj.lead_id) {
+                        const lead = DB.tables.leads.find(l => l.id === proj.lead_id);
+                        if (lead) {
+                            const allDone = proj.tasks.length > 0 && proj.tasks.every(task => task.done);
+                            if (allDone) {
+                                lead.status = 'finished';
+                            } else if (lead.status === 'finished') {
+                                // If tasks are unchecked, revert from finished to working
+                                lead.status = 'working';
+                            }
+                        }
+                    }
+                    
+                    DB.save(); 
+                    syncToSupabase(); // Use full sync to ensure lead status is pushed
+                    renderAll(); 
+                }
+            }
+        }
+
+        /* --------------------------------------
+           OTHER DASHBOARD LOGIC
+           -------------------------------------- */
+
+        function formatRelativeTime(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins === 1) return '1 minute ago';
+            if (diffMins < 60) return diffMins + ' minutes ago';
+            
+            const diffHours = Math.floor(diffMins / 60);
+            if (diffHours === 1) return '1 hour ago';
+            if (diffHours < 24) return diffHours + ' hours ago';
+            
+            const diffDays = Math.floor(diffHours / 24);
+            if (diffDays === 1) return 'Yesterday';
+            return diffDays + ' days ago';
+        }
+
+        function getFlowTrackerEvents() {
+            let events = [];
+
+            // 1. Projects
+            (DB.tables.projects || []).forEach(p => {
+                if (p.created_at) {
+                    events.push({
+                        id: 'proj_create_' + p.id,
+                        module_type: 'PROJECT',
+                        title: 'Workspace activated',
+                        related_entity: p.client_name + ' - ' + p.project_name,
+                        status: 'Active',
+                        timestamp: p.created_at
+                    });
+                }
+                // Project Tasks
+                (p.tasks || []).forEach(t => {
+                    if (t.done && t.updated_at) {
+                        events.push({
+                            id: 'task_done_' + t.id,
+                            module_type: 'TASK',
+                            title: t.name,
+                            related_entity: p.client_name,
+                            status: 'Completed',
+                            timestamp: t.updated_at
+                        });
+                    }
+                });
+            });
+
+            // 2. Leads
+            (DB.tables.leads || []).forEach(l => {
+                if (l.created_at) {
+                    events.push({
+                        id: 'lead_create_' + l.id,
+                        module_type: 'LEAD',
+                        title: 'New inquiry captured',
+                        related_entity: l.name,
+                        status: l.status === 'new' ? 'Awaiting follow-up' : l.status.toUpperCase(),
+                        timestamp: l.created_at
+                    });
+                }
+            });
+
+            // 3. Meetings
+            (DB.tables.meetings || []).forEach(m => {
+                if (m.time) {
+                    const isPast = new Date(m.time).getTime() < Date.now();
+                    let leadName = 'Client';
+                    if (m.lead_id) {
+                        const lead = (DB.tables.leads || []).find(l => l.id === m.lead_id);
+                        if (lead) leadName = lead.name;
+                    }
+                    events.push({
+                        id: 'meet_' + m.id,
+                        module_type: 'MEETING',
+                        title: m.title,
+                        related_entity: leadName,
+                        status: isPast ? 'Completed' : 'Scheduled',
+                        timestamp: new Date(m.time).toISOString()
+                    });
+                }
+            });
+
+            // 4. Invoices
+            (DB.tables.invoices || []).forEach(i => {
+                if (i.created_at) {
+                    events.push({
+                        id: 'inv_create_' + i.id,
+                        module_type: 'INVOICE',
+                        title: `Invoice created (${i.payment_mode || 'Standard'})`,
+                        related_entity: i.lead_name + ' - ' + i.project_name,
+                        status: 'Sent',
+                        timestamp: i.created_at
+                    });
+                    if (i.paid_now_amount > 0) {
+                        events.push({
+                            id: 'inv_pay_' + i.id,
+                            module_type: 'INVOICE',
+                            title: `Payment received (${i.currency || 'INR'} ${i.paid_now_amount})`,
+                            related_entity: i.lead_name,
+                            status: 'Paid',
+                            timestamp: i.created_at
+                        });
+                    }
+                }
+            });
+
+            // 5. Automations
+            (DB.tables.automations || []).forEach(a => {
+                if (a.timestamp) {
+                    events.push({
+                        id: 'auto_' + a.id,
+                        module_type: 'AUTOMATION',
+                        title: a.title,
+                        related_entity: a.related_entity || 'System',
+                        status: a.status || 'Successful',
+                        timestamp: a.timestamp
+                    });
+                }
+            });
+
+            // Sort events by timestamp descending (newest first)
+            events.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+            // If empty, fall back to mock data
+            if (events.length === 0) {
+                const now = new Date();
+                events = [
+                    {
+                        id: 'mock_1',
+                        module_type: 'PROJECT',
+                        title: 'Workspace activated',
+                        related_entity: 'Raga Designers',
+                        status: 'Active',
+                        timestamp: new Date(now.getTime() - 2 * 60000).toISOString()
+                    },
+                    {
+                        id: 'mock_2',
+                        module_type: 'LEAD',
+                        title: 'New inquiry captured',
+                        related_entity: 'Elevate Consulting',
+                        status: 'Awaiting follow-up',
+                        timestamp: new Date(now.getTime() - 5 * 60000).toISOString()
+                    },
+                    {
+                        id: 'mock_3',
+                        module_type: 'MEETING',
+                        title: 'Discovery call booked',
+                        related_entity: 'Third Eye Blind Productions',
+                        status: 'Scheduled',
+                        timestamp: new Date(now.getTime() - 11 * 60000).toISOString()
+                    },
+                    {
+                        id: 'mock_4',
+                        module_type: 'TASK',
+                        title: 'Homepage automation approved by Chira',
+                        related_entity: 'Chira',
+                        status: 'Completed',
+                        timestamp: new Date(now.getTime() - 16 * 60000).toISOString()
+                    },
+                    {
+                        id: 'mock_5',
+                        module_type: 'AUTOMATION',
+                        title: 'Invoice reminder workflow executed',
+                        related_entity: 'Techasoft Pvt Ltd',
+                        status: 'Successful',
+                        timestamp: new Date(now.getTime() - 22 * 60000).toISOString()
+                    }
+                ];
+            }
+
+            return events;
+        }
+
+        function renderFlowTracker() {
+            const container = document.getElementById('flow-timeline-container');
+            if (!container) return;
+
+            const events = getFlowTrackerEvents();
+            
+            container.innerHTML = events.map((ev, index) => {
+                const isNewest = index === 0;
+                let badgeClass = 'badge-' + ev.module_type.toLowerCase();
+                
+                return `
+                    <div class="flow-card">
+                        <div class="flow-node">
+                            <div class="flow-bullet ${isNewest ? 'active-pulse' : ''}"></div>
+                            <div class="flow-line"></div>
+                        </div>
+                        <div class="flow-card-content">
+                            <div class="flow-card-meta">
+                                <span class="flow-badge ${badgeClass}">[${ev.module_type}]</span>
+                                <span class="flow-time">${formatRelativeTime(ev.timestamp)}</span>
+                            </div>
+                            <div class="flow-card-title">${ev.title}</div>
+                            <div class="flow-card-footer">
+                                <span style="font-size: 10px; font-weight: 700; opacity: 0.8; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    ${ev.related_entity}
+                                </span>
+                                <span class="flow-status" style="color: ${ev.status === 'Completed' || ev.status === 'Successful' || ev.status === 'Paid' ? '#10B981' : 'var(--text-color)'}">
+                                    ${ev.status}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderAll() {
+            DB.load();
+            sortAllTablesNewestFirst();
+            renderHomeMetrics(); renderLeads(); renderPlanner(); renderProjects(); renderTeam(); renderKnowledge(); renderFeedback(); renderFlowTracker(); renderRevenuePipeline();
+        }
+
+        function renderHomeMetrics() {
+            const leads = DB.tables.leads; 
+            document.getElementById('metric-leads-count').innerText = leads.length;
+            document.getElementById('metric-tasks-today').innerText = DB.tables.projects.length;
+
+            // Compute task completion across ALL projects
+            let totalTasks = 0, doneTasks = 0;
+            DB.tables.projects.forEach(p => {
+                (p.tasks || []).forEach(t => {
+                    totalTasks++;
+                    if (t.done) doneTasks++;
+                });
+            });
+            const pendingTasks = totalTasks - doneTasks;
+
+            document.getElementById('metric-pending-count').innerText = pendingTasks;
+            document.getElementById('metric-completed-count').innerText = doneTasks;
+
+            let allPendingTasks = [];
+            DB.tables.projects.forEach(p => { (p.tasks || []).forEach(t => { if(!t.done) allPendingTasks.push({proj: p.project_name, ...t}); }) });
+            allPendingTasks = sortNewestFirst(allPendingTasks, 'updated_at');
+            
+            document.getElementById('home-recent-tasks-body').innerHTML = allPendingTasks.slice(0, 5).map(task => `
+                <tr>
+                    <td><strong>${task.proj}</strong></td>
+                    <td><div style="font-weight:800; font-size:11px;">${task.category}</div></td>
+                    <td>
+                        <div style="font-weight:700">${task.name}</div>
+                        ${task.notes ? `<div style="font-size:10px; font-weight:700; color:var(--accent-color); white-space:pre-wrap;">NOTE: ${task.notes}</div>` : ''}
+                    </td>
+                    <td><span class="badge" style="background:#fffebc">PENDING</span></td>
+                </tr>
+            `).join('');
+        }
+
+        // LEADS 
+        function renderLeads() { 
+            const allLeads = DB.tables.leads || [];
+            
+            const prospects = allLeads.filter(l => !['working', 'finished', 'closed'].includes(l.status));
+            const clients = allLeads.filter(l => ['working', 'finished', 'closed'].includes(l.status));
+
+            const mapLeadToHtml = (lead) => {
+                const msg = lead.message || '';
+                
+                // Optimized category routing
+                let cat = 'QUERY', col = '#38BDF8', dMsg = msg;
+                const isWork = msg.includes('[BOOKING/ISSUE]') || msg.includes('[ISSUE DISCUSSION]') || msg.includes('[CALL BOOKED]') || msg.includes('[ISSUE]');
+                
+                if (isWork) {
+                    cat = 'BOOKING / ISSUE'; col = '#10B981';
+                    dMsg = msg.replace(/\[BOOKING\/ISSUE\]|\[ISSUE DISCUSSION\]|\[CALL BOOKED\]|\[ISSUE\]/, '').trim();
+                } else if (msg.includes('[QUERY]')) {
+                    dMsg = msg.replace('[QUERY]', '').trim();
+                } else if (!msg.trim()) {
+                    cat = 'SYSTEM'; col = '#5b5b5b'; dMsg = 'Manual Entry / Legacy Record';
+                }
+
+                const s = lead.status;
+                const sCol = s==='new'?'#ffdd00': s==='working'?'#ff3c00': s==='finished'?'#10B981': s==='closed'?'#ccffcc':'#ddddff';
+
+                // Safely format display number with + if numeric DB dropped it
+                let displayNumber = lead.number || '---';
+                if (displayNumber !== '---') {
+                    let numStr = String(displayNumber).replace(/\D/g, '');
+                    if (numStr.length >= 10 && !String(displayNumber).startsWith('+')) {
+                         // Check common prefixes to restore +
+                         if (numStr.startsWith('91') && numStr.length >= 12) displayNumber = '+' + numStr;
+                         else if (numStr.startsWith('1') && numStr.length === 11) displayNumber = '+' + numStr;
+                         else if (numStr.startsWith('44') && numStr.length >= 12) displayNumber = '+' + numStr;
+                         else if (numStr.startsWith('61') && numStr.length >= 11) displayNumber = '+' + numStr;
+                         else if (numStr.length > 10) displayNumber = '+' + numStr;
+                    }
+                }
+
+                const meet = (DB.tables.meetings || []).find(m => m.lead_id === lead.id);
+                let meetHtml = '';
+                if (meet) {
+                    const meetIsPast = meet.time && !isNaN(new Date(meet.time).getTime()) && new Date(meet.time).getTime() < Date.now();
+                    if (meetIsPast) {
+                        meetHtml = `
+                            <div style="margin-top:6px; padding:6px; border:2px dashed #bbb; background:#f5f5f5; font-size:11px; font-weight:800; color:#888;">
+                                ✅ PAST: ${meet.title}<br>
+                                <span style="font-size:9px;">Ended ${formatMeetingTime(meet.time)}</span>
+                            </div>
+                        `;
+                    } else {
+                        meetHtml = `
+                            <div style="margin-top:6px; padding:6px; border:2px solid var(--border-color); background:#fffebc; font-size:11px; font-weight:800; color:var(--accent-color);">
+                                📅 ${meet.title}<br>
+                                ⏰ ${formatMeetingTime(meet.time)}<br>
+                                <div style="display:flex; gap:4px; margin-top:4px; align-items:center;">
+                                    <input type="text" value="${meet.link}" readonly style="padding: 2px 4px; font-size: 10px; border:2px solid var(--border-color); cursor:pointer; width:120px;" onclick="window.open(this.value, '_blank')" title="Click to join meet">
+                                    <button class="btn btn-primary" style="padding: 2px 6px; font-size: 9px; box-shadow: 1px 1px 0 #000; border: 2px solid #000;" onclick="window.open('${meet.link}', '_blank')">JOIN</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+
+                return `<tr>
+                    <td><span class="badge" style="background:${col}; color:#fff; border:none;">${cat}</span></td>
+                    <td>
+                        <strong>${lead.name}</strong>
+                        ${lead.lead_lock ? `<a href="${lead.lead_lock}" target="_blank" class="badge" style="background:#000; color:#fff; text-decoration:none; margin-left:8px; font-size:9px;">🔗 LOCK</a>` : ''}
+                        ${meetHtml}
+                    </td>
+                    <td>${lead.email}</td>
+                    <td>${displayNumber}</td>
+                    <td><span style="font-size:12px; font-weight:700;">${dMsg.substring(0,40)}${dMsg.length > 40 ? '...' : ''}</span></td>
+                    <td><span class="badge" style="background:${sCol}; color: ${['working','finished'].includes(s)?'#fff':'#000'}">${s}</span></td>
+                    <td><div style="display:flex; gap:8px;">
+                        <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px; background:#000; border-color:#000;" onclick="openScheduleAction('${lead.name.replace(/'/g, "\\'")}', '${lead.id}')">SCHEDULE</button>
+                        <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px;" onclick="openProjectGenerator('${lead.name.replace(/'/g, "\\'")}', '${lead.id}')">START</button>
+                        <button class="btn" style="padding: 4px 8px; font-size:10px;" onclick="updateLeadStatus('${lead.id}')">EDIT</button>
+                    </div></td>
+                </tr>`;
+            };
+
+            document.getElementById('leads-prospects-table-body').innerHTML = prospects.length === 0
+                ? '<tr><td colspan="7" style="text-align:center; font-weight:700; opacity:0.5; padding:16px;">No active prospects.</td></tr>'
+                : prospects.map(mapLeadToHtml).join('');
+                
+            document.getElementById('leads-clients-table-body').innerHTML = clients.length === 0
+                ? '<tr><td colspan="7" style="text-align:center; font-weight:700; opacity:0.5; padding:16px;">No converted clients yet. Click START on a prospect to convert.</td></tr>'
+                : clients.map(mapLeadToHtml).join('');
+        }
+        window.createNewLead = function() { 
+            openModal("ADD NEW LEAD", [
+                {id: 'name', label: 'Full Name'}, 
+                {id: 'email', label: 'Email Address'}, 
+                {id: 'number', label: 'Mobile Number'}, 
+                {id: 'lead_lock', label: 'Lead Lock (Invoice Link)'},
+                {id: 'status', label: 'Initial Status', type: 'select', options: ['new', 'contacted', 'closed']}
+            ], (res) => { 
+                if(res.name) { 
+                    DB.tables.leads.unshift({ 
+                        id: generateId(), 
+                        name: res.name, 
+                        email: res.email, 
+                        number: res.number, 
+                        lead_lock: res.lead_lock,
+                        message: "", 
+                        status: res.status, 
+                        created_at: new Date().toISOString() 
+                    }); 
+                    DB.save(); renderAll(); syncToSupabase(); closeModal(); 
+                }
+            }); 
+        }
+        window.updateLeadStatus = function(id) { 
+            const lead = DB.tables.leads.find(l => l.id === id); 
+            if(lead) { 
+                openModal("UPDATE LEAD", [
+                    {id: 'name', label: 'Name', val: lead.name}, 
+                    {id: 'number', label: 'Number', val: lead.number || lead.mobile}, 
+                    {id: 'lead_lock', label: 'Lead Lock (Invoice Link)', val: lead.lead_lock || ''},
+                    {id: 'status', label: 'Status', type: 'select', options: ['new', 'contacted', 'working', 'finished', 'closed'], val: lead.status}
+                ], (res) => { 
+                    Object.assign(lead, {name: res.name, number: res.number, lead_lock: res.lead_lock, status: res.status}); 
+                    DB.save(); renderAll(); syncToSupabase(); closeModal(); 
+                }); 
+            } 
+        }
+
+        // TEAM LEADERBOARD & KNOWLEDGE
+        function renderTeam() { 
+            let scores = {};
+            DB.tables.projects.forEach(p => {
+                (p.tasks || []).forEach(t => {
+                    if (t.done && t.completed_by) {
+                        scores[t.completed_by] = (scores[t.completed_by] || 0) + 1;
+                    }
+                });
+            });
+
+            // Convert to array and sort
+            let sortedBoard = Object.keys(scores).map(member => ({ member, score: scores[member] }));
+            sortedBoard.sort((a, b) => b.score - a.score);
+
+            if (sortedBoard.length === 0) {
+                document.getElementById('team-table-body').innerHTML = `<tr><td colspan="4" style="text-align:center;font-weight:700;padding:24px;">No tasks completed yet. Start checking boxes!</td></tr>`;
+                return;
+            }
+
+            document.getElementById('team-table-body').innerHTML = sortedBoard.map((u, i) => `
+                <tr>
+                    <td><strong>#${i + 1}</strong></td>
+                    <td><strong>${u.member}</strong></td>
+                    <td><span class="badge" style="background:#000; color:#fff; font-size:14px;">${u.score} pts</span></td>
+                    <td><span class="badge" style="background:#ccffcc">Active</span></td>
+                </tr>
+            `).join(''); 
+        }
+        /* KNOWLEDGE BASE TAB SWITCHER */
+        function switchKBTab(tab) {
+            document.getElementById('kb-view-notes').style.display = tab === 'notes' ? 'block' : 'none';
+            document.getElementById('kb-view-docs').style.display = tab === 'docs' ? 'block' : 'none';
+            const notesBtn = document.getElementById('kb-tab-notes');
+            const docsBtn = document.getElementById('kb-tab-docs');
+            if (tab === 'notes') {
+                notesBtn.style.background = 'var(--text-color)'; notesBtn.style.color = 'var(--surface-color)';
+                docsBtn.style.background = 'var(--surface-color)'; docsBtn.style.color = 'var(--text-color)';
+            } else {
+                docsBtn.style.background = 'var(--text-color)'; docsBtn.style.color = 'var(--surface-color)';
+                notesBtn.style.background = 'var(--surface-color)'; notesBtn.style.color = 'var(--text-color)';
+            }
+        }
+
+        /* KNOWLEDGE BASE: ADD NOTE */
+        window.addKnowledgeNote = function() {
+            const title = document.getElementById('kb-note-title').value.trim();
+            const body = document.getElementById('kb-note-body').value.trim();
+            if (!title) { alert('Please enter a note title.'); return; }
+            if (!body) { alert('Please enter note content.'); return; }
+            DB.tables.docs.push({
+                id: generateId(),
+                title: title,
+                content: body,
+                type: 'note',
+                created_at: new Date().toISOString()
+            });
+            DB.save(); syncToSupabase(); renderKnowledge();
+            document.getElementById('kb-note-title').value = '';
+            document.getElementById('kb-note-body').value = '';
+        }
+
+        /* KNOWLEDGE BASE: ADD DOC (file upload or paste → saves to feedback table in Supabase) */
+        window.addKnowledgeDoc = async function() {
+            const fileInput = document.getElementById('kb-doc-file');
+            const pasteArea = document.getElementById('kb-doc-paste');
+            let titleInput = document.getElementById('kb-doc-title');
+            let docContent = '';
+            let docTitle = titleInput.value.trim();
+
+            // Read from file if selected
+            if (fileInput.files && fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                if (!docTitle) docTitle = file.name;
+                try {
+                    docContent = await file.text();
+                } catch(e) {
+                    alert('Could not read file. Please paste content instead.');
+                    return;
+                }
+            } else if (pasteArea.value.trim()) {
+                docContent = pasteArea.value.trim();
+            }
+
+            if (!docContent) { alert('Please select a file or paste document content.'); return; }
+            if (!docTitle) docTitle = 'Untitled Document';
+
+            // Save locally as a doc entry
+            const docEntry = {
+                id: generateId(),
+                title: docTitle,
+                content: docContent,
+                type: 'doc',
+                created_at: new Date().toISOString()
+            };
+            DB.tables.docs.push(docEntry);
+            DB.save();
+
+            // Also push to Supabase feedback table
+            try {
+                const feedbackRow = {
+                    id: docEntry.id,
+                    type: 'document',
+                    description: '[DOC: ' + docTitle + '] ' + docContent.substring(0, 500),
+                    created_at: docEntry.created_at
+                };
+                const { error } = await sb.from('feedback').upsert([feedbackRow], { onConflict: 'id' });
+                if (error) {
+                    console.error('[Flowra] Doc → feedback sync error:', error);
+                    alert('Doc saved locally but Supabase sync failed: ' + (error.message || JSON.stringify(error)));
+                } else {
+                    console.log('[Flowra] Doc synced to feedback table:', docTitle);
+                }
+            } catch(e) {
+                console.error('[Flowra] Doc Supabase push error:', e);
+                alert('Doc saved locally but could not connect to Supabase.');
+            }
+
+            renderKnowledge();
+            // Clear inputs
+            fileInput.value = '';
+            pasteArea.value = '';
+            titleInput.value = '';
+        }
+
+        /* Auto-fill doc title from file name */
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('kb-doc-file');
+            if (fileInput) {
+                fileInput.addEventListener('change', () => {
+                    if (fileInput.files && fileInput.files.length > 0) {
+                        const titleField = document.getElementById('kb-doc-title');
+                        if (titleField && !titleField.value.trim()) {
+                            titleField.value = fileInput.files[0].name;
+                        }
+                    }
+                });
+            }
+        });
+
+        function renderKnowledge() {
+            const notes = (DB.tables.docs || []).filter(d => d.type === 'note' || !d.type);
+            const docs = (DB.tables.docs || []).filter(d => d.type === 'doc');
+
+            document.getElementById('knowledge-notes-grid').innerHTML = notes.length === 0
+                ? '<div class="card" style="grid-column: 1/-1; text-align:center; font-weight:700; opacity:0.5;">No notes yet. Create your first note above.</div>'
+                : notes.map(doc => `<div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                        <h3 style="margin-bottom:8px;">📝 ${doc.title}</h3>
+                        <button class="btn" style="padding:2px 6px; font-size:10px;" onclick="deleteKBItem('${doc.id}')">✕</button>
+                    </div>
+                    <p style="font-size:13px; border-left: 3px solid var(--accent-color); padding: 8px 12px; background: #fff8f5; white-space:pre-wrap; flex:1;">${doc.content.length > 120 ? doc.content.substring(0,120) + '...' : doc.content}</p>
+                    <div style="font-size:10px; font-weight:700; margin-top:8px; opacity:0.5;">${doc.created_at ? new Date(doc.created_at).toLocaleDateString() : ''}</div>
+                </div>`).join('');
+
+            document.getElementById('knowledge-docs-grid').innerHTML = docs.length === 0
+                ? '<div class="card" style="grid-column: 1/-1; text-align:center; font-weight:700; opacity:0.5;">No documents yet. Upload or paste a document above.</div>'
+                : docs.map(doc => `<div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:start;">
+                        <h3 style="margin-bottom:8px;">📄 ${doc.title}</h3>
+                        <button class="btn" style="padding:2px 6px; font-size:10px;" onclick="deleteKBItem('${doc.id}')">✕</button>
+                    </div>
+                    <p style="font-size:13px; border-left: 3px solid #3b82f6; padding: 8px 12px; background: #f0f7ff; white-space:pre-wrap; flex:1;">${doc.content.length > 120 ? doc.content.substring(0,120) + '...' : doc.content}</p>
+                    <div style="font-size:10px; font-weight:700; margin-top:8px; opacity:0.5;">${doc.created_at ? new Date(doc.created_at).toLocaleDateString() : ''}</div>
+                </div>`).join('');
+        }
+
+        window.deleteKBItem = function(id) {
+            if (!confirm('Delete this item?')) return;
+            DB.tables.docs = (DB.tables.docs || []).filter(d => d.id !== id);
+            DB.save(); syncToSupabase(); renderKnowledge();
+        }
+
+        /* FEEDBACK: Submit to local + Supabase */
+        window.submitFeedback = async function() {
+            const input = document.getElementById('feedback-input');
+            const text = input.value.trim();
+            if (!text) { alert('Please enter feedback.'); return; }
+            const entry = {
+                id: generateId(),
+                type: 'idea',
+                description: text,
+                created_at: new Date().toISOString()
+            };
+            DB.tables.feedback.push(entry);
+            DB.save();
+
+            // Push to Supabase feedback table
+            try {
+                const { error } = await sb.from('feedback').upsert([entry], { onConflict: 'id' });
+                if (error) console.error('[Flowra] Feedback sync error:', error);
+            } catch(e) { console.error('[Flowra] Feedback push error:', e); }
+
+            renderFeedback();
+            input.value = '';
+        }
+
+        function renderFeedback() { document.getElementById('feedback-table-body').innerHTML = DB.tables.feedback.map(f => `<tr><td><span class="badge">${f.type}</span></td><td>${f.description}</td></tr>`).join(''); }
+        window.triggerAutomation = function(action) { 
+            if (!DB.tables.automations) DB.tables.automations = [];
+            DB.tables.automations.push({
+                id: generateId(),
+                title: `${action} playbook executed`,
+                related_entity: 'Manual Webhook',
+                status: 'Successful',
+                timestamp: new Date().toISOString()
+            });
+            DB.save();
+            renderAll();
+            alert(`Webhook Payload ready for: ${action}`); 
+        }
+        
+        window.triggerVoiceWebhook = function() {
+            const logs = document.getElementById('voice-logs');
+            if (!logs) return;
+            logs.innerHTML += `> [${new Date().toLocaleTimeString()}] Voice generator is disabled for now. Invoice pipeline remains active.<br>`;
+            logs.scrollTop = logs.scrollHeight;
+        }
+
+        function parseMoney(v) {
+            const n = Number(v);
+            return Number.isFinite(n) ? n : 0;
+        }
+
+        function roundMoney(v) {
+            return Number(parseMoney(v).toFixed(2));
+        }
+
+        function clampPercent(v, min, max) {
+            return Math.min(Math.max(parseMoney(v), min), max);
+        }
+
+        function normalizeInvoicePaymentMode(mode) {
+            const allowedModes = ['add_25_now', 'pay_full_now', 'pay_partial_of_upfront', 'add_another_invoice'];
+            return allowedModes.includes(mode) ? mode : 'add_25_now';
+        }
+
+        function getInvoiceModeLabel(mode) {
+            const labels = {
+                add_25_now: 'ADD 25% RIGHT NOW',
+                pay_full_now: 'PAY COMPLETELY RIGHT NOW',
+                pay_partial_of_upfront: 'PAY PARTIAL OF UPFRONT',
+                add_another_invoice: 'ADD ANOTHER INVOICE'
+            };
+            return labels[mode] || mode;
+        }
+
+        function normalizePaymentMethod(value) {
+            const methods = ['upi', 'bank_transfer', 'card', 'cash', 'cheque', 'other'];
+            return methods.includes(value) ? value : 'upi';
+        }
+
+        function uniqSorted(arr) {
+            return [...new Set((arr || []).filter(Boolean).map(x => String(x).trim()))].sort();
+        }
+
+        function buildLeadInvoiceModules(leadId, selectedProjectId) {
+            const relatedProjects = (DB.tables.projects || []).filter(p => {
+                if (selectedProjectId && p.id === selectedProjectId) return true;
+                if (!selectedProjectId && p.lead_id === leadId) return true;
+                return false;
+            });
+            const projectNames = relatedProjects.map(p => p.project_name || p.id);
+            const modules = [];
+            relatedProjects.forEach((p) => {
+                (p.tasks || []).forEach((t) => {
+                    if (t.module) modules.push(t.module);
+                });
+            });
+            return {
+                modules: uniqSorted(modules),
+                projectNames: uniqSorted(projectNames),
+                projectIds: uniqSorted(relatedProjects.map(p => p.id))
+            };
+        }
+
+        let invoiceModalState = {
+            leadId: null,
+            clientName: '',
+            paymentMode: 'add_25_now',
+            paymentMethod: 'upi'
+        };
+
+        function getSelectedInvoiceProjectRef() {
+            const sel = document.getElementById('invoice-project');
+            const projectId = sel ? sel.value : '';
+            const projectName = sel && sel.options[sel.selectedIndex] ? sel.options[sel.selectedIndex].text : 'Unassigned';
+            return {
+                selectedProjectId: projectId || null,
+                selectedProjectName: projectName || 'Unassigned'
+            };
+        }
+
+        function getLatestInvoiceContext(leadId, projectId) {
+            if (!leadId || !projectId) return null;
+            const contextInvoices = (DB.tables.invoices || []).filter((i) => i.lead_id === leadId && i.project_id === projectId);
+            return sortNewestFirst(contextInvoices, 'created_at')[0] || null;
+        }
+
+        function hydrateInvoiceFormFromHistory(leadId, projectId) {
+            const latestInvoice = getLatestInvoiceContext(leadId, projectId);
+            const setVal = (id, val) => {
+                const el = document.getElementById(id);
+                if (el) el.value = val;
+            };
+
+            if (!latestInvoice) {
+                setVal('invoice-base-amount', '0');
+                setVal('invoice-addon-amount', '0');
+                setVal('invoice-upfront-percent', '25');
+                setVal('invoice-partial-percent', '50');
+                setVal('invoice-currency', 'INR');
+                setVal('invoice-payment-method', 'upi');
+                setVal('invoice-notes', '');
+                setVal('invoice-link', '');
+                invoiceModalState.paymentMethod = 'upi';
+                return;
+            }
+
+            // Keep locked total sticky by default when user reopens scheduler.
+            setVal('invoice-base-amount', String(roundMoney(latestInvoice.locked_total_amount || 0)));
+            setVal('invoice-addon-amount', '0');
+            setVal('invoice-upfront-percent', String(clampPercent(latestInvoice.upfront_percent, 0, 100)));
+            setVal('invoice-partial-percent', String(clampPercent(latestInvoice.partial_percent_of_upfront, 0, 100)));
+            setVal('invoice-currency', String(latestInvoice.currency || 'INR'));
+
+            const paymentMethod = normalizePaymentMethod(latestInvoice.payment_method);
+            setVal('invoice-payment-method', paymentMethod);
+            invoiceModalState.paymentMethod = paymentMethod;
+            setVal('invoice-notes', latestInvoice.notes || '');
+            setVal('invoice-link', latestInvoice.invoice_link || '');
+        }
+
+        function getInvoiceComputation() {
+            const { selectedProjectId } = getSelectedInvoiceProjectRef();
+            const paymentMode = normalizeInvoicePaymentMode(invoiceModalState.paymentMode);
+            const baseAmount = Math.max(0, roundMoney(document.getElementById('invoice-base-amount')?.value));
+            const addonAmount = Math.max(0, roundMoney(document.getElementById('invoice-addon-amount')?.value));
+            const upfrontPercent = clampPercent(document.getElementById('invoice-upfront-percent')?.value, 0, 100);
+            const partialPercent = clampPercent(document.getElementById('invoice-partial-percent')?.value, 0, 100);
+
+            const contextInvoices = (DB.tables.invoices || []).filter(i => i.lead_id === invoiceModalState.leadId && i.project_id === selectedProjectId);
+            const latestInvoice = sortNewestFirst(contextInvoices, 'created_at')[0] || null;
+            const previousLockedTotal = latestInvoice ? roundMoney(latestInvoice.locked_total_amount) : 0;
+            const hasPriorInvoice = Boolean(latestInvoice);
+
+            let currentChargeBase = roundMoney(baseAmount + addonAmount);
+            let lockedTotal = currentChargeBase;
+            if (paymentMode === 'add_another_invoice' && hasPriorInvoice) {
+                currentChargeBase = addonAmount;
+                lockedTotal = roundMoney(previousLockedTotal + addonAmount);
+            }
+
+            const upfrontAmount = roundMoney(lockedTotal * (upfrontPercent / 100));
+            const upfrontOnCurrentCharge = roundMoney(currentChargeBase * (upfrontPercent / 100));
+
+            let dueNow = upfrontAmount;
+            if (paymentMode === 'pay_full_now') {
+                dueNow = roundMoney(lockedTotal);
+            }
+            if (paymentMode === 'pay_partial_of_upfront') {
+                dueNow = roundMoney(upfrontAmount * (partialPercent / 100));
+            }
+            if (paymentMode === 'add_another_invoice') {
+                dueNow = roundMoney(upfrontOnCurrentCharge);
+            }
+
+            dueNow = Math.max(0, Math.min(roundMoney(lockedTotal), dueNow));
+            const paidNowAmount = dueNow;
+            const remainingAmount = roundMoney(Math.max(0, lockedTotal - paidNowAmount));
+
+            return {
+                selectedProjectId,
+                paymentMode,
+                baseAmount,
+                addonAmount,
+                upfrontPercent,
+                partialPercent,
+                previousLockedTotal,
+                hasPriorInvoice,
+                currentChargeBase,
+                lockedTotal,
+                upfrontAmount,
+                dueNow,
+                paidNowAmount,
+                remainingAmount
+            };
+        }
+
+        function refreshInvoicePreview() {
+            const calc = getInvoiceComputation();
+            const mode = calc.paymentMode;
+            const paymentMethod = normalizePaymentMethod(document.getElementById('invoice-payment-method')?.value);
+            invoiceModalState.paymentMethod = paymentMethod;
+            const partialInput = document.getElementById('invoice-partial-percent');
+            if (partialInput) partialInput.disabled = mode !== 'pay_partial_of_upfront';
+
+            const total = calc.lockedTotal;
+            const paid = calc.paidNowAmount;
+            const remaining = Math.max(0, total - paid);
+
+            let paymentStatus = 'Payment Pending';
+            if (paid > 0 && remaining > 0) paymentStatus = 'Partial Payment';
+            else if (remaining === 0) paymentStatus = 'Fully Paid';
+
+            const setText = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) el.innerText = String(value);
+            };
+            setText('invoice-preview-locked', total.toFixed(2));
+            setText('invoice-preview-charge-base', calc.currentChargeBase.toFixed(2));
+            setText('invoice-preview-paid', paid.toFixed(2));
+            setText('invoice-preview-remaining', remaining.toFixed(2));
+            setText('invoice-preview-due', calc.dueNow.toFixed(2));
+            setText('invoice-preview-payment-status', paymentStatus);
+            setText('invoice-preview-invoice-status', 'Sent');
+            setText('invoice-preview-mode', getInvoiceModeLabel(mode));
+            setText('invoice-preview-method', paymentMethod.toUpperCase());
+
+            const stageSent = document.getElementById('pipeline-stage-sent');
+            const stagePartial = document.getElementById('pipeline-stage-partial');
+            const stageFull = document.getElementById('pipeline-stage-full');
+            
+            if (stageSent && stagePartial && stageFull) {
+                [stageSent, stagePartial, stageFull].forEach(el => {
+                    el.style.background = '#fff';
+                    el.style.color = '#888';
+                    el.style.borderColor = '#bbb';
+                    el.style.boxShadow = 'none';
+                });
+
+                if (paymentStatus === 'Payment Pending') {
+                    stageSent.style.background = '#ffdd00';
+                    stageSent.style.color = '#000';
+                    stageSent.style.borderColor = 'var(--border-color)';
+                    stageSent.style.boxShadow = '2px 2px 0 #000';
+                } else if (paymentStatus === 'Partial Payment') {
+                    stagePartial.style.background = '#ff8a65';
+                    stagePartial.style.color = '#fff';
+                    stagePartial.style.borderColor = 'var(--border-color)';
+                    stagePartial.style.boxShadow = '2px 2px 0 #000';
+                } else if (paymentStatus === 'Fully Paid') {
+                    stageFull.style.background = '#10B981';
+                    stageFull.style.color = '#fff';
+                    stageFull.style.borderColor = 'var(--border-color)';
+                    stageFull.style.boxShadow = '2px 2px 0 #000';
+                }
+            }
+
+            refreshInvoiceSendEligibility();
+        }
+
+        window.setInvoicePaymentMode = function(mode) {
+            invoiceModalState.paymentMode = normalizeInvoicePaymentMode(mode);
+            const modes = [
+                ['mode-add-25', 'add_25_now'],
+                ['mode-pay-full', 'pay_full_now'],
+                ['mode-pay-partial', 'pay_partial_of_upfront'],
+                ['mode-add-another', 'add_another_invoice']
+            ];
+            modes.forEach(([id, val]) => {
+                const btn = document.getElementById(id);
+                if (!btn) return;
+                if (val === invoiceModalState.paymentMode) {
+                    btn.classList.add('btn-primary');
+                } else {
+                    btn.classList.remove('btn-primary');
+                }
+            });
+            refreshInvoicePreview();
+        }
+
+        window.closeInvoiceModal = function() {
+            const modal = document.getElementById('invoiceModal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function setInvoiceSendButtonState(state = 'idle') {
+            const sendBtn = document.getElementById('invoice-send-btn');
+            if (!sendBtn) return;
+            if (state === 'sending') {
+                sendBtn.disabled = true;
+                sendBtn.textContent = 'SENDING...';
+                sendBtn.style.opacity = '0.8';
+                return;
+            }
+            if (state === 'sent') {
+                sendBtn.disabled = true;
+                sendBtn.textContent = 'SENT';
+                sendBtn.style.opacity = '1';
+                return;
+            }
+            sendBtn.textContent = 'SEND';
+            refreshInvoiceSendEligibility();
+        }
+
+        function canSendInvoiceNow() {
+            if (!invoiceModalState?.leadId) return false;
+
+            const leadName = String(document.getElementById('invoice-lead-name')?.value || '').trim();
+            const projectId = String(document.getElementById('invoice-project')?.value || '').trim();
+            const currency = String(document.getElementById('invoice-currency')?.value || '').trim();
+            const paymentMethod = String(document.getElementById('invoice-payment-method')?.value || '').trim();
+            const notes = String(document.getElementById('invoice-notes')?.value || '').trim();
+            if (!leadName || !projectId || !currency || !paymentMethod || !notes) return false;
+
+            const calc = getInvoiceComputation();
+            if (!calc || calc.lockedTotal <= 0) return false;
+            if (calc.baseAmount < 0 || calc.addonAmount < 0) return false;
+            if (calc.paymentMode === 'add_another_invoice' && (!calc.hasPriorInvoice || calc.addonAmount <= 0)) return false;
+            if (calc.paymentMode === 'pay_partial_of_upfront' && calc.partialPercent <= 0) return false;
+
+            return true;
+        }
+
+        function refreshInvoiceSendEligibility() {
+            const sendBtn = document.getElementById('invoice-send-btn');
+            if (!sendBtn) return;
+            const canSend = canSendInvoiceNow();
+            sendBtn.disabled = !canSend;
+            sendBtn.style.opacity = canSend ? '1' : '0.55';
+        }
+
+
+
+        window.openScheduleAction = function(clientName = '', leadId = null) {
+            openModal("SCHEDULE ACTION", [
+                {id: 'action', label: 'Choose Action', type: 'select', options: ['schedule_meeting', 'schedule_invoice'], val: 'schedule_meeting'}
+            ], (res) => {
+                const action = (res.action || '').toLowerCase();
+                if (action === 'schedule_invoice') {
+                    window.openInvoiceScheduler(clientName, leadId);
+                } else {
+                    window.openScheduler(clientName, leadId);
+                }
+            });
+        }
+
+        window.openInvoiceScheduler = function(clientName = '', leadId = null) {
+            const leadProjects = (DB.tables.projects || []).filter(p => p.lead_id === leadId);
+            invoiceModalState = {
+                leadId,
+                clientName: clientName || 'Unknown Client',
+                paymentMode: 'add_25_now',
+                paymentMethod: 'upi'
+            };
+
+            refreshInvoiceSendEligibility();
+
+            const leadInput = document.getElementById('invoice-lead-name');
+            if (leadInput) leadInput.value = invoiceModalState.clientName;
+
+            const projectSelect = document.getElementById('invoice-project');
+            if (projectSelect) {
+                projectSelect.innerHTML = '';
+                if (leadProjects.length > 0) {
+                    leadProjects.forEach((p) => {
+                        const opt = document.createElement('option');
+                        opt.value = p.id;
+                        opt.textContent = p.project_name || 'Unnamed Project';
+                        projectSelect.appendChild(opt);
+                    });
+                } else {
+                    const opt = document.createElement('option');
+                    opt.value = '';
+                    opt.textContent = 'No Linked Project';
+                    projectSelect.appendChild(opt);
+                }
+            }
+
+            ['invoice-project', 'invoice-base-amount', 'invoice-addon-amount', 'invoice-upfront-percent', 'invoice-partial-percent', 'invoice-currency', 'invoice-payment-method', 'invoice-notes', 'invoice-link']
+                .forEach((id) => {
+                    const el = document.getElementById(id);
+                    if (!el) return;
+                    el.oninput = refreshInvoicePreview;
+                    el.onchange = refreshInvoicePreview;
+                });
+
+            const projectSelectEl = document.getElementById('invoice-project');
+            if (projectSelectEl) {
+                projectSelectEl.onchange = () => {
+                    const selectedProjectId = projectSelectEl.value || null;
+                    hydrateInvoiceFormFromHistory(invoiceModalState.leadId, selectedProjectId);
+                    refreshInvoicePreview();
+                };
+            }
+
+            const { selectedProjectId } = getSelectedInvoiceProjectRef();
+            hydrateInvoiceFormFromHistory(invoiceModalState.leadId, selectedProjectId);
+
+            window.setInvoicePaymentMode('add_25_now');
+            const modal = document.getElementById('invoiceModal');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function buildInvoiceRecordFromForm() {
+            const { selectedProjectId, selectedProjectName } = getSelectedInvoiceProjectRef();
+            const calc = getInvoiceComputation();
+            const leadContext = buildLeadInvoiceModules(invoiceModalState.leadId, selectedProjectId);
+            const leadRecord = (DB.tables.leads || []).find((l) => l.id === invoiceModalState.leadId) || null;
+            const currencyRaw = document.getElementById('invoice-currency')?.value || 'INR';
+            const currency = String(currencyRaw).trim().toUpperCase().slice(0, 8) || 'INR';
+            const paymentMethod = normalizePaymentMethod(document.getElementById('invoice-payment-method')?.value);
+            const notes = document.getElementById('invoice-notes')?.value || '';
+            const invoiceLink = document.getElementById('invoice-link')?.value || '';
+
+            if (!invoiceModalState.leadId) {
+                alert('This lead is missing a valid ID. Open invoice from a lead row and try again.');
+                return null;
+            }
+
+            if (!selectedProjectId) {
+                alert('Please select a project before creating an invoice.');
+                return null;
+            }
+
+            if (calc.lockedTotal <= 0) {
+                alert('Locked total must be greater than 0.');
+                return null;
+            }
+
+            if (calc.paymentMode === 'add_another_invoice' && !calc.hasPriorInvoice) {
+                alert('No previous invoice found for this project. Use ADD 25% or PAY FULL for the first invoice.');
+                return null;
+            }
+
+            if (calc.paymentMode === 'add_another_invoice' && calc.addonAmount <= 0) {
+                alert('Add-on amount must be greater than 0 for ADD ANOTHER INVOICE mode.');
+                return null;
+            }
+
+            invoiceModalState.paymentMethod = paymentMethod;
+
+            const total = Number(calc.lockedTotal || 0);
+            const paid = Number(calc.paidNowAmount || 0);
+            const remaining = Math.max(0, total - paid);
+            let payStatus = 'Payment Pending';
+            if (paid > 0 && remaining > 0) payStatus = 'Partial Payment';
+            else if (remaining === 0) payStatus = 'Fully Paid';
+
+            return {
+                id: generateId(),
+                lead_id: invoiceModalState.leadId,
+                lead_name: invoiceModalState.clientName || 'Unknown Client',
+                lead_email: leadRecord ? (leadRecord.email || '') : '',
+                project_id: selectedProjectId,
+                project_name: selectedProjectName,
+                project_ids: leadContext.projectIds,
+                project_names: leadContext.projectNames,
+                modules: leadContext.modules,
+                payment_mode: calc.paymentMode,
+                payment_method: paymentMethod,
+                base_amount: calc.baseAmount,
+                addon_amount: calc.addonAmount,
+                previous_locked_total: calc.previousLockedTotal,
+                current_charge_base: calc.currentChargeBase,
+                locked_total_amount: total,
+                upfront_percent: calc.upfrontPercent,
+                upfront_amount: calc.upfrontAmount,
+                partial_percent_of_upfront: calc.partialPercent,
+                due_now_amount: calc.dueNow,
+                paid_now_amount: paid,
+                remaining_amount: remaining,
+                total_amount: total,
+                paid_amount: paid,
+                invoice_status: 'Sent',
+                payment_status: payStatus,
+                currency,
+                notes,
+                invoice_link: invoiceLink,
+                created_at: new Date().toISOString()
+            };
+        }
+
+        async function syncSingleInvoiceToSupabase(invoiceRecord) {
+            const invoiceLockRow = mapInvoiceRecordToInvoiceLockRow(invoiceRecord);
+            await upsertInvoiceLockRow(invoiceLockRow);
+            return 'invoice_lock';
+        }
+
+        async function triggerInvoiceWebhook(invoiceRecord) {
+            if (!invoiceRecord) return;
+            try {
+                if (!DB.tables.automations) DB.tables.automations = [];
+                DB.tables.automations.push({
+                    id: generateId(),
+                    title: 'Invoice automation triggered',
+                    related_entity: invoiceRecord.lead_name,
+                    status: 'Successful',
+                    timestamp: new Date().toISOString()
+                });
+                DB.save();
+
+                const payload = new URLSearchParams();
+                payload.append('event', 'invoice_submitted');
+                
+                // Map every field to form-data for n8n compatibility
+                Object.keys(invoiceRecord).forEach(key => {
+                    let val = invoiceRecord[key];
+                    if (Array.isArray(val) || (typeof val === 'object' && val !== null)) {
+                        payload.append(key, JSON.stringify(val));
+                    } else {
+                        payload.append(key, val);
+                    }
+                });
+
+                return fetch('https://havslayer.app.n8n.cloud/webhook/2190b590-cd74-4e51-af86-a1308e78c940', {
+                    method: 'POST',
+                    body: payload
+                });
+            } catch (e) {
+                console.error('[Flowra] Webhook trigger failed:', e);
+            }
+        }
+
+        async function persistInvoiceRecord(invoiceRecord) {
+            if (!invoiceRecord) return false;
+
+            if (!Array.isArray(DB.tables.invoices)) DB.tables.invoices = [];
+            DB.tables.invoices.unshift(invoiceRecord);
+
+            // Sync invoice link to the lead's master lock field for dashboard visibility
+            const lead = (DB.tables.leads || []).find(l => l.id === invoiceRecord.lead_id);
+            if (lead && invoiceRecord.invoice_link) {
+                lead.lead_lock = invoiceRecord.invoice_link;
+            }
+
+            DB.save();
+
+            try {
+                await syncSingleInvoiceToSupabase(invoiceRecord);
+            } catch (e) {
+                console.error('[Flowra] Invoice cloud sync failed:', e);
+                setSyncStatus('error', e.message || 'Invoice sync failed');
+                renderAll();
+                alert('Invoice saved locally, but failed to save in Supabase invoice_lock table. Check RLS and table permissions.');
+                return false;
+            }
+
+            await syncToSupabase();
+            renderAll();
+            return true;
+        }
+
+        window.saveInvoiceScheduler = async function() {
+            const invoiceRecord = buildInvoiceRecordFromForm();
+            if (!invoiceRecord) return;
+            const synced = await persistInvoiceRecord(invoiceRecord);
+            if (!synced) return;
+            
+            // Trigger webhook on Submit/Save as well
+            triggerInvoiceWebhook(invoiceRecord).catch(e => console.error(e));
+
+            closeInvoiceModal();
+            alert(`Invoice saved. Due now: ${invoiceRecord.currency} ${invoiceRecord.due_now_amount.toFixed(2)} | Remaining: ${invoiceRecord.currency} ${invoiceRecord.remaining_amount.toFixed(2)} | Method: ${invoiceRecord.payment_method.toUpperCase()}`);
+        }
+
+        function buildInstantInvoiceWebhookRecord() {
+            const { selectedProjectId, selectedProjectName } = getSelectedInvoiceProjectRef();
+            const calc = getInvoiceComputation();
+            const leadId = invoiceModalState?.leadId || 'none';
+            const leadName = invoiceModalState?.clientName || 'Unknown Client';
+            const leadRecord = (DB.tables.leads || []).find((l) => l.id === leadId) || null;
+            const leadContext = buildLeadInvoiceModules(leadId, selectedProjectId);
+            const currencyRaw = document.getElementById('invoice-currency')?.value || 'INR';
+            const currency = String(currencyRaw).trim().toUpperCase().slice(0, 8) || 'INR';
+            const paymentMethod = normalizePaymentMethod(document.getElementById('invoice-payment-method')?.value);
+            const notes = document.getElementById('invoice-notes')?.value || '';
+            const invoiceLink = document.getElementById('invoice-link')?.value || '';
+
+            const total = Number(calc.lockedTotal || 0);
+            const paid = Number(calc.paidNowAmount || 0);
+            const remaining = Math.max(0, total - paid);
+            let payStatus = 'Payment Pending';
+            if (paid > 0 && remaining > 0) payStatus = 'Partial Payment';
+            else if (remaining === 0) payStatus = 'Fully Paid';
+
+            return {
+                id: generateId(),
+                lead_id: leadId,
+                lead_name: leadName,
+                lead_email: leadRecord ? (leadRecord.email || '') : '',
+                project_id: selectedProjectId || 'none',
+                project_name: selectedProjectName || 'Unassigned',
+                project_ids: leadContext.projectIds || [],
+                project_names: leadContext.projectNames || [],
+                modules: leadContext.modules || [],
+                payment_mode: calc.paymentMode || invoiceModalState?.paymentMode || 'add_25_now',
+                payment_method: paymentMethod || 'upi',
+                base_amount: Number(calc.baseAmount || 0),
+                addon_amount: Number(calc.addonAmount || 0),
+                previous_locked_total: Number(calc.previousLockedTotal || 0),
+                current_charge_base: Number(calc.currentChargeBase || 0),
+                locked_total_amount: total,
+                upfront_percent: Number(calc.upfrontPercent || 25),
+                upfront_amount: Number(calc.upfrontAmount || 0),
+                partial_percent_of_upfront: Number(calc.partialPercent || 0),
+                due_now_amount: Number(calc.dueNow || 0),
+                paid_now_amount: paid,
+                remaining_amount: remaining,
+                total_amount: total,
+                paid_amount: paid,
+                invoice_status: 'Sent',
+                payment_status: payStatus,
+                currency,
+                notes,
+                invoice_link: invoiceLink,
+                created_at: new Date().toISOString()
+            };
+        }
+
+        window.sendInvoiceScheduler = async function() {
+            if (!canSendInvoiceNow()) {
+                alert('Fill all invoice fields before sending.');
+                refreshInvoiceSendEligibility();
+                return;
+            }
+            const invoiceRecord = buildInstantInvoiceWebhookRecord();
+            setInvoiceSendButtonState('sending');
+            
+            try {
+                // 1. Trigger Webhook (using original form-data pattern)
+                const payload = new URLSearchParams();
+                payload.append('event', 'invoice_submitted');
+                Object.keys(invoiceRecord).forEach(key => {
+                    let val = invoiceRecord[key];
+                    payload.append(key, (typeof val === 'object' && val !== null) ? JSON.stringify(val) : val);
+                });
+
+                const response = await fetch('https://havslayer.app.n8n.cloud/webhook/2190b590-cd74-4e51-af86-a1308e78c940', {
+                    method: 'POST',
+                    body: payload
+                });
+
+                if (!response.ok) console.warn('Webhook responded with error, but proceeding with save.');
+                
+                // 2. Save to Supabase and Local
+                await persistInvoiceRecord(invoiceRecord);
+                renderAll();
+
+                setInvoiceSendButtonState('sent');
+                setTimeout(() => {
+                    closeInvoiceModal();
+                    alert('SUCCESS: Invoice saved and sent to automation!');
+                }, 500);
+            } catch (e) {
+                console.error('[Flowra] Invoice operation failed:', e);
+                setInvoiceSendButtonState('idle');
+                alert(`Error: ${e.message || 'Check connection'}`);
+            }
+        }
+
+        // Backward compatibility for older button references.
+        window.submitInvoiceScheduler = window.saveInvoiceScheduler;
+
+        // Helper: format ISO datetime string to human-readable e.g. "Sat May 24, 10:30 AM"
+        function formatMeetingTime(timeStr) {
+            if (!timeStr) return '---';
+            const d = new Date(timeStr);
+            if (isNaN(d.getTime())) return timeStr; // fallback for old text-based times
+            return d.toLocaleString('en-IN', { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+        }
+
+        window.openScheduler = function(clientName = '', leadId = null) {
+            const existingMeet = leadId ? (DB.tables.meetings || []).find(m => m.lead_id === leadId) : null;
+            const defaultMeetLink = existingMeet ? existingMeet.link : `https://meet.jit.si/flowra-meet-${leadId || generateId()}`;
+            const defaultTitle = existingMeet ? existingMeet.title : (clientName ? `${clientName} Discovery` : '');
+
+            // Default datetime: tomorrow 10:00 AM
+            let defaultTime = '';
+            if (existingMeet && existingMeet.time) {
+                defaultTime = existingMeet.time;
+            } else {
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                tomorrow.setHours(10, 0, 0, 0);
+                defaultTime = tomorrow.toISOString().slice(0, 16); // "YYYY-MM-DDTHH:MM"
+            }
+
+            openModal("SCHEDULE MEETING / DEAL CALL", [
+                {id: 'title', label: 'Meeting Title (e.g. Discovery Call)', val: defaultTitle},
+                {id: 'time', label: 'Date & Time', val: defaultTime, type: 'datetime-local'},
+                {id: 'link', label: 'Meeting Link', val: defaultMeetLink}
+            ], (res) => {
+                if(res.title && res.time) {
+                    if(!DB.tables.meetings) DB.tables.meetings = [];
+                    // Overwrite if existing meeting for this lead, otherwise create new
+                    const existingIndex = leadId ? DB.tables.meetings.findIndex(m => m.lead_id === leadId) : -1;
+                    const newMeet = {
+                        id: existingIndex >= 0 ? DB.tables.meetings[existingIndex].id : generateId(),
+                        title: res.title,
+                        time: res.time,
+                        link: res.link || defaultMeetLink,
+                        lead_id: leadId
+                    };
+                    if (existingIndex >= 0) {
+                        DB.tables.meetings[existingIndex] = newMeet;
+                    } else {
+                        DB.tables.meetings.push(newMeet);
+                    }
+                    DB.save(); syncToSupabase(); renderAll(); closeModal();
+                }
+            });
+        }
+
+        function renderPlanner() {
+            const list = document.getElementById('meetings-list');
+            if(!list) return;
+
+            const now = Date.now();
+            const allMeetings = DB.tables.meetings || [];
+
+            // Split into upcoming and past
+            const upcomingMeetings = allMeetings
+                .filter(m => {
+                    const t = new Date(m.time).getTime();
+                    return isNaN(t) || t >= now; // include legacy text-based times in upcoming
+                })
+                .sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime()); // soonest first
+
+            const pastMeetings = allMeetings
+                .filter(m => {
+                    const t = new Date(m.time).getTime();
+                    return !isNaN(t) && t < now;
+                })
+                .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()); // most recent first
+
+            // Update active meeting card (next upcoming only)
+            const activeCard = document.getElementById('active-meeting-card');
+            if (activeCard) {
+                if (upcomingMeetings.length > 0) {
+                    const nextMeet = upcomingMeetings[0];
+                    activeCard.innerHTML = `
+                        <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px;">Next Scheduled Meetup</h3>
+                        <div style="font-weight: 900; font-size: 28px; color: var(--accent-color); margin: 16px 0; line-height: 1.2;">${formatMeetingTime(nextMeet.time)}</div>
+                        <p style="font-weight: 800; font-size: 16px; margin-bottom: 16px;">${nextMeet.title}</p>
+                        <div style="font-size: 12px; font-weight: 800; background: var(--bg-color); padding: 12px; border: 3px solid var(--border-color); margin-bottom: 12px;">
+                            <strong>Participants:</strong> Chira, Rudra, Client<br>
+                            <strong>Room Link:</strong> <span style="word-break: break-all; color: var(--accent-color);">${nextMeet.link || '---'}</span>
+                        </div>
+                        <button class="btn btn-primary" style="width: 100%; border-color: var(--border-color);" onclick="window.open('${nextMeet.link}', '_blank')">JOIN MEETING ROOM</button>
+                    `;
+                } else {
+                    activeCard.innerHTML = `
+                        <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px;">No Upcoming Meetings</h3>
+                        <div style="font-weight: 900; font-size: 24px; color: #888; margin: 24px 0; text-align: center;">📅 Free Schedule</div>
+                        <p style="font-weight: 800; font-size: 14px; text-align: center; color: #666; margin-bottom: 16px;">No upcoming deal calls or meetings on the calendar.</p>
+                        <button class="btn" style="width: 100%;" onclick="switchView('leads')">GO TO LEADS & CLIENTS</button>
+                    `;
+                }
+            }
+
+            // Render upcoming list
+            if (upcomingMeetings.length === 0) {
+                list.innerHTML = `<li style="padding: 12px; font-weight: 800; font-size: 12px; text-align: center; color: #888;">No upcoming deals scheduled.</li>`;
+            } else {
+                list.innerHTML = upcomingMeetings.map(m => `
+                    <li style="border: 2px solid var(--border-color); padding: 12px; font-weight: 800; font-size: 11px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-color);">
+                        <div style="display: flex; flex-direction: column; max-width: 60%;">
+                            <span>${m.title}</span>
+                            <a href="${m.link}" target="_blank" style="font-size: 9px; color: var(--accent-color); word-break: break-all; margin-top: 4px;">${m.link}</a>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span class="badge" style="background:#ccffcc; font-size: 9px; min-width: 80px; text-align: center;">${formatMeetingTime(m.time)}</span>
+                            <button class="btn btn-primary" style="padding: 2px 6px; font-size: 9px; box-shadow: 1px 1px 0 #000; border: 2px solid #000;" onclick="window.open('${m.link}', '_blank')">JOIN</button>
+                            <button class="btn" style="padding: 2px 6px; font-size: 9px; box-shadow: 1px 1px 0 #000; border: 2px solid #000; background: #ffcccc;" onclick="deleteMeeting('${m.id}')">X</button>
+                        </div>
+                    </li>
+                `).join('');
+            }
+
+            // Render past meetings / history
+            const pastList = document.getElementById('past-meetings-list');
+            const historySection = document.getElementById('meeting-history-section');
+            if (pastList) {
+                if (pastMeetings.length === 0) {
+                    historySection && (historySection.style.display = 'none');
+                } else {
+                    historySection && (historySection.style.display = '');
+                    pastList.innerHTML = pastMeetings.map(m => `
+                        <li style="border: 2px dashed #bbb; padding: 10px 12px; font-weight: 800; font-size: 11px; display: flex; justify-content: space-between; align-items: center; background: #f9f9f9; color: #777;">
+                            <div style="display: flex; flex-direction: column; max-width: 65%;">
+                                <span style="color: #555;">✅ ${m.title}</span>
+                                <span style="font-size: 9px; margin-top: 3px; color: #999;">Ended ${formatMeetingTime(m.time)}</span>
+                            </div>
+                            <button class="btn" style="padding: 2px 6px; font-size: 9px; border: 2px solid #bbb; background: #eee; color: #777;" onclick="deleteMeeting('${m.id}')">DELETE</button>
+                        </li>
+                    `).join('');
+                }
+            }
+        }
+
+        function renderRevenuePipeline() {
+            const tbody = document.getElementById('revenue-pipeline-tbody');
+            if (!tbody) return;
+
+            const invoices = DB.tables.invoices || [];
+            if (invoices.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; font-weight:700; opacity:0.5; padding:16px;">No invoices found.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = invoices.map(i => {
+                const total = Number(i.total_amount || i.locked_total_amount || 0);
+                const paid = Number(i.paid_amount || i.paid_now_amount || 0);
+                const remaining = Math.max(0, total - paid);
+                
+                let paymentStatus = i.payment_status;
+                if (!paymentStatus) {
+                    paymentStatus = paid === 0 ? 'Payment Pending' : (remaining > 0 ? 'Partial Payment' : 'Fully Paid');
+                }
+
+                let badgeColor = '#ffdd00'; // Pending = yellow
+                let textColor = '#000';
+                if (paymentStatus === 'Partial Payment') {
+                    badgeColor = '#ff8a65'; // Partial = orange
+                    textColor = '#fff';
+                } else if (paymentStatus === 'Fully Paid') {
+                    badgeColor = '#10B981'; // Fully Paid = green
+                    textColor = '#fff';
+                }
+
+                const displayTotal = `${i.currency || 'INR'} ${total.toFixed(2)}`;
+                const displayPaid = `${i.currency || 'INR'} ${paid.toFixed(2)}`;
+                const displayRemaining = `${i.currency || 'INR'} ${remaining.toFixed(2)}`;
+
+                return `<tr>
+                    <td><strong>${i.lead_name}</strong></td>
+                    <td>${i.project_name || 'Unassigned'}</td>
+                    <td>${displayTotal}</td>
+                    <td>${displayPaid}</td>
+                    <td>${displayRemaining}</td>
+                    <td><span class="badge" style="background:#000; color:#fff; border:none;">${i.invoice_status || 'Sent'}</span></td>
+                    <td><span class="badge" style="background:${badgeColor}; color:${textColor}; border:none;">${paymentStatus}</span></td>
+                    <td><button class="btn btn-primary" style="padding:4px 8px; font-size:10px;" onclick="recordPayment('${i.id}')">RECORD PAYMENT</button></td>
+                </tr>`;
+            }).join('');
+        }
+
+        window.recordPayment = function(invoiceId) {
+            const inv = DB.tables.invoices.find(i => i.id === invoiceId);
+            if (!inv) return;
+            
+            const total = Number(inv.total_amount || inv.locked_total_amount || 0);
+            const currentPaid = Number(inv.paid_amount || inv.paid_now_amount || 0);
+
+            openModal("RECORD PAYMENT", [
+                {id: 'paid_amount', label: `Amount Paid So Far (Total: ${inv.currency || 'INR'} ${total.toFixed(2)})`, type: 'number', val: currentPaid}
+            ], (res) => {
+                const paid = Math.max(0, Number(res.paid_amount || 0));
+                const remaining = Math.max(0, total - paid);
+                
+                let paymentStatus = 'Payment Pending';
+                if (paid > 0 && remaining > 0) paymentStatus = 'Partial Payment';
+                else if (remaining === 0) paymentStatus = 'Fully Paid';
+
+                Object.assign(inv, {
+                    paid_amount: paid,
+                    paid_now_amount: paid,
+                    remaining_amount: remaining,
+                    payment_status: paymentStatus
+                });
+
+                DB.save();
+                renderAll();
+                syncToSupabase();
+                closeModal();
+            });
+        }
+
+        window.deleteMeeting = function(meetingId) {
+            if (confirm("Are you sure you want to cancel and delete this scheduled meeting?")) {
+                DB.tables.meetings = (DB.tables.meetings || []).filter(m => m.id !== meetingId);
+                DB.save();
+                syncToSupabase();
+                renderAll();
+            }
+        }
+        
+        window.onload = async () => {
+            const sessionData = localStorage.getItem('flowra_session');
+            if (sessionData) {
+                try {
+                    const session = JSON.parse(sessionData);
+                    let roleStr = session.email;
+                    if (session.email === "iblamechira@gmail.com") roleStr = "CHIRA (FOUNDER)";
+                    else if (session.email === "rudraprakash18@outlook.com") roleStr = "RUDRA (CO-FOUNDER)";
+                    const adminLabel = document.getElementById('admin-email');
+                    if (adminLabel) adminLabel.innerText = roleStr;
+                } catch(e) {}
+            }
+            // Attempt Supabase load first; fall back to localStorage
+            const fromCloud = await loadFromSupabase();
+            if (!fromCloud) DB.load();
+            renderAll();
+
+            // Handle URL parameters or hash to open specific tab on page load
+            const urlParams = new URLSearchParams(window.location.search);
+            const viewParam = urlParams.get('view') || window.location.hash.substring(1);
+            if (viewParam) {
+                switchView(viewParam);
+            }
+        };
+        window.logout = function() { localStorage.removeItem('flowra_session'); window.location.href = '/login.html'; }
+    </script>
+</body>
+</html>

@@ -161,7 +161,9 @@
             localStorage.setItem('flowra_session', JSON.stringify({ email, expiry }));
 
             btn.innerText = "SUCCESS";
-            window.location.href = "/dashboard.html";
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirectUrl = urlParams.get('redirect') || "/dashboard.html";
+            window.location.href = redirectUrl;
         });
     </script>
 </body>
