@@ -605,7 +605,7 @@
                 </div>
                 <div class="card" style="margin-bottom: 24px; border-color: var(--accent-color);">
                     <div style="font-weight: 800;">Real Estate Automated Workflows:</div>
-                    <div style="font-size: 13px; font-weight: 600; margin-top: 4px;">These workflows are automatically active in the background. You can toggle their operational status below.</div>
+                    <div style="font-size: 13px; font-weight: 600; margin-top: 4px;">These workflows are automatically active in the background. You can toggle their status or trigger manual payload tests below.</div>
                 </div>
                 <table>
                     <thead>
@@ -615,9 +615,31 @@
                             <th>Target Actions</th>
                             <th>Scope / Operator</th>
                             <th>Active Status</th>
+                            <th>Demo Trigger</th>
                         </tr>
                     </thead>
                     <tbody id="playbooks-table-body"></tbody>
+                </table>
+
+                <div class="flex-between" style="margin-top: 40px; margin-bottom: 16px; border-top: 3px solid var(--border-color); padding-top: 24px;">
+                    <div>
+                        <h2>INTEGRATION EXECUTION REGISTRY</h2>
+                        <p style="font-weight: 700; font-size: 12px; text-transform: uppercase;">n8n Webhook Logs and Live Automation Telemetry.</p>
+                    </div>
+                    <button class="btn" onclick="clearAutomationLogs()" style="background:#ffcccc; color:#111; font-weight:800; border: 2px solid var(--border-color); box-shadow: 2px 2px 0 var(--border-color);">CLEAR REGISTRY</button>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Timestamp</th>
+                            <th>Workflow Name</th>
+                            <th>Target Prospect</th>
+                            <th>Integration Route</th>
+                            <th>Status</th>
+                            <th>Payload Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="automations-table-body"></tbody>
                 </table>
             </div>
 
@@ -1569,6 +1591,24 @@
                             operator: "Compliance Officer",
                             linked_project: "Agreement Phase",
                             active: false
+                        },
+                        {
+                            id: "pb_6",
+                            name: "Customer Call Recovery Workflow",
+                            trigger: "Missed call logged on prospect line",
+                            actions: "1. Log callback ticket in Planner<br>2. Send automated SMS callback scheduler<br>3. Alert broker via push notification",
+                            operator: "Call Coordinator",
+                            linked_project: "Cold Prospects",
+                            active: true
+                        },
+                        {
+                            id: "pb_7",
+                            name: "Customer Follow-Up Workflow",
+                            trigger: "Site Visit scheduled & incomplete",
+                            actions: "1. Send WhatsApp visit checklist<br>2. Confirm site coordinator availability<br>3. Send SMS location coordinates",
+                            operator: "Relationship Manager",
+                            linked_project: "Active Showings",
+                            active: true
                         }
                     ],
                     automations: []
@@ -2982,9 +3022,46 @@
                                 </button>
                             </div>
                         </td>
+                        <td>
+                            <button class="btn btn-small btn-primary" onclick="triggerManualWorkflow('${pb.id}')" style="background:var(--text-color); color:var(--surface-color); font-weight: 800; padding: 4px 8px; font-size: 10px; box-shadow: 2px 2px 0 var(--border-color);">
+                                ⚡ TRIGGER
+                            </button>
+                        </td>
                     </tr>
                 `;
             }).join('');
+
+            // Also render automations list
+            const autotbody = document.getElementById('automations-table-body');
+            if (autotbody) {
+                const logs = DB.tables.automations || [];
+                if (logs.length === 0) {
+                    autotbody.innerHTML = '<tr><td colspan="6" style="text-align:center; font-weight:700; opacity:0.5; padding:16px;">No integration logs captured yet. Try triggering a workflow manually.</td></tr>';
+                } else {
+                    autotbody.innerHTML = logs.map(log => {
+                        const dateStr = new Date(log.timestamp).toLocaleTimeString();
+                        let badgeBg = '#ccffcc';
+                        let badgeText = '#111';
+                        if (log.status === 'Failed' || log.status === 'Error') {
+                            badgeBg = '#ffcccc';
+                        } else if (log.status === 'Triggering...') {
+                            badgeBg = '#ffffcc';
+                        }
+                        return `
+                            <tr>
+                                <td><span style="font-family:monospace; font-size:11px;">${dateStr}</span></td>
+                                <td><strong>${log.title}</strong><br><small style="font-size:9px; color:#666;">Trigger: ${log.trigger || 'Manual'}</small></td>
+                                <td><span class="badge" style="background:#eee; color:#111; font-weight:700; border:1px solid #111;">${log.related_entity}</span></td>
+                                <td><span style="font-family:monospace; font-size:10px; font-weight:700; color:var(--accent-color);">n8n Webhook POST</span></td>
+                                <td><span class="badge" style="background:${badgeBg}; color:${badgeText}; border: 1.5px solid #111; font-weight:800; font-size:9px;">${log.status || 'Success'}</span></td>
+                                <td>
+                                    <button class="btn btn-small" style="padding: 2px 6px; font-size:9px;" onclick="viewPayloadData('${log.id}')">VIEW PAYLOAD</button>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            }
         }
 
         window.togglePlaybook = function(pbId) {
@@ -2996,13 +3073,148 @@
                 renderAll();
             }
         }
+
+        window.clearAutomationLogs = function() {
+            DB.tables.automations = [];
+            DB.save();
+            renderAll();
+        };
+
+        window.viewPayloadData = function(logId) {
+            const log = DB.tables.automations.find(x => x.id === logId);
+            if (!log) return;
+
+            let prettyPayload = "";
+            try {
+                prettyPayload = JSON.stringify(JSON.parse(log.payload), null, 4);
+            } catch (e) {
+                prettyPayload = log.payload;
+            }
+
+            openModal("WEBHOOK PAYLOAD DETAILS", [
+                {
+                    id: 'payload_view',
+                    label: 'Payload JSON',
+                    type: 'textarea',
+                    val: prettyPayload
+                }
+            ], () => {
+                closeModal();
+            });
+            
+            // Adjust textarea style inside modal
+            setTimeout(() => {
+                const t = document.getElementById('mod_payload_view');
+                if (t) {
+                    t.style.height = '240px';
+                    t.style.fontFamily = 'monospace';
+                    t.style.fontSize = '11px';
+                    t.style.whiteSpace = 'pre';
+                    t.readOnly = true;
+                }
+            }, 100);
+        };
+
+        window.triggerManualWorkflow = function(pbId) {
+            const pb = DB.tables.playbooks.find(x => x.id === pbId);
+            if (!pb) return;
+
+            const leads = DB.tables.leads || [];
+            const selectOptions = leads.map(l => ({ value: l.id, label: l.name }));
+            if (selectOptions.length === 0) {
+                selectOptions.push({ value: 'mock_lead', label: 'Mock Test Prospect' });
+            }
+
+            openModal(`TRIGGER AUTOMATION: ${pb.name}`, [
+                {
+                    id: 'target_lead',
+                    label: 'Select Target Client / Prospect',
+                    type: 'select',
+                    options: selectOptions.map(o => o.label),
+                    val: selectOptions[0].label
+                },
+                {
+                    id: 'custom_note',
+                    label: 'Custom Trigger Payload Note',
+                    type: 'text',
+                    val: 'Demo Manual Webhook Trigger'
+                }
+            ], async (res) => {
+                const selectedLabel = res.target_lead;
+                const selectedOpt = selectOptions.find(o => o.label === selectedLabel) || selectOptions[0];
+                const leadId = selectedOpt.value;
+                const leadName = selectedOpt.label;
+
+                const proj = (DB.tables.projects || []).find(p => p.lead_id === leadId);
+                const propertyName = proj ? proj.project_name : 'No Active Property';
+                const propertyAddress = proj ? proj.property_address : 'N/A';
+
+                const payload = {
+                    event: "manual_workflow_trigger",
+                    workflow_id: pb.id,
+                    workflow_name: pb.name,
+                    trigger_event: pb.trigger,
+                    actions: pb.actions,
+                    operator: pb.operator,
+                    scope: pb.linked_project,
+                    timestamp: new Date().toISOString(),
+                    payload: {
+                        lead_id: leadId,
+                        lead_name: leadName,
+                        property_name: propertyName,
+                        property_address: propertyAddress,
+                        custom_note: res.custom_note || ''
+                    }
+                };
+
+                if (!DB.tables.automations) DB.tables.automations = [];
+                const logId = generateId();
+                const logEntry = {
+                    id: logId,
+                    title: pb.name,
+                    trigger: pb.trigger,
+                    related_entity: leadName,
+                    status: 'Triggering...',
+                    payload: JSON.stringify(payload),
+                    timestamp: new Date().toISOString()
+                };
+                DB.tables.automations.unshift(logEntry);
+                DB.save();
+                renderAll();
+                closeModal();
+
+                try {
+                    const response = await fetch('https://havslayer.app.n8n.cloud/webhook/2190b590-cd74-4e51-af86-a1308e78c940', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const log = DB.tables.automations.find(x => x.id === logId);
+                    if (log) {
+                        log.status = response.ok ? 'Success' : 'Error';
+                    }
+                } catch (err) {
+                    console.error("n8n webhook manual trigger failed:", err);
+                    const log = DB.tables.automations.find(x => x.id === logId);
+                    if (log) {
+                        log.status = 'Failed';
+                    }
+                }
+                DB.save();
+                renderAll();
+            });
+        };
+
         window.triggerAutomation = function(action) { 
             if (!DB.tables.automations) DB.tables.automations = [];
             DB.tables.automations.push({
                 id: generateId(),
-                title: `${action} playbook executed`,
+                title: `${action} workflow executed`,
                 related_entity: 'Manual Webhook',
-                status: 'Successful',
+                status: 'Success',
                 timestamp: new Date().toISOString()
             });
             DB.save();
