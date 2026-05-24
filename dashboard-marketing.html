@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flowra OS Dashboard</title>
+    <title>FLOWRA OS — MARKETING OPERATING SYSTEM</title>
     <script>
         (function() {
             try {
@@ -381,7 +381,10 @@
 
     <!-- MAIN APP STRUCTURE -->
     <div class="sidebar">
-        <div class="brand">Flowra OS</div>
+        <div class="brand" style="line-height: 1.2; padding: 16px 20px;">
+            <div style="font-size: 20px; font-weight: 900; letter-spacing: -1px;">FLOWRA OS</div>
+            <div style="font-size: 9px; font-weight: 800; letter-spacing: 0.5px; opacity: 0.9; margin-top: 4px; text-transform: uppercase;">Marketing OS</div>
+        </div>
         <div class="nav-menu">
             <div class="nav-item active" onclick="switchView('home')">Command Center</div>
             <div class="nav-item" onclick="switchView('projects')">Active Projects</div>
@@ -1205,24 +1208,6 @@
                 DB.tables = {
                     leads: [
                         {
-                            id: "lead_re_1",
-                            name: "Sarah Jenkins (Buyer)",
-                            email: "sarah.jenkins@re.com",
-                            number: "+1 555-0192",
-                            status: "working",
-                            message: "[BUYER ENQUIRY] Looking for a 3-bedroom townhouse in suburban area.",
-                            created_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString()
-                        },
-                        {
-                            id: "lead_re_2",
-                            name: "David Miller (Seller)",
-                            email: "david.miller@re.com",
-                            number: "+1 555-0143",
-                            status: "working",
-                            message: "[PROPERTY LISTING] Urgent sale of 2-bedroom downtown condo.",
-                            created_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString()
-                        },
-                        {
                             id: "lead_agency_1",
                             name: "Vivid Branding Co",
                             email: "hello@vividbranding.co",
@@ -1236,38 +1221,30 @@
                             name: "Nova Apparel",
                             email: "contact@novaapparel.io",
                             number: "+91 87654 32109",
-                            status: "new",
+                            status: "working",
                             message: "[QUERY] Request for Webflow custom Shopify integrated website.",
+                            created_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString()
+                        },
+                        {
+                            id: "lead_agency_3",
+                            name: "Apex Capital Group",
+                            email: "marketing@apexcap.com",
+                            number: "+1 555-0199",
+                            status: "new",
+                            message: "[PROPOSAL REQUEST] Comprehensive SEO, keyword mapping and digital ad strategy.",
                             created_at: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString()
+                        },
+                        {
+                            id: "lead_agency_4",
+                            name: "Summit Outdoor",
+                            email: "collabs@summitoutdoor.com",
+                            number: "+1 555-0188",
+                            status: "new",
+                            message: "[CAMPAIGN REQUEST] TikTok video creation and influencer management setup.",
+                            created_at: new Date(Date.now() - 12 * 3600 * 1000).toISOString()
                         }
                     ],
                     projects: [
-                        {
-                            id: "proj_re_1",
-                            client_name: "Sarah Jenkins",
-                            project_name: "Sarah Jenkins - Home Acquisition",
-                            lead_id: "lead_re_1",
-                            created_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(),
-                            tasks: [
-                                { id: "t_re_1", category: "🏡 REAL ESTATE WORKFLOW", module: "Search & Showings", name: "Select townhouses matching criteria", notes: "Focus on suburbs with good school districts", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString() },
-                                { id: "t_re_2", category: "🏡 REAL ESTATE WORKFLOW", module: "Search & Showings", name: "Schedule home showings", notes: "Book for this weekend", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString() },
-                                { id: "t_re_3", category: "🏡 REAL ESTATE WORKFLOW", module: "Contracting & Escrow", name: "Draft and submit offer", notes: "Offer submitted at 5% below asking price", done: false, updated_at: new Date().toISOString() },
-                                { id: "t_re_4", category: "🏡 REAL ESTATE WORKFLOW", module: "Contracting & Escrow", name: "Open escrow & deposit earnest money", notes: "", done: false, updated_at: new Date().toISOString() },
-                                { id: "t_re_5", category: "🏡 REAL ESTATE WORKFLOW", module: "Closing & Transfer", name: "Arrange home inspection & appraisal", notes: "", done: false, updated_at: new Date().toISOString() }
-                            ]
-                        },
-                        {
-                            id: "proj_re_2",
-                            client_name: "David Miller",
-                            project_name: "David Miller - Property Listing",
-                            lead_id: "lead_re_2",
-                            created_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
-                            tasks: [
-                                { id: "t_re_6", category: "🏡 REAL ESTATE WORKFLOW", module: "Listing & Marketing", name: "Sign Listing Agreement & Disclosures", notes: "Standard 6% agent commission", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString() },
-                                { id: "t_re_7", category: "🏡 REAL ESTATE WORKFLOW", module: "Listing & Marketing", name: "Professional staging & photography", notes: "Scheduled for tomorrow afternoon", done: false, updated_at: new Date().toISOString() },
-                                { id: "t_re_8", category: "🏡 REAL ESTATE WORKFLOW", module: "Listing & Marketing", name: "Upload listing to MLS & syndication", notes: "", done: false, updated_at: new Date().toISOString() }
-                            ]
-                        },
                         {
                             id: "proj_agency_1",
                             client_name: "Vivid Branding Co",
@@ -1279,16 +1256,39 @@
                                 { id: "t_ag_2", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Discovery & Briefing", name: "Create mood boards & style scape", notes: "Presented 3 options, client chose option B", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString() },
                                 { id: "t_ag_3", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Design & Copy", name: "Draft logo concepts (3 variations)", notes: "Working on modern brutalist style options", done: false, updated_at: new Date().toISOString() },
                                 { id: "t_ag_4", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Client Revisions", name: "Collect feedback round 1 & edit", notes: "", done: false, updated_at: new Date().toISOString() },
-                                { id: "t_ag_5", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Handover & Support", name: "Export logo package & guideline PDF", notes: "", done: false, updated_at: new Date().toISOString() }
+                                { id: "t_ag_5", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Handover & Support", name: "Export logo package & assets", notes: "", done: false, updated_at: new Date().toISOString() }
+                            ]
+                        },
+                        {
+                            id: "proj_agency_2",
+                            client_name: "Nova Apparel",
+                            project_name: "Nova Apparel - Webflow E-Commerce",
+                            lead_id: "lead_agency_2",
+                            created_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(),
+                            tasks: [
+                                { id: "t_ag_6", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Discovery & Briefing", name: "Conduct client kickoff call", notes: "Focus on design preferences and layout scope", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString() },
+                                { id: "t_ag_7", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Design & Copy", name: "Draft homepage layout mockup", notes: "", done: false, updated_at: new Date().toISOString() },
+                                { id: "t_ag_8", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Handover & Support", name: "Setup domain & configure DNS", notes: "", done: false, updated_at: new Date().toISOString() }
+                            ]
+                        },
+                        {
+                            id: "proj_agency_3",
+                            client_name: "Apex Capital Group",
+                            project_name: "Apex Capital - Brand Positioning & SEO",
+                            lead_id: "lead_agency_3",
+                            created_at: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(),
+                            tasks: [
+                                { id: "t_ag_9", category: "📈 DIGITAL MARKETING WORKFLOW", module: "SEO & Audits", name: "Run technical SEO audit", notes: "Analyze page loading speed and crawl issues", done: false, updated_at: new Date().toISOString() },
+                                { id: "t_ag_10", category: "📈 DIGITAL MARKETING WORKFLOW", module: "SEO & Audits", name: "Keyword research & mapping", notes: "", done: false, updated_at: new Date().toISOString() }
                             ]
                         }
                     ],
                     meetings: [
                         {
                             id: "meet_1",
-                            title: "Sarah Jenkins - Home Showings",
+                            title: "Vivid Branding - Logo Review Meeting",
                             datetime: new Date(Date.now() + 2 * 24 * 3600 * 1000).toISOString().slice(0, 16),
-                            description: "Review property details and visit the suburban townhouses.",
+                            description: "Review initial draft of logo concepts and mood boards.",
                             status: "Scheduled",
                             created_at: new Date().toISOString()
                         },
@@ -1299,53 +1299,55 @@
                             description: "Go through requirements for Shopify Webflow site.",
                             status: "Scheduled",
                             created_at: new Date().toISOString()
+                        },
+                        {
+                            id: "meet_3",
+                            title: "Apex Capital - SEO Roadmap Review",
+                            datetime: new Date(Date.now() + 3 * 24 * 3600 * 1000).toISOString().slice(0, 16),
+                            description: "Go through technical SEO findings and map target keywords.",
+                            status: "Scheduled",
+                            created_at: new Date().toISOString()
                         }
                     ],
                     team: [],
                     docs: [
                         {
                             id: "doc_1",
-                            name: "Real Estate Operations Guide.pdf",
-                            notes: "Internal SOPs for listing properties, scheduling viewings, and coordinating closings.",
-                            type: "Operations Guide",
-                            created_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString()
-                        },
-                        {
-                            id: "doc_2",
                             name: "Creative Agency Playbook.pdf",
                             notes: "Standard guidelines for creative briefing, mood boarding, revision rounds, and client handovers.",
                             type: "Playbook",
                             created_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString()
+                        },
+                        {
+                            id: "doc_2",
+                            name: "Marketing Campaign Template.xlsx",
+                            notes: "Template for mapping advertising campaigns, budgets, and key channel metrics.",
+                            type: "Campaign Plan",
+                            created_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString()
+                        },
+                        {
+                            id: "doc_3",
+                            name: "SEO On-Page Audit Checklist.pdf",
+                            notes: "Basic parameters for auditing title tags, meta tags, and content structure.",
+                            type: "Technical Guide",
+                            created_at: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString()
                         }
                     ],
                     feedback: [
                         {
                             id: "fb_1",
                             type: "Suggestion",
-                            description: "Add SMS notifications for showing schedules to real estate leads.",
+                            description: "Add TikTok ad campaign performance dashboard widgets.",
                             created_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString()
+                        },
+                        {
+                            id: "fb_2",
+                            type: "Feedback",
+                            description: "Clients appreciate the Figma live preview embed option.",
+                            created_at: new Date(Date.now() - 12 * 3600 * 1000).toISOString()
                         }
                     ],
                     invoices: [
-                        {
-                            id: "inv_re_1",
-                            lead_id: "lead_re_1",
-                            lead_name: "Sarah Jenkins (Buyer)",
-                            project_name: "Sarah Jenkins - Home Acquisition",
-                            currency: "INR",
-                            base_amount: 250000,
-                            addon_amount: 0,
-                            total_amount: 250000,
-                            paid_amount: 100000,
-                            remaining_amount: 150000,
-                            invoice_status: "Sent",
-                            payment_status: "Partial Payment",
-                            due_now_amount: 100000,
-                            upfront_percent: 40,
-                            payment_method: "upi",
-                            notes: "Downpayment for escrow opening.",
-                            invoice_link: "https://flowra.io/invoices/inv_re_1"
-                        },
                         {
                             id: "inv_ag_1",
                             lead_id: "lead_agency_1",
@@ -1374,15 +1376,34 @@
                             base_amount: 200000,
                             addon_amount: 0,
                             total_amount: 200000,
-                            paid_amount: 0,
-                            remaining_amount: 200000,
+                            paid_amount: 50000,
+                            remaining_amount: 150000,
                             invoice_status: "Sent",
-                            payment_status: "Payment Pending",
+                            payment_status: "Partial Payment",
                             due_now_amount: 50000,
                             upfront_percent: 25,
                             payment_method: "upi",
-                            notes: "Awaiting retainer deposit.",
+                            notes: "Retainer deposit received. Awaiting launch milestone payment.",
                             invoice_link: "https://flowra.io/invoices/inv_ag_2"
+                        },
+                        {
+                            id: "inv_ag_3",
+                            lead_id: "lead_agency_3",
+                            lead_name: "Apex Capital Group",
+                            project_name: "Apex Capital - Brand Positioning & SEO",
+                            currency: "INR",
+                            base_amount: 120000,
+                            addon_amount: 0,
+                            total_amount: 120000,
+                            paid_amount: 0,
+                            remaining_amount: 120000,
+                            invoice_status: "Sent",
+                            payment_status: "Payment Pending",
+                            due_now_amount: 30000,
+                            upfront_percent: 25,
+                            payment_method: "bank_transfer",
+                            notes: "Awaiting retainer deposit.",
+                            invoice_link: "https://flowra.io/invoices/inv_ag_3"
                         }
                     ],
                     automations: []
@@ -1395,17 +1416,17 @@
 
         /* HARDCODED MODULE & TASK HIERARCHY */
         const TASK_STRUCTURE = {
-            "🏡 REAL ESTATE WORKFLOW": {
-                "Listing & Marketing": ["Sign Listing Agreement & Disclosures", "Professional staging & photography", "Upload listing to MLS & syndication"],
-                "Search & Showings": ["Select townhouses matching criteria", "Schedule home showings", "Conduct virtual property tours"],
-                "Contracting & Escrow": ["Draft and submit purchase offer", "Open escrow & deposit earnest money", "Review seller disclosures"],
-                "Closing & Transfer": ["Arrange home inspection & appraisal", "Review Closing Disclosure", "Sign deed transfer & settle funds"]
-            },
             "🎨 CREATIVE AGENCY WORKFLOW": {
                 "Discovery & Briefing": ["Conduct client kickoff call", "Create mood boards & style scape", "Finalize design brief"],
                 "Design & Copy": ["Draft logo concepts (3 variations)", "Draft brand identity guidebook", "Write homepage copy"],
                 "Client Revisions": ["Collect feedback round 1 & edit", "Collect feedback round 2 & edit"],
                 "Handover & Support": ["Export logo package & assets", "Deliver style guidelines PDF", "Conduct handoff meeting"]
+            },
+            "📈 DIGITAL MARKETING WORKFLOW": {
+                "SEO & Audits": ["Run technical SEO audit", "Keyword research & mapping", "Optimize page speed & metadata"],
+                "Paid Campaigns": ["Setup Google Ads account", "Draft copy & target keywords", "Design Facebook Ad creatives", "Launch campaigns & monitor spend"],
+                "Social Media Management": ["Draft 30-day content calendar", "Schedule posts on Buffer/Hootsuite", "Engage with community comments"],
+                "Email & Funnels": ["Design Mailchimp newsletter template", "Write automated welcome email sequence", "Setup lead magnet landing page"]
             },
             "🟪 CUSTOMER AUTOMATION": {
                 "Website Chatbot": ["Setup chatbot", "Train on company data", "Connect to website"],
@@ -1417,39 +1438,6 @@
                 "Team Dashboard": ["Build dashboard UI"],
                 "Task Automation": ["Create task system", "Automate repetitive actions"],
                 "Workflow Automation": ["Connect database", "Setup internal tools"]
-            },
-            "🟧 SALES & FOLLOW-UP": {
-                "Lead Management": ["Setup lead tracking"],
-                "Follow-up Automation": ["Auto follow-up system"],
-                "Email Automation": ["Email templates", "CRM logic"]
-            },
-            "🟩 SCHEDULING & BOOKINGS": {
-                "Booking System": ["Create booking flow"],
-                "Slot Management": ["Assign slots"],
-                "Agent Assignment": ["Connect calendar", "Auto-confirm bookings"]
-            },
-            "🟥 OPERATIONS & DELIVERY": {
-                "Task Execution System": ["Assign delivery tasks"],
-                "Agent Flow": ["Setup notifications"],
-                "Notifications": ["Track completion"]
-            },
-            "🟨 INTELLIGENCE & ALERTS": {
-                "Predictive Alerts": ["Setup alerts"],
-                "Inventory Monitoring": ["Define triggers"],
-                "Usage Tracking": ["Connect data sources"]
-            },
-            "📊 ANALYTICS & INSIGHTS (CORE UPGRADE)": {
-                "Lead & Sales Visibility": ["Count total leads", "Track lead status (new → contacted → closed)", "Identify uncontacted leads", "Calculate conversion rate", "Show lead movement (pipeline flow)"],
-                "Operations Performance": ["Count total tasks", "Track completed vs pending", "Identify overdue tasks", "Measure response time", "Show workload distribution"]
-            },
-            "🟦 ADMIN / CONTROL SYSTEM": {
-                "Team Monitoring": ["Track tasks per member", "Track completed tasks", "Log working hours", "Show simple leaderboard", "Detect overloaded members"],
-                "Task Control": ["Assign task", "Reassign task", "Set priority", "Set deadline", "Update status"],
-                "Approval Flow (keep simple)": ["Submit for approval", "Approve / reject", "Add comment", "Log decision"]
-            },
-            "🟧 INTEGRATIONS (ONLY PRACTICAL ONES)": {
-                "Data Sync (KEEP THIS)": ["Sync leads to Google Sheets", "Backup data", "Export data", "Import external data"],
-                "Tool Sync (LIMITED)": ["Connect email (basic)", "Store communication logs", "Sync basic client info"]
             }
         };
 

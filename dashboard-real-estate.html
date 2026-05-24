@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flowra OS Dashboard</title>
+    <title>FLOWRA OS — REAL ESTATE TRANSACTION OPERATING SYSTEM</title>
     <script>
         (function() {
             try {
@@ -269,33 +269,62 @@
         </div>
     </div>
 
-    <!-- Invoice Scheduler Modal -->
+    <!-- Deal Payment Scheduler Modal -->
     <div id="invoiceModal" style="display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 110; justify-content: center; align-items: center;">
         <div class="modal-content" style="width: 840px; max-width: 96%; max-height: 92vh; overflow-y: auto;">
             <div class="flex-between" style="border-bottom: 3px solid var(--border-color); padding-bottom: 12px; margin-bottom: 20px;">
-                <h2 style="margin: 0; border: none; padding: 0;">SCHEDULE INVOICE</h2>
+                <h2 style="margin: 0; border: none; padding: 0;">SCHEDULE PROPERTY DEAL PAYMENT</h2>
                 <button class="btn" onclick="closeInvoiceModal()" style="padding: 4px 8px;">X</button>
             </div>
 
             <div class="grid-2" style="margin-bottom: 12px;">
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label>Lead</label>
+                    <label>Lead / Client</label>
                     <input id="invoice-lead-name" type="text" disabled>
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label>Project</label>
+                    <label>Property Workspace</label>
                     <select id="invoice-project"></select>
                 </div>
             </div>
 
             <div class="grid-2" style="margin-bottom: 12px;">
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label>Base Total Amount</label>
-                    <input id="invoice-base-amount" type="number" min="0" step="0.01" value="0">
+                    <label>Total Deal Value (INR)</label>
+                    <input id="invoice-base-amount" type="number" min="0" value="0">
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label>Add-on Amount</label>
-                    <input id="invoice-addon-amount" type="number" min="0" step="0.01" value="0">
+                    <label>Paid Amount (INR)</label>
+                    <input id="invoice-paid-amount" type="number" min="0" value="0">
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-bottom: 12px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Token Advance (INR)</label>
+                    <input id="invoice-token-advance" type="number" min="0" value="0">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Registration Payment (INR)</label>
+                    <input id="invoice-registration-payment" type="number" min="0" value="0">
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-bottom: 12px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Commission Amount (INR)</label>
+                    <input id="invoice-commission-amount" type="number" min="0" value="0">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Payment Milestone Status</label>
+                    <select id="invoice-payment-status">
+                        <option value="Token Pending">Token Pending</option>
+                        <option value="Partial Paid">Partial Paid</option>
+                        <option value="Legal Hold">Legal Hold</option>
+                        <option value="Final Payment Pending">Final Payment Pending</option>
+                        <option value="Registration Complete">Registration Complete</option>
+                        <option value="Fully Settled">Fully Settled</option>
+                    </select>
                 </div>
             </div>
 
@@ -317,59 +346,40 @@
                 </div>
             </div>
 
-            <div class="grid-2" style="margin-bottom: 12px;">
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label>Upfront Percent (editable)</label>
-                    <input id="invoice-upfront-percent" type="number" min="1" max="100" step="0.01" value="25">
-                </div>
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label>Partial of Upfront (%)</label>
-                    <input id="invoice-partial-percent" type="number" min="0" max="100" step="0.01" value="50">
-                </div>
-            </div>
-
             <div class="form-group" style="margin-bottom: 12px;">
-                <label>Invoice Payment Link</label>
-                <input id="invoice-link" type="text" placeholder="https://buy.stripe.com/...">
-            </div>
-
-            <label style="margin-bottom:8px;">Payment Mode</label>
-            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;">
-                <button id="mode-add-25" class="btn btn-primary" type="button" onclick="setInvoicePaymentMode('add_25_now')">ADD 25% RIGHT NOW</button>
-                <button id="mode-pay-full" class="btn" type="button" onclick="setInvoicePaymentMode('pay_full_now')">PAY COMPLETELY RIGHT NOW</button>
-                <button id="mode-pay-partial" class="btn" type="button" onclick="setInvoicePaymentMode('pay_partial_of_upfront')">PAY ONLY PARTIAL OF UPFRONT</button>
-                <button id="mode-add-another" class="btn" type="button" onclick="setInvoicePaymentMode('add_another_invoice')">ADD ANOTHER INVOICE</button>
+                <label>Secure Payment Link</label>
+                <input id="invoice-link" type="text" placeholder="https://buy.stripe.com/... or Bank account instructions">
             </div>
 
             <div class="card" style="margin-bottom: 12px; background:#fffebc;">
-                <div style="font-weight:800; font-size:12px; text-transform:uppercase; margin-bottom:8px;">Invoice Preview</div>
+                <div style="font-weight:800; font-size:12px; text-transform:uppercase; margin-bottom:8px;">Milestone Deal Payment Preview</div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-weight:700; font-size:13px; margin-bottom: 12px;">
-                    <div>Locked Total: <span id="invoice-preview-locked">0</span></div>
-                    <div>Current Charge Basis: <span id="invoice-preview-charge-base">0</span></div>
+                    <div>Total Deal Value: <span id="invoice-preview-total">0</span></div>
                     <div>Paid Amount: <span id="invoice-preview-paid">0</span></div>
                     <div>Remaining Amount: <span id="invoice-preview-remaining">0</span></div>
-                    <div>Due Now: <span id="invoice-preview-due">0</span></div>
-                    <div>Payment Status: <span id="invoice-preview-payment-status">Payment Pending</span></div>
+                    <div>Commission Amount: <span id="invoice-preview-commission">0</span></div>
+                    <div>Token Advance: <span id="invoice-preview-token">0</span></div>
+                    <div>Registration Payment: <span id="invoice-preview-registration">0</span></div>
+                    <div>Payment Status: <span id="invoice-preview-payment-status">Token Pending</span></div>
                     <div>Invoice Status: <span id="invoice-preview-invoice-status">Sent</span></div>
-                    <div>Mode: <span id="invoice-preview-mode">add_25_now</span></div>
-                    <div>Payment Method: <span id="invoice-preview-method">upi</span></div>
+                    <div>Payment Method: <span id="invoice-preview-method">UPI</span></div>
                 </div>
                 
                 <div style="border-top: 2px solid var(--border-color); padding-top: 12px;">
-                    <div style="font-weight: 800; font-size: 10px; text-transform: uppercase; margin-bottom: 8px;">Payment Pipeline Status</div>
+                    <div style="font-weight: 800; font-size: 10px; text-transform: uppercase; margin-bottom: 8px;">Milestone Pipeline State</div>
                     <div style="display: flex; align-items: center; justify-content: space-between; font-weight: 900; font-size: 11px; text-transform: uppercase; gap: 4px;">
-                        <div id="pipeline-stage-sent" style="flex: 1; padding: 6px; border: 2px solid var(--border-color); text-align: center; background: #fff; transition: all 0.3s ease;">Invoice Sent</div>
+                        <div id="pipeline-stage-token" style="flex: 1; padding: 6px; border: 2px solid var(--border-color); text-align: center; background: #fff; transition: all 0.3s ease;">Token Pending</div>
                         <div style="font-size: 14px; font-weight: bold; color: var(--border-color);">➔</div>
                         <div id="pipeline-stage-partial" style="flex: 1; padding: 6px; border: 2px solid var(--border-color); text-align: center; background: #fff; transition: all 0.3s ease;">Partial Paid</div>
                         <div style="font-size: 14px; font-weight: bold; color: var(--border-color);">➔</div>
-                        <div id="pipeline-stage-full" style="flex: 1; padding: 6px; border: 2px solid var(--border-color); text-align: center; background: #fff; transition: all 0.3s ease;">Fully Paid</div>
+                        <div id="pipeline-stage-settled" style="flex: 1; padding: 6px; border: 2px solid var(--border-color); text-align: center; background: #fff; transition: all 0.3s ease;">Fully Settled</div>
                     </div>
                 </div>
             </div>
 
             <div class="form-group">
-                <label>Invoice Notes</label>
-                <textarea id="invoice-notes" rows="3" placeholder="Any special terms, free revisions, milestone notes..."></textarea>
+                <label>Payment / Milestone Notes</label>
+                <textarea id="invoice-notes" rows="3" placeholder="Specify token receipt conditions, registration details, or custom payout rules..."></textarea>
             </div>
 
             <div class="flex-between" style="margin-top:20px; margin-bottom:0;">
@@ -381,16 +391,19 @@
 
     <!-- MAIN APP STRUCTURE -->
     <div class="sidebar">
-        <div class="brand">Flowra OS</div>
+        <div class="brand" style="line-height: 1.2; padding: 16px 20px;">
+            <div style="font-size: 20px; font-weight: 900; letter-spacing: -1px;">FLOWRA OS</div>
+            <div style="font-size: 9px; font-weight: 800; letter-spacing: 0.5px; opacity: 0.9; margin-top: 4px; text-transform: uppercase;">Real Estate Transaction OS</div>
+        </div>
         <div class="nav-menu">
             <div class="nav-item active" onclick="switchView('home')">Command Center</div>
-            <div class="nav-item" onclick="switchView('projects')">Active Projects</div>
+            <div class="nav-item" onclick="switchView('projects')">Property Center</div>
             <div class="nav-item" onclick="switchView('leads')">Leads & Clients</div>
             <div class="nav-item" onclick="switchView('planner')">Meetings & Deals</div>
             <div class="nav-item" onclick="switchView('team')">Team Ops</div>
-            <div class="nav-item" onclick="switchView('automation')">n8n Automation</div>
+            <div class="nav-item" onclick="switchView('automation')">Operational Playbooks</div>
             <div class="nav-item" onclick="switchView('knowledge')">Knowledge Base</div>
-            <div class="nav-item" onclick="switchView('feedback')">Feedback & Ideas</div>
+            <div class="nav-item" onclick="switchView('feedback')">System Registry</div>
         </div>
         <div style="padding: 20px;">
             <button class="btn" style="width:100%" onclick="renderAll()">⟲ REFRESH</button>
@@ -400,8 +413,8 @@
     <!-- Business Flow Tracker Rail -->
     <div class="flow-tracker-rail">
         <div class="flow-header">
-            <h2>Business Flow Tracker</h2>
-            <p class="flow-subtitle">Track real operational movement across projects, leads, meetings, tasks, invoices, and automations.</p>
+            <h2>Transaction Flow Tracker</h2>
+            <p class="flow-subtitle">Track real operational movement across property listings, site visits, legal checks, and milestones.</p>
         </div>
         <div class="flow-timeline" id="flow-timeline-container">
             <!-- Stacked operational cards loaded dynamically -->
@@ -494,19 +507,20 @@
                     </div>
                 </div>
 
-                <!-- Revenue & Deal Pipeline Table -->
+                <!-- Deal Payment Pipeline Table -->
                 <div class="card" style="margin-top: 24px;">
-                    <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px; text-transform: uppercase;">💰 Revenue & Deal Pipeline</h3>
+                    <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px; text-transform: uppercase;">💰 Deal Payment Pipeline</h3>
                     <div style="overflow-x: auto;">
                         <table style="width: 100%; border-collapse: collapse;">
                             <thead>
                                 <tr>
-                                    <th>Client</th>
-                                    <th>Project</th>
-                                    <th>Total</th>
-                                    <th>Paid</th>
-                                    <th>Remaining</th>
-                                    <th>Invoice Status</th>
+                                    <th>Client / Property</th>
+                                    <th>Total Deal Value</th>
+                                    <th>Token Advance</th>
+                                    <th>Paid Amount</th>
+                                    <th>Remaining Amount</th>
+                                    <th>Registration Payment</th>
+                                    <th>Commission Amount</th>
                                     <th>Payment Status</th>
                                     <th>Actions</th>
                                 </tr>
@@ -539,28 +553,30 @@
                 </table>
             </div>
 
-            <!-- 6. Automation Hub -->
+            <!-- 6. Operational Playbooks -->
             <div id="view-automation" class="view-section">
                 <div class="flex-between" style="margin-bottom: 16px;">
                     <div>
-                        <h2>Automation Playbooks</h2>
-                        <p style="font-weight: 700; font-size: 12px; text-transform: uppercase;">n8n Webhook triggers for active pipelines.</p>
+                        <h2>Operational Playbooks</h2>
+                        <p style="font-weight: 700; font-size: 12px; text-transform: uppercase;">Active pipeline templates and event-driven workflows.</p>
                     </div>
                 </div>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-                    <button class="btn btn-large" onclick="triggerAutomation('Send Proposal')" style="padding: 20px; font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 4px 4px 0 var(--border-color);">
-                        <span style="font-size: 28px;">📄</span>
-                        SEND PROPOSAL
-                    </button>
-                    <button class="btn btn-large" onclick="triggerAutomation('Send Follow-Up')" style="padding: 20px; font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 4px 4px 0 var(--border-color);">
-                        <span style="font-size: 28px;">🔔</span>
-                        SEND FOLLOW-UP
-                    </button>
-                    <button class="btn btn-large" onclick="syncToSupabase().then(() => alert('Force sync complete.'))" style="padding: 20px; font-size: 14px; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 4px 4px 0 var(--border-color); background: var(--surface-color);">
-                        <span style="font-size: 28px;">☁️</span>
-                        FORCE SYNC TO CLOUD
-                    </button>
+                <div class="card" style="margin-bottom: 24px; border-color: var(--accent-color);">
+                    <div style="font-weight: 800;">Real Estate Transaction Playbooks:</div>
+                    <div style="font-size: 13px; font-weight: 600; margin-top: 4px;">These playbooks are automatically active in the background. You can toggle their operational status below.</div>
                 </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Playbook Workflow</th>
+                            <th>Trigger Event</th>
+                            <th>Target Actions</th>
+                            <th>Scope / Operator</th>
+                            <th>Operational Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="playbooks-table-body"></tbody>
+                </table>
             </div>
 
             <!-- 7. Knowledge Base -->
@@ -1172,9 +1188,9 @@
 
         /* DB MOCKING SYSTEM (Local Storage) */
         const DB = {
-            tables: { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [], invoices: [], automations: [] },
+            tables: { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [], invoices: [], automations: [], playbooks: [] },
             ensureShape: () => {
-                const defaults = { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [], invoices: [], automations: [] };
+                const defaults = { leads: [], projects: [], meetings: [], team: [], docs: [], feedback: [], invoices: [], automations: [], playbooks: [] };
                 DB.tables = { ...defaults, ...(DB.tables || {}) };
                 Object.keys(defaults).forEach((k) => {
                     if (!Array.isArray(DB.tables[k])) DB.tables[k] = defaults[k];
@@ -1195,7 +1211,7 @@
                 const saved = localStorage.getItem('flowra_mock_db_experimental');
                 if (saved) {
                     DB.tables = JSON.parse(saved);
-                } else {
+                    } else {
                     DB.seed();
                 }
                 DB.ensureShape();
@@ -1211,7 +1227,7 @@
                             number: "+1 555-0192",
                             status: "working",
                             message: "[BUYER ENQUIRY] Looking for a 3-bedroom townhouse in suburban area.",
-                            created_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString()
+                            created_at: new Date(Date.now() - 8 * 24 * 3600 * 1000).toISOString()
                         },
                         {
                             id: "lead_re_2",
@@ -1220,83 +1236,159 @@
                             number: "+1 555-0143",
                             status: "working",
                             message: "[PROPERTY LISTING] Urgent sale of 2-bedroom downtown condo.",
-                            created_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString()
-                        },
-                        {
-                            id: "lead_agency_1",
-                            name: "Vivid Branding Co",
-                            email: "hello@vividbranding.co",
-                            number: "+91 98765 43210",
-                            status: "working",
-                            message: "[AGENCY INQUIRY] Complete rebrand project including logo, assets, and design system.",
                             created_at: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString()
                         },
                         {
-                            id: "lead_agency_2",
-                            name: "Nova Apparel",
-                            email: "contact@novaapparel.io",
-                            number: "+91 87654 32109",
+                            id: "lead_re_3",
+                            name: "Rajesh Kumar (Buyer)",
+                            email: "rajesh.kumar@tech.co",
+                            number: "+91 98765 43210",
                             status: "new",
-                            message: "[QUERY] Request for Webflow custom Shopify integrated website.",
+                            message: "[BUYER ENQUIRY] Seeking modern 4BHK villa near IT corridor.",
                             created_at: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString()
+                        },
+                        {
+                            id: "lead_re_4",
+                            name: "Zenith Tech Solutions",
+                            email: "realestate@zenith.io",
+                            number: "+91 87654 32109",
+                            status: "working",
+                            message: "[COMMERCIAL ENQUIRY] Office space lease or purchase for 120 pax.",
+                            created_at: new Date(Date.now() - 15 * 24 * 3600 * 1000).toISOString()
                         }
                     ],
                     projects: [
                         {
                             id: "proj_re_1",
                             client_name: "Sarah Jenkins",
-                            project_name: "Sarah Jenkins - Home Acquisition",
+                            project_name: "Greenwood Townhouse #14",
                             lead_id: "lead_re_1",
-                            created_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(),
+                            seller_name: "Johnathan Davis",
+                            buyer_name: "Sarah Jenkins",
+                            assigned_broker: "Marcus Vance",
+                            property_type: "Townhouse",
+                            deal_value: 9500000,
+                            commission_percent: 2.0,
+                            deal_stage: "Agreement Drafting",
+                            registration_deadline: "2026-06-15",
+                            waiting_on: [
+                                { item: "Buyer signature on draft agreement", responsible: "Sarah Jenkins (Buyer)", duration: "2 days", urgency: "High" }
+                            ],
+                            documents: [
+                                { id: "doc_re_1", name: "Title_Deed_Greenwood.pdf", category: "Ownership Documents", uploaded_at: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Marcus Vance (Broker)", status: "Approved", visibility: "Public", version: "v1.0" },
+                                { id: "doc_re_2", name: "Property_Tax_Clearance_2025.pdf", category: "Government Approvals", uploaded_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Marcus Vance (Broker)", status: "Approved", visibility: "Public", version: "v1.0" },
+                                { id: "doc_re_3", name: "Buyer_Aadhaar_PAN.pdf", category: "Buyer/Seller KYC", uploaded_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Sarah Jenkins (Buyer)", status: "Approved", visibility: "Private", version: "v1.0" },
+                                { id: "doc_re_4", name: "Draft_Sale_Agreement_v1.2.pdf", category: "Agreements", uploaded_at: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Elena Ross (Legal)", status: "Pending Approval", visibility: "Public", version: "v1.2" }
+                            ],
+                            team_thread: [
+                                { id: "msg_1", sender: "Marcus Vance", message: "Client requested minor adjustment to the hand-over schedule. Updated draft v1.2 uploaded.", timestamp: new Date(Date.now() - 24 * 3600 * 1000).toISOString() },
+                                { id: "msg_2", sender: "Elena Ross (Legal)", message: "Adjusted penalty fee in Clause 6. Ready for buyer review and signature.", timestamp: new Date(Date.now() - 20 * 3600 * 1000).toISOString() }
+                            ],
+                            client_timeline: [
+                                { title: "New buyer inquiry captured", timestamp: new Date(Date.now() - 8 * 24 * 3600 * 1000).toISOString() },
+                                { title: "Site visit completed", timestamp: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString() },
+                                { title: "Price term sheet signed", timestamp: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString() },
+                                { title: "Token advance payment received", timestamp: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString() },
+                                { title: "Legal review initiated", timestamp: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString() }
+                            ],
+                            created_at: new Date(Date.now() - 8 * 24 * 3600 * 1000).toISOString(),
                             tasks: [
-                                { id: "t_re_1", category: "🏡 REAL ESTATE WORKFLOW", module: "Search & Showings", name: "Select townhouses matching criteria", notes: "Focus on suburbs with good school districts", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString() },
-                                { id: "t_re_2", category: "🏡 REAL ESTATE WORKFLOW", module: "Search & Showings", name: "Schedule home showings", notes: "Book for this weekend", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString() },
-                                { id: "t_re_3", category: "🏡 REAL ESTATE WORKFLOW", module: "Contracting & Escrow", name: "Draft and submit offer", notes: "Offer submitted at 5% below asking price", done: false, updated_at: new Date().toISOString() },
-                                { id: "t_re_4", category: "🏡 REAL ESTATE WORKFLOW", module: "Contracting & Escrow", name: "Open escrow & deposit earnest money", notes: "", done: false, updated_at: new Date().toISOString() },
-                                { id: "t_re_5", category: "🏡 REAL ESTATE WORKFLOW", module: "Closing & Transfer", name: "Arrange home inspection & appraisal", notes: "", done: false, updated_at: new Date().toISOString() }
+                                { id: "t_re_1", category: "🏡 REAL ESTATE WORKFLOW", module: "Inquiry", name: "Review buyer inquiry details", notes: "Looking for townhouse", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 8 * 24 * 3600 * 1000).toISOString() },
+                                { id: "t_re_2", category: "🏡 REAL ESTATE WORKFLOW", module: "Site Visit", name: "Conduct physical site walk-through", notes: "Greenwood location visit", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString() },
+                                { id: "t_re_3", category: "🏡 REAL ESTATE WORKFLOW", module: "Negotiation", name: "Sign term sheet", notes: "Locked at 95L", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString() },
+                                { id: "t_re_4", category: "🏡 REAL ESTATE WORKFLOW", module: "Token Advance", name: "Confirm token receipt in bank", notes: "9.5L received", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString() },
+                                { id: "t_re_5", category: "🏡 REAL ESTATE WORKFLOW", module: "Legal Review", name: "Search title deed history", notes: "Cleared by Elena", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString() },
+                                { id: "t_re_6", category: "🏡 REAL ESTATE WORKFLOW", module: "Agreement Drafting", name: "Draft purchase agreement copy", notes: "", done: false, updated_at: new Date().toISOString() },
+                                { id: "t_re_7", category: "🏡 REAL ESTATE WORKFLOW", module: "Registration", name: "Book registrar office slot", notes: "", done: false, updated_at: new Date().toISOString() }
                             ]
                         },
                         {
                             id: "proj_re_2",
                             client_name: "David Miller",
-                            project_name: "David Miller - Property Listing",
+                            project_name: "Bellevue Condo Suite 4B",
                             lead_id: "lead_re_2",
-                            created_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
+                            seller_name: "David Miller",
+                            buyer_name: "Rajesh Kumar",
+                            assigned_broker: "Clara Sterling",
+                            property_type: "Condo",
+                            deal_value: 18000000,
+                            commission_percent: 2.5,
+                            deal_stage: "Site Visit",
+                            registration_deadline: "2026-07-20",
+                            waiting_on: [
+                                { item: "Buyer confirmation post visit", responsible: "Rajesh Kumar (Buyer)", duration: "1 day", urgency: "Medium" }
+                            ],
+                            documents: [
+                                { id: "doc_re_5", name: "RERA_Condo_Certificate.pdf", category: "Government Approvals", uploaded_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(), uploaded_by: "David Miller (Seller)", status: "Approved", visibility: "Public", version: "v1.0" },
+                                { id: "doc_re_6", name: "Condo_Floor_Plan.jpg", category: "Property Media", uploaded_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(), uploaded_by: "David Miller (Seller)", status: "Approved", visibility: "Public", version: "v1.0" }
+                            ],
+                            team_thread: [
+                                { id: "msg_3", sender: "Clara Sterling", message: "Conducted virtual tour. Rajesh wants to do a physical visit this Saturday.", timestamp: new Date(Date.now() - 12 * 3600 * 1000).toISOString() }
+                            ],
+                            client_timeline: [
+                                { title: "Property listing activated", timestamp: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString() },
+                                { title: "Site visit scheduled", timestamp: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString() }
+                            ],
+                            created_at: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString(),
                             tasks: [
-                                { id: "t_re_6", category: "🏡 REAL ESTATE WORKFLOW", module: "Listing & Marketing", name: "Sign Listing Agreement & Disclosures", notes: "Standard 6% agent commission", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString() },
-                                { id: "t_re_7", category: "🏡 REAL ESTATE WORKFLOW", module: "Listing & Marketing", name: "Professional staging & photography", notes: "Scheduled for tomorrow afternoon", done: false, updated_at: new Date().toISOString() },
-                                { id: "t_re_8", category: "🏡 REAL ESTATE WORKFLOW", module: "Listing & Marketing", name: "Upload listing to MLS & syndication", notes: "", done: false, updated_at: new Date().toISOString() }
+                                { id: "t_re_8", category: "🏡 REAL ESTATE WORKFLOW", module: "Inquiry", name: "Qualify financial capability", notes: "", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString() },
+                                { id: "t_re_9", category: "🏡 REAL ESTATE WORKFLOW", module: "Site Visit", name: "Schedule site walk-through", notes: "Saturday", done: false, updated_at: new Date().toISOString() }
                             ]
                         },
                         {
-                            id: "proj_agency_1",
-                            client_name: "Vivid Branding Co",
-                            project_name: "Vivid Branding - Logo & Guidelines",
-                            lead_id: "lead_agency_1",
-                            created_at: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString(),
+                            id: "proj_re_3",
+                            client_name: "Zenith Tech Solutions",
+                            project_name: "Oakridge Commercial Complex",
+                            lead_id: "lead_re_4",
+                            seller_name: "Sterling Assets Ltd",
+                            buyer_name: "Zenith Tech Solutions",
+                            assigned_broker: "Marcus Vance",
+                            property_type: "Commercial Space",
+                            deal_value: 42000000,
+                            commission_percent: 1.5,
+                            deal_stage: "Legal Review",
+                            registration_deadline: "2026-06-30",
+                            waiting_on: [
+                                { item: "Building occupancy clearance certificate", responsible: "Sterling Assets (Seller)", duration: "5 days", urgency: "High" }
+                            ],
+                            documents: [
+                                { id: "doc_re_7", name: "Commercial_Layout_NOC.pdf", category: "Government Approvals", uploaded_at: new Date(Date.now() - 14 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Sterling Assets (Seller)", status: "Approved", visibility: "Public", version: "v1.0" },
+                                { id: "doc_re_8", name: "Corporate_Trade_License.pdf", category: "Buyer/Seller KYC", uploaded_at: new Date(Date.now() - 12 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Zenith Tech (Buyer)", status: "Approved", visibility: "Private", version: "v1.0" },
+                                { id: "doc_re_9", name: "Title_Search_Report.pdf", category: "Legal Verification", uploaded_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Elena Ross (Legal)", status: "Pending Review", visibility: "Public", version: "v1.1" }
+                            ],
+                            team_thread: [
+                                { id: "msg_4", sender: "Marcus Vance", message: "Seller rep promised occupancy certificate scan by Monday morning.", timestamp: new Date(Date.now() - 4 * 3600 * 1000).toISOString() }
+                            ],
+                            client_timeline: [
+                                { title: "Corporate inquiry captured", timestamp: new Date(Date.now() - 15 * 24 * 3600 * 1000).toISOString() },
+                                { title: "Site visit completed", timestamp: new Date(Date.now() - 12 * 24 * 3600 * 1000).toISOString() },
+                                { title: "Token advance payment received", timestamp: new Date(Date.now() - 8 * 24 * 3600 * 1000).toISOString() },
+                                { title: "Legal review initiated", timestamp: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString() }
+                            ],
+                            created_at: new Date(Date.now() - 15 * 24 * 3600 * 1000).toISOString(),
                             tasks: [
-                                { id: "t_ag_1", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Discovery & Briefing", name: "Conduct client kickoff call", notes: "Discuss style direction and brand pillars", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString() },
-                                { id: "t_ag_2", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Discovery & Briefing", name: "Create mood boards & style scape", notes: "Presented 3 options, client chose option B", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString() },
-                                { id: "t_ag_3", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Design & Copy", name: "Draft logo concepts (3 variations)", notes: "Working on modern brutalist style options", done: false, updated_at: new Date().toISOString() },
-                                { id: "t_ag_4", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Client Revisions", name: "Collect feedback round 1 & edit", notes: "", done: false, updated_at: new Date().toISOString() },
-                                { id: "t_ag_5", category: "🎨 CREATIVE AGENCY WORKFLOW", module: "Handover & Support", name: "Export logo package & guideline PDF", notes: "", done: false, updated_at: new Date().toISOString() }
+                                { id: "t_re_10", category: "🏡 REAL ESTATE WORKFLOW", module: "Inquiry", name: "Review buyer inquiry details", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 15 * 24 * 3600 * 1000).toISOString() },
+                                { id: "t_re_11", category: "🏡 REAL ESTATE WORKFLOW", module: "Site Visit", name: "Conduct physical site walk-through", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 12 * 24 * 3600 * 1000).toISOString() },
+                                { id: "t_re_12", category: "🏡 REAL ESTATE WORKFLOW", module: "Negotiation", name: "Sign term sheet", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 10 * 24 * 3600 * 1000).toISOString() },
+                                { id: "t_re_13", category: "🏡 REAL ESTATE WORKFLOW", module: "Token Advance", name: "Confirm token receipt in bank", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 8 * 24 * 3600 * 1000).toISOString() },
+                                { id: "t_re_14", category: "🏡 REAL ESTATE WORKFLOW", module: "Legal Review", name: "Verify property tax clearance", done: false, updated_at: new Date().toISOString() }
                             ]
                         }
                     ],
                     meetings: [
                         {
                             id: "meet_1",
-                            title: "Sarah Jenkins - Home Showings",
+                            title: "Sarah Jenkins - Final Showings Review",
                             datetime: new Date(Date.now() + 2 * 24 * 3600 * 1000).toISOString().slice(0, 16),
-                            description: "Review property details and visit the suburban townhouses.",
+                            description: "Review draft agreement details and verify remaining conditions.",
                             status: "Scheduled",
                             created_at: new Date().toISOString()
                         },
                         {
                             id: "meet_2",
-                            title: "Nova Apparel - Discovery Call",
+                            title: "Rajesh Kumar - Site Visit Walkthrough",
                             datetime: new Date(Date.now() + 1 * 24 * 3600 * 1000).toISOString().slice(0, 16),
-                            description: "Go through requirements for Shopify Webflow site.",
+                            description: "Walkthrough of Bellevue Condo Suite 4B with seller.",
                             status: "Scheduled",
                             created_at: new Date().toISOString()
                         }
@@ -1308,13 +1400,6 @@
                             name: "Real Estate Operations Guide.pdf",
                             notes: "Internal SOPs for listing properties, scheduling viewings, and coordinating closings.",
                             type: "Operations Guide",
-                            created_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString()
-                        },
-                        {
-                            id: "doc_2",
-                            name: "Creative Agency Playbook.pdf",
-                            notes: "Standard guidelines for creative briefing, mood boarding, revision rounds, and client handovers.",
-                            type: "Playbook",
                             created_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString()
                         }
                     ],
@@ -1329,60 +1414,104 @@
                     invoices: [
                         {
                             id: "inv_re_1",
+                            project_id: "proj_re_1",
                             lead_id: "lead_re_1",
-                            lead_name: "Sarah Jenkins (Buyer)",
-                            project_name: "Sarah Jenkins - Home Acquisition",
+                            lead_name: "Sarah Jenkins",
+                            project_name: "Greenwood Townhouse #14",
                             currency: "INR",
-                            base_amount: 250000,
-                            addon_amount: 0,
-                            total_amount: 250000,
-                            paid_amount: 100000,
-                            remaining_amount: 150000,
+                            total_amount: 9500000,
+                            paid_amount: 950000,
+                            remaining_amount: 8550000,
+                            commission_amount: 190000,
+                            token_advance: 950000,
+                            registration_payment: 0,
                             invoice_status: "Sent",
-                            payment_status: "Partial Payment",
-                            due_now_amount: 100000,
-                            upfront_percent: 40,
-                            payment_method: "upi",
-                            notes: "Downpayment for escrow opening.",
-                            invoice_link: "https://flowra.io/invoices/inv_re_1"
+                            payment_status: "Partial Paid",
+                            notes: "Token advance received. Awaiting agreement signing for next milestone.",
+                            created_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString()
                         },
                         {
-                            id: "inv_ag_1",
-                            lead_id: "lead_agency_1",
-                            lead_name: "Vivid Branding Co",
-                            project_name: "Vivid Branding - Logo & Guidelines",
+                            id: "inv_re_2",
+                            project_id: "proj_re_2",
+                            lead_id: "lead_re_2",
+                            lead_name: "David Miller",
+                            project_name: "Bellevue Condo Suite 4B",
                             currency: "INR",
-                            base_amount: 120000,
-                            addon_amount: 30000,
-                            total_amount: 150000,
-                            paid_amount: 150000,
-                            remaining_amount: 0,
-                            invoice_status: "Sent",
-                            payment_status: "Fully Paid",
-                            due_now_amount: 150000,
-                            upfront_percent: 100,
-                            payment_method: "bank_transfer",
-                            notes: "100% upfront branding fee.",
-                            invoice_link: "https://flowra.io/invoices/inv_ag_1"
-                        },
-                        {
-                            id: "inv_ag_2",
-                            lead_id: "lead_agency_2",
-                            lead_name: "Nova Apparel",
-                            project_name: "Nova Apparel - Webflow E-Commerce",
-                            currency: "INR",
-                            base_amount: 200000,
-                            addon_amount: 0,
-                            total_amount: 200000,
+                            total_amount: 18000000,
                             paid_amount: 0,
-                            remaining_amount: 200000,
+                            remaining_amount: 18000000,
+                            commission_amount: 450000,
+                            token_advance: 1800000,
+                            registration_payment: 0,
                             invoice_status: "Sent",
-                            payment_status: "Payment Pending",
-                            due_now_amount: 50000,
-                            upfront_percent: 25,
-                            payment_method: "upi",
-                            notes: "Awaiting retainer deposit.",
-                            invoice_link: "https://flowra.io/invoices/inv_ag_2"
+                            payment_status: "Token Pending",
+                            notes: "Awaiting site visit completion to negotiate token deposit.",
+                            created_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString()
+                        },
+                        {
+                            id: "inv_re_3",
+                            project_id: "proj_re_3",
+                            lead_id: "lead_re_4",
+                            lead_name: "Zenith Tech Solutions",
+                            project_name: "Oakridge Commercial Complex",
+                            currency: "INR",
+                            total_amount: 42000000,
+                            paid_amount: 2100000,
+                            remaining_amount: 39900000,
+                            commission_amount: 630000,
+                            token_advance: 2100000,
+                            registration_payment: 0,
+                            invoice_status: "Sent",
+                            payment_status: "Partial Paid",
+                            notes: "Token payment confirmed. Awaiting legal approval.",
+                            created_at: new Date(Date.now() - 8 * 24 * 3600 * 1000).toISOString()
+                        }
+                    ],
+                    playbooks: [
+                        {
+                            id: "pb_1",
+                            name: "New Buyer Inquiry Workflow",
+                            trigger: "New Buyer Lead Captured in System",
+                            actions: "1. Auto-assign broker via round-robin<br>2. Send WhatsApp digital brochure<br>3. Schedule callback in planner",
+                            operator: "Lead Coordinator",
+                            linked_project: "All New Prospects",
+                            active: true
+                        },
+                        {
+                            id: "pb_2",
+                            name: "WhatsApp Follow-Up Workflow",
+                            trigger: "Site Visit marked completed + 24 hrs",
+                            actions: "1. Send automated feedback form link<br>2. Request buyer rating on property<br>3. Task broker to call client",
+                            operator: "Relationship Manager",
+                            linked_project: "Active Buyer Workspaces",
+                            active: true
+                        },
+                        {
+                            id: "pb_3",
+                            name: "Site Visit Reminder Workflow",
+                            trigger: "Scheduled Site Visit - 2 hrs",
+                            actions: "1. SMS broker and client with directions<br>2. Share property address & broker contacts<br>3. Check attendance status",
+                            operator: "Site Supervisor",
+                            linked_project: "Active Showings",
+                            active: true
+                        },
+                        {
+                            id: "pb_4",
+                            name: "Payment Reminder Workflow",
+                            trigger: "Milestone invoice sent + 3 days",
+                            actions: "1. Auto WhatsApp reminder with invoice details<br>2. Escalate overdue to accounts manager<br>3. Pause legal document release",
+                            operator: "Finance Officer",
+                            linked_project: "Milestone Contracts",
+                            active: true
+                        },
+                        {
+                            id: "pb_5",
+                            name: "Document Request Workflow",
+                            trigger: "Agreement Drafting stage activated",
+                            actions: "1. Send automated email requesting KYC list<br>2. Generate secure document upload link<br>3. Log verification task",
+                            operator: "Compliance Officer",
+                            linked_project: "Agreement Workspace",
+                            active: false
                         }
                     ],
                     automations: []
@@ -1396,60 +1525,13 @@
         /* HARDCODED MODULE & TASK HIERARCHY */
         const TASK_STRUCTURE = {
             "🏡 REAL ESTATE WORKFLOW": {
-                "Listing & Marketing": ["Sign Listing Agreement & Disclosures", "Professional staging & photography", "Upload listing to MLS & syndication"],
-                "Search & Showings": ["Select townhouses matching criteria", "Schedule home showings", "Conduct virtual property tours"],
-                "Contracting & Escrow": ["Draft and submit purchase offer", "Open escrow & deposit earnest money", "Review seller disclosures"],
-                "Closing & Transfer": ["Arrange home inspection & appraisal", "Review Closing Disclosure", "Sign deed transfer & settle funds"]
-            },
-            "🎨 CREATIVE AGENCY WORKFLOW": {
-                "Discovery & Briefing": ["Conduct client kickoff call", "Create mood boards & style scape", "Finalize design brief"],
-                "Design & Copy": ["Draft logo concepts (3 variations)", "Draft brand identity guidebook", "Write homepage copy"],
-                "Client Revisions": ["Collect feedback round 1 & edit", "Collect feedback round 2 & edit"],
-                "Handover & Support": ["Export logo package & assets", "Deliver style guidelines PDF", "Conduct handoff meeting"]
-            },
-            "🟪 CUSTOMER AUTOMATION": {
-                "Website Chatbot": ["Setup chatbot", "Train on company data", "Connect to website"],
-                "WhatsApp / Call Handling": ["Setup WhatsApp flow", "Setup auto-reply"],
-                "Lead Capture System": ["Setup lead capture"],
-                "Missed Call Recovery": ["Setup fallback flow"]
-            },
-            "🟦 INTERNAL OPERATIONS": {
-                "Team Dashboard": ["Build dashboard UI"],
-                "Task Automation": ["Create task system", "Automate repetitive actions"],
-                "Workflow Automation": ["Connect database", "Setup internal tools"]
-            },
-            "🟧 SALES & FOLLOW-UP": {
-                "Lead Management": ["Setup lead tracking"],
-                "Follow-up Automation": ["Auto follow-up system"],
-                "Email Automation": ["Email templates", "CRM logic"]
-            },
-            "🟩 SCHEDULING & BOOKINGS": {
-                "Booking System": ["Create booking flow"],
-                "Slot Management": ["Assign slots"],
-                "Agent Assignment": ["Connect calendar", "Auto-confirm bookings"]
-            },
-            "🟥 OPERATIONS & DELIVERY": {
-                "Task Execution System": ["Assign delivery tasks"],
-                "Agent Flow": ["Setup notifications"],
-                "Notifications": ["Track completion"]
-            },
-            "🟨 INTELLIGENCE & ALERTS": {
-                "Predictive Alerts": ["Setup alerts"],
-                "Inventory Monitoring": ["Define triggers"],
-                "Usage Tracking": ["Connect data sources"]
-            },
-            "📊 ANALYTICS & INSIGHTS (CORE UPGRADE)": {
-                "Lead & Sales Visibility": ["Count total leads", "Track lead status (new → contacted → closed)", "Identify uncontacted leads", "Calculate conversion rate", "Show lead movement (pipeline flow)"],
-                "Operations Performance": ["Count total tasks", "Track completed vs pending", "Identify overdue tasks", "Measure response time", "Show workload distribution"]
-            },
-            "🟦 ADMIN / CONTROL SYSTEM": {
-                "Team Monitoring": ["Track tasks per member", "Track completed tasks", "Log working hours", "Show simple leaderboard", "Detect overloaded members"],
-                "Task Control": ["Assign task", "Reassign task", "Set priority", "Set deadline", "Update status"],
-                "Approval Flow (keep simple)": ["Submit for approval", "Approve / reject", "Add comment", "Log decision"]
-            },
-            "🟧 INTEGRATIONS (ONLY PRACTICAL ONES)": {
-                "Data Sync (KEEP THIS)": ["Sync leads to Google Sheets", "Backup data", "Export data", "Import external data"],
-                "Tool Sync (LIMITED)": ["Connect email (basic)", "Store communication logs", "Sync basic client info"]
+                "Inquiry": ["Review buyer inquiry details", "Qualify financial capability"],
+                "Site Visit": ["Schedule site walk-through", "Conduct physical site walk-through", "Log buyer feedback"],
+                "Negotiation": ["Negotiate price and terms", "Sign term sheet"],
+                "Token Advance": ["Confirm token receipt in bank", "Issue token payment receipt"],
+                "Legal Review": ["Search title deed history", "Verify property tax clearance", "Check NOC documents"],
+                "Agreement Drafting": ["Draft purchase agreement copy", "Collect buyer & seller signatures"],
+                "Registration": ["Book registrar office slot", "Pay stamp duty and registration fees", "Complete registration at registrar office"]
             }
         };
 
@@ -1610,48 +1692,389 @@
            PROJECT CHECKLIST UI
            -------------------------------------- */
 
-        function renderProjects() {
-            document.getElementById('projects-grid').innerHTML = DB.tables.projects.map(proj => {
-                let tasks = proj.tasks || [];
-                let total = tasks.length;
-                let done = tasks.filter(t => t.done).length;
-                let progress = total > 0 ? Math.round((done / total) * 100) : 0;
+        /* --------------------------------------
+           PROPERTY TRANSACTION CENTER WORKSPACES
+           -------------------------------------- */
 
-                return `
-                <div class="card" style="position: relative;">
-                    <div class="flex-between" style="padding-right: 80px;">
-                        <div>
-                            <span style="font-weight:900; text-transform:uppercase; font-size:12px;">CLIENT: ${proj.client_name}</span>
-                            <h3 style="margin-bottom:0; font-size: 24px;">${proj.project_name}</h3>
-                        </div>
-                        <span style="font-weight:900; font-size:32px; color: ${progress===100?'#ff3c00':'var(--text-color)'}">${progress}%</span>
+        window.changeProjectStage = function(projId, newStage) {
+            const proj = DB.tables.projects.find(p => p.id === projId);
+            if (!proj) return;
+
+            const oldStage = proj.deal_stage;
+            if (oldStage === newStage) return;
+
+            proj.deal_stage = newStage;
+
+            // Log stage shift in timeline
+            if (!proj.client_timeline) proj.client_timeline = [];
+            proj.client_timeline.push({
+                title: `Deal stage shifted to ${newStage}`,
+                timestamp: new Date().toISOString()
+            });
+
+            // Auto-complete or revert checklist tasks based on new stage index
+            const stages = ["Inquiry", "Site Visit", "Negotiation", "Token Advance", "Legal Review", "Agreement Drafting", "Registration", "Completed"];
+            const targetIdx = stages.indexOf(newStage);
+            
+            (proj.tasks || []).forEach(t => {
+                const tIdx = stages.indexOf(t.module);
+                if (tIdx !== -1) {
+                    if (tIdx < targetIdx) {
+                        t.done = true;
+                    } else if (tIdx > targetIdx) {
+                        t.done = false;
+                    }
+                }
+            });
+
+            // Update associated lead status
+            if (proj.lead_id) {
+                const lead = DB.tables.leads.find(l => l.id === proj.lead_id);
+                if (lead) {
+                    lead.status = (newStage === 'Completed') ? 'finished' : 'working';
+                }
+            }
+
+            // Sync invoice payment status if appropriate
+            const inv = (DB.tables.invoices || []).find(i => i.project_id === proj.id);
+            if (inv) {
+                if (newStage === 'Completed') {
+                    inv.payment_status = 'Fully Settled';
+                    inv.paid_amount = inv.total_amount;
+                    inv.remaining_amount = 0;
+                } else if (newStage === 'Registration') {
+                    inv.payment_status = 'Registration Complete';
+                } else if (newStage === 'Legal Review') {
+                    inv.payment_status = 'Legal Hold';
+                }
+            }
+
+            DB.save();
+            syncToSupabase();
+            renderAll();
+        };
+
+        window.addProjectBlocker = function(projId) {
+            const proj = DB.tables.projects.find(p => p.id === projId);
+            if (!proj) return;
+
+            openModal("ADD OPERATIONAL BOTTLENECK", [
+                {id: 'item', label: 'Bottleneck Description (e.g. Waiting on Seller Signature)'},
+                {id: 'responsible', label: 'Responsible Party (e.g. David Miller)'},
+                {id: 'urgency', label: 'Urgency Level', type: 'select', options: ['High', 'Medium', 'Low'], val: 'Medium'}
+            ], (res) => {
+                if (res.item && res.item.trim() !== '') {
+                    if (!proj.waiting_on) proj.waiting_on = [];
+                    proj.waiting_on.push({
+                        item: res.item,
+                        responsible: res.responsible || 'Unassigned',
+                        duration: '0 days',
+                        urgency: res.urgency || 'Medium'
+                    });
+
+                    if (!proj.client_timeline) proj.client_timeline = [];
+                    proj.client_timeline.push({
+                        title: `Bottleneck flagged: ${res.item}`,
+                        timestamp: new Date().toISOString()
+                    });
+
+                    DB.save();
+                    syncToSupabase();
+                    renderAll();
+                    closeModal();
+                } else {
+                    alert('Bottleneck description cannot be empty.');
+                }
+            });
+        };
+
+        window.resolveProjectBlocker = function(projId, index) {
+            const proj = DB.tables.projects.find(p => p.id === projId);
+            if (!proj || !proj.waiting_on || !proj.waiting_on[index]) return;
+
+            const resolved = proj.waiting_on.splice(index, 1)[0];
+
+            if (!proj.client_timeline) proj.client_timeline = [];
+            proj.client_timeline.push({
+                title: `Resolved bottleneck: ${resolved.item}`,
+                timestamp: new Date().toISOString()
+            });
+
+            DB.save();
+            syncToSupabase();
+            renderAll();
+        };
+
+        window.addProjectDocument = function(projId) {
+            const proj = DB.tables.projects.find(p => p.id === projId);
+            if (!proj) return;
+
+            openModal("UPLOAD PROPERTY DOCUMENT", [
+                {id: 'name', label: 'Document File Name (e.g. Property_Sale_Agreement.pdf)'},
+                {id: 'category', label: 'Vault Folder Category', type: 'select', options: ["Ownership Documents", "Government Approvals", "Buyer/Seller KYC", "Legal Verification", "Payment Receipts", "Agreements", "Property Media"], val: 'Agreements'}
+            ], (res) => {
+                if (res.name && res.name.trim() !== '') {
+                    if (!proj.documents) proj.documents = [];
+                    proj.documents.push({
+                        id: 'doc_' + generateId(),
+                        name: res.name,
+                        category: res.category,
+                        uploaded_at: new Date().toISOString(),
+                        uploaded_by: 'Marcus Vance (Broker)',
+                        status: 'Approved',
+                        visibility: 'Public',
+                        version: 'v1.0'
+                    });
+
+                    if (!proj.client_timeline) proj.client_timeline = [];
+                    proj.client_timeline.push({
+                        title: `Property agreement uploaded: ${res.name}`,
+                        timestamp: new Date().toISOString()
+                    });
+
+                    DB.save();
+                    syncToSupabase();
+                    renderAll();
+                    closeModal();
+                } else {
+                    alert('File name cannot be empty.');
+                }
+            });
+        };
+
+        window.postProjectChatMessage = function(projId) {
+            const proj = DB.tables.projects.find(p => p.id === projId);
+            if (!proj) return;
+
+            const inputEl = document.getElementById(`chat_input_${projId}`);
+            if (!inputEl) return;
+
+            const msgText = inputEl.value;
+            if (!msgText || msgText.trim() === '') return;
+
+            if (!proj.team_thread) proj.team_thread = [];
+            proj.team_thread.push({
+                id: 'msg_' + generateId(),
+                sender: 'Marcus Vance (Broker)',
+                message: msgText.trim(),
+                timestamp: new Date().toISOString()
+            });
+
+            inputEl.value = '';
+
+            DB.save();
+            syncToSupabase();
+            renderAll();
+        };
+
+        function renderProjects() {
+            const grid = document.getElementById('projects-grid');
+            if (!grid) return;
+
+            const projects = DB.tables.projects || [];
+            if (projects.length === 0) {
+                grid.innerHTML = '<div class="card" style="text-align:center; font-weight:700; padding:48px; opacity:0.5;">No active properties in pipeline.</div>';
+                return;
+            }
+
+            grid.innerHTML = projects.map(proj => {
+                const tasks = proj.tasks || [];
+                const doneCount = tasks.filter(t => t.done).length;
+                const progress = tasks.length > 0 ? Math.round((doneCount / tasks.length) * 100) : 0;
+                
+                const stages = ["Inquiry", "Site Visit", "Negotiation", "Token Advance", "Legal Review", "Agreement Drafting", "Registration", "Completed"];
+                const docCategories = [
+                    "Ownership Documents", 
+                    "Government Approvals", 
+                    "Buyer/Seller KYC", 
+                    "Legal Verification", 
+                    "Payment Receipts", 
+                    "Agreements", 
+                    "Property Media"
+                ];
+                const blockers = proj.waiting_on || [];
+
+                // Pipeline html
+                const pipelineHtml = `<div style="display:flex; justify-content:space-between; align-items:center; margin: 16px 0; background:#eee; border:2.5px solid var(--border-color); padding: 4px; overflow-x:auto;">
+                    ${stages.map((stg, idx) => {
+                        const isActive = proj.deal_stage === stg;
+                        const isPast = stages.indexOf(proj.deal_stage) > idx;
+                        let bg = '#fff';
+                        let fg = 'var(--text-color)';
+                        let weight = '700';
+                        if (isActive) {
+                            bg = 'var(--accent-color)';
+                            fg = '#fff';
+                            weight = '900';
+                        } else if (isPast) {
+                            bg = '#111';
+                            fg = '#fff';
+                        }
+                        return `
+                            <div onclick="changeProjectStage('${proj.id}', '${stg}')" style="cursor:pointer; padding:6px 10px; font-size:10px; font-weight:${weight}; text-transform:uppercase; background:${bg}; color:${fg}; border: 1.5px solid var(--border-color); text-align:center; flex:1; white-space:nowrap; margin: 2px;">
+                                ${idx+1}. ${stg}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>`;
+
+                // Property Info Grid HTML
+                const infoGridHtml = `<div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; margin-bottom:20px; border-bottom: 2px solid var(--border-color); padding-bottom:16px;">
+                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Property Type</span><div style="font-weight:900; font-size:14px;">${proj.property_type || 'Unknown'}</div></div>
+                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Deal Value</span><div style="font-weight:900; font-size:14px; color: #10B981;">INR ${(proj.deal_value || 0).toLocaleString()}</div></div>
+                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Commission</span><div style="font-weight:900; font-size:14px;">${proj.commission_percent || 0}% (INR ${Math.round((proj.deal_value || 0) * ((proj.commission_percent || 0)/100)).toLocaleString()})</div></div>
+                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Reg Deadline</span><div style="font-weight:900; font-size:14px;">${proj.registration_deadline || 'N/A'}</div></div>
+                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Seller Name</span><div style="font-weight:900; font-size:14px;">${proj.seller_name || 'N/A'}</div></div>
+                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Buyer Name</span><div style="font-weight:900; font-size:14px;">${proj.buyer_name || proj.client_name || 'N/A'}</div></div>
+                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Assigned Broker</span><div style="font-weight:900; font-size:14px; color: var(--accent-color);">${proj.assigned_broker || 'Unassigned'}</div></div>
+                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Overall Checklist</span><div style="font-weight:900; font-size:14px;">${doneCount}/${tasks.length} Done (${progress}%)</div></div>
+                </div>`;
+
+                // Blockers list HTML
+                const blockersHtml = `<div style="background:#fff3f3; border: 2.5px solid var(--border-color); padding: 12px; margin-bottom:20px;">
+                    <div class="flex-between" style="margin-bottom:8px; border-bottom:1.5px solid var(--border-color); padding-bottom:4px;">
+                        <h4 style="font-size:12px; text-transform:uppercase; color:#ff3c00; font-weight:900; margin:0;">⚠️ Operational Bottlenecks</h4>
+                        <button class="btn" style="padding:2px 6px; font-size:9px; border-color:#ff3c00; color:#ff3c00;" onclick="addProjectBlocker('${proj.id}')">+ ADD BOTTLENECK</button>
                     </div>
-                    
-                    <div style="border: 4px solid var(--border-color); height: 28px; width: 100%; margin: 16px 0 24px 0; background: var(--bg-color); position: relative;">
-                        <div style="background: var(--accent-color); width: ${progress}%; height: 100%; border-right: ${progress > 0 && progress < 100 ? '4px solid var(--border-color)' : 'none'}; transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);"></div>
-                    </div>
-                    
-                    <div style="background:#fffebc; border: 3px solid var(--border-color); padding: 16px;">
-                        <div class="flex-between" style="border-bottom: 2px solid rgba(0,0,0,0.1); padding-bottom: 8px; margin-bottom:16px;">
-                            <h4 style="font-size:13px; text-transform:uppercase;">Execution Checklist:</h4>
-                            <button class="btn btn-primary" style="padding: 4px 8px; font-size:10px;" onclick="addCustomTask('${proj.id}')">+ ADD AD-HOC TASK</button>
+                    ${blockers.length === 0 ? `<div style="font-size:12px; font-weight:700; color:#777; padding:4px;">No active operational bottlenecks. Deal is moving smoothly.</div>` : `
+                        <div style="display:flex; flex-direction:column; gap:6px;">
+                            ${blockers.map((b, bIdx) => {
+                                let urgencyBg = '#ffeb3b';
+                                let urgencyFg = '#000';
+                                if (b.urgency === 'High') { urgencyBg = '#f44336'; urgencyFg = '#fff'; }
+                                return `
+                                    <div style="display:flex; justify-content:space-between; align-items:center; background:#fff; border:1.5px solid var(--border-color); padding:6px 10px;">
+                                        <div style="font-size:12px; font-weight:700;">
+                                            <span class="badge" style="background:${urgencyBg}; color:${urgencyFg}; border:none; padding:2px 4px; font-size:8px; margin-right:6px;">${b.urgency}</span>
+                                            <strong>${b.item}</strong> (Responsible: ${b.responsible})
+                                            <span style="font-size:10px; opacity:0.6; margin-left:8px;">Pending: ${b.duration}</span>
+                                        </div>
+                                        <button class="btn btn-primary" style="padding:2px 6px; font-size:9px; background:#10B981;" onclick="resolveProjectBlocker('${proj.id}', ${bIdx})">✔ RESOLVED</button>
+                                    </div>
+                                `;
+                            }).join('')}
                         </div>
-                        
-                        <div style="display:flex; flex-direction:column; gap:12px;">
-                            ${(proj.tasks || []).map((t) => `
-                                <div style="display:flex; flex-direction:column; padding-bottom:12px; border-bottom: 1px solid rgba(0,0,0,0.05);">
-                                    <div style="font-weight:900; font-size:10px; margin-bottom:4px; opacity:0.8;">[${t.category}] ➡ ${t.module}</div>
-                                    <label style="display:flex; align-items:flex-start; cursor:pointer; font-weight: 700; font-size:14px; text-decoration: ${t.done?'line-through':'none'}; opacity: ${t.done?0.5:1}">
-                                        <input type="checkbox" ${t.done?'checked':''} onchange="toggleProjectTask('${proj.id}', '${t.id}')" style="width:18px; height:18px; margin-top:2px; margin-right:12px; cursor:pointer; border: 2px solid #000;">
-                                        <span>${t.name}</span>
-                                    </label>
-                                    ${t.notes ? `<div style="font-size:11px; font-weight:700; color:var(--accent-color); margin-left:30px; margin-top:4px; white-space: pre-wrap;">NOTES: ${t.notes}</div>` : ''}
+                    `}
+                </div>`;
+
+                // Documents Vault HTML
+                const docsVaultHtml = `<div style="background:#f9f9f9; border: 2.5px solid var(--border-color); padding: 12px;">
+                    <div class="flex-between" style="margin-bottom:8px; border-bottom:1.5px solid var(--border-color); padding-bottom:4px;">
+                        <h4 style="font-size:12px; text-transform:uppercase; font-weight:900; margin:0;">📄 Document Vault</h4>
+                        <button class="btn btn-primary" style="padding:2px 6px; font-size:9px;" onclick="addProjectDocument('${proj.id}')">+ UPLOAD DOCUMENT</button>
+                    </div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; max-height:220px; overflow-y:auto;">
+                        ${docCategories.map(cat => {
+                            const catDocs = (proj.documents || []).filter(d => d.category === cat);
+                            return `
+                                <div style="background:#fff; border:1.5px solid var(--border-color); padding:8px;">
+                                    <div style="font-size:10px; font-weight:900; text-transform:uppercase; border-bottom:1px solid #eee; padding-bottom:2px; margin-bottom:6px; color:#555;">📁 ${cat}</div>
+                                    ${catDocs.length === 0 ? `<div style="font-size:10px; opacity:0.5; font-weight:700;">No documents uploaded.</div>` : `
+                                        <div style="display:flex; flex-direction:column; gap:4px;">
+                                            ${catDocs.map(d => `
+                                                <div style="font-size:11px; font-weight:700; display:flex; justify-content:space-between; align-items:center;">
+                                                    <span title="${d.name}">${d.name.length > 20 ? d.name.slice(0,18)+'...' : d.name} <span style="font-size:8px; opacity:0.5;">(${d.version})</span></span>
+                                                    <span class="badge" style="font-size:8px; padding:1px 3px; background:${d.status==='Approved'?'#e8f5e9':'#ffe0b2'}; border:none;">${d.status}</span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    `}
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>`;
+
+                // Chat Thread HTML
+                const chatThreadHtml = `<div style="background:#f4f4f4; border: 2.5px solid var(--border-color); padding: 12px; display:flex; flex-direction:column; height: 280px;">
+                    <h4 style="font-size:12px; text-transform:uppercase; font-weight:900; margin-bottom:6px; border-bottom:1.5px solid var(--border-color); padding-bottom:4px;">💬 Internal Team Thread (Secure Broker Logs)</h4>
+                    <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding:6px; background:#fff; border:1.5px solid var(--border-color); margin-bottom:8px;" id="chat_messages_${proj.id}">
+                        ${(proj.team_thread || []).length === 0 ? `<div style="font-size:11px; opacity:0.5; text-align:center; font-weight:700; padding-top:40px;">No message logs. Start coordinating with brokers/legal teams.</div>` : `
+                            ${(proj.team_thread || []).map(msg => `
+                                <div style="font-size:11px; border-bottom:1px solid #f0f0f0; padding-bottom:4px;">
+                                    <div style="display:flex; justify-content:space-between; font-weight:800; font-size:9px; color:#555;">
+                                        <span>${msg.sender}</span>
+                                        <span>${formatRelativeTime(msg.timestamp)}</span>
+                                    </div>
+                                    <div style="font-weight:700; margin-top:2px;">${msg.message}</div>
                                 </div>
                             `).join('')}
+                        `}
+                    </div>
+                    <div style="display:flex; gap:6px;">
+                        <input type="text" id="chat_input_${proj.id}" placeholder="Type broker instruction, legal update, or note..." style="flex:1; padding:6px; font-size:12px; height:32px; border:2px solid var(--border-color);">
+                        <button class="btn btn-primary" style="padding:0 12px; font-size:10px; height:32px;" onclick="postProjectChatMessage('${proj.id}')">POST</button>
+                    </div>
+                </div>`;
+
+                // Client Timeline HTML
+                const clientTimelineHtml = `<div style="background:#fffebc; border: 2.5px solid var(--border-color); padding: 12px;">
+                    <h4 style="font-size:12px; text-transform:uppercase; font-weight:900; margin-bottom:6px; border-bottom:1.5px solid var(--border-color); padding-bottom:4px;">⏳ Relationship Lifecycle</h4>
+                    <div style="display:flex; flex-direction:column; gap:6px; padding:4px; max-height:220px; overflow-y:auto;">
+                        ${(proj.client_timeline || []).map(tl => `
+                            <div style="display:flex; gap:8px; font-size:11px; font-weight:700;">
+                                <span style="color:var(--accent-color);">➔</span>
+                                <div>${tl.title} <span style="font-size:9px; opacity:0.5; margin-left:6px;">${formatRelativeTime(tl.timestamp)}</span></div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>`;
+
+                // Checklist Tasks HTML
+                const tasksHtml = `<div style="background:#fff; border: 2.5px solid var(--border-color); padding: 12px;">
+                    <div class="flex-between" style="border-bottom:1.5px solid var(--border-color); padding-bottom:4px; margin-bottom:12px;">
+                        <h4 style="font-size:12px; text-transform:uppercase; font-weight:900; margin:0;">📋 Stage Checklist (${proj.deal_stage})</h4>
+                        <button class="btn btn-primary" style="padding:2px 6px; font-size:9px;" onclick="addCustomTask('${proj.id}')">+ ADD TASK</button>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto;">
+                        ${tasks.filter(t => t.module === proj.deal_stage).length === 0 ? `<div style="font-size:11px; opacity:0.5; font-weight:700;">No tasks defined for this stage. Add an ad-hoc action item above.</div>` : `
+                            ${tasks.filter(t => t.module === proj.deal_stage).map(t => `
+                                <div style="display:flex; flex-direction:column; padding-bottom:8px; border-bottom: 1px solid #f0f0f0;">
+                                    <label style="display:flex; align-items:center; cursor:pointer; font-weight: 700; font-size:13px; text-decoration: ${t.done?'line-through':'none'}; opacity: ${t.done?0.5:1}">
+                                        <input type="checkbox" ${t.done?'checked':''} onchange="toggleProjectTask('${proj.id}', '${t.id}')" style="width:16px; height:16px; margin-right:10px; cursor:pointer; border: 2px solid #000;">
+                                        <span>${t.name}</span>
+                                    </label>
+                                    ${t.notes ? `<div style="font-size:10px; font-weight:700; color:var(--accent-color); margin-left:26px; margin-top:2px;">NOTES: ${t.notes}</div>` : ''}
+                                </div>
+                            `).join('')}
+                        `}
+                    </div>
+                </div>`;
+
+                return `
+                <div class="card" style="margin-bottom: 32px; border: 4px solid var(--border-color); background: var(--surface-color);">
+                    <div class="flex-between" style="border-bottom:3px solid var(--border-color); padding-bottom:12px; margin-bottom:16px;">
+                        <div>
+                            <span style="font-weight:900; text-transform:uppercase; font-size:10px; opacity:0.6; letter-spacing:0.5px;">Transaction Deal Folder</span>
+                            <h3 style="margin:0; font-size:26px; font-weight:900;">🏡 ${proj.project_name}</h3>
+                        </div>
+                        <div style="text-align:right;">
+                            <span class="badge" style="background:var(--accent-color); color:#fff; border:2px solid var(--border-color); font-weight:900; font-size:12px; text-transform:uppercase;">${proj.deal_stage}</span>
                         </div>
                     </div>
+                    
+                    ${pipelineHtml}
+                    ${infoGridHtml}
+                    ${blockersHtml}
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom:20px;">
+                        ${docsVaultHtml}
+                        ${chatThreadHtml}
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+                        ${clientTimelineHtml}
+                        ${tasksHtml}
+                    </div>
                 </div>
-            `}).join('');
+                `;
+            }).join('');
+            
+            // Scroll chat message boxes to bottom
+            projects.forEach(proj => {
+                const chatBox = document.getElementById(`chat_messages_${proj.id}`);
+                if (chatBox) chatBox.scrollTop = chatBox.scrollHeight;
+            });
         }
 
         window.addCustomTask = function(projId) {
@@ -1662,13 +2085,12 @@
                 {id: 'name', label: 'Actionable Task Name'},
                 {id: 'notes', label: 'Notes (e.g. from client meeting)', type: 'textarea'}
             ], (res) => {
-                // Ensure name isn't blank
                 if(res.name && res.name.trim() !== '') {
                     if(!proj.tasks) proj.tasks = [];
                     proj.tasks.push({
                         id: generateId(),
-                        category: '⬜ CUSTOM ADDITION',
-                        module: 'Ad-hoc Task',
+                        category: '🏡 REAL ESTATE WORKFLOW',
+                        module: proj.deal_stage || 'Inquiry',
                         name: res.name,
                         notes: res.notes,
                         done: false,
@@ -1708,14 +2130,13 @@
                             if (allDone) {
                                 lead.status = 'finished';
                             } else if (lead.status === 'finished') {
-                                // If tasks are unchecked, revert from finished to working
                                 lead.status = 'working';
                             }
                         }
                     }
                     
                     DB.save(); 
-                    syncToSupabase(); // Use full sync to ensure lead status is pushed
+                    syncToSupabase(); 
                     renderAll(); 
                 }
             }
@@ -1748,154 +2169,96 @@
         function getFlowTrackerEvents() {
             let events = [];
 
-            // 1. Projects
+            // 1. Projects (Properties)
             (DB.tables.projects || []).forEach(p => {
                 if (p.created_at) {
                     events.push({
                         id: 'proj_create_' + p.id,
-                        module_type: 'PROJECT',
-                        title: 'Workspace activated',
-                        related_entity: p.client_name + ' - ' + p.project_name,
+                        event_type: 'LISTING',
+                        title: `Property Listing Activated: ${p.property_type}`,
+                        property_name: p.project_name || 'Unassigned Property',
+                        client_name: p.client_name,
+                        current_stage: p.deal_stage || 'Inquiry',
+                        waiting_on: p.waiting_on && p.waiting_on.length > 0 ? p.waiting_on[0].item : '',
                         status: 'Active',
                         timestamp: p.created_at
                     });
                 }
-                // Project Tasks
-                (p.tasks || []).forEach(t => {
-                    if (t.done && t.updated_at) {
-                        events.push({
-                            id: 'task_done_' + t.id,
-                            module_type: 'TASK',
-                            title: t.name,
-                            related_entity: p.client_name,
-                            status: 'Completed',
-                            timestamp: t.updated_at
-                        });
-                    }
+                
+                // client relationship timeline
+                (p.client_timeline || []).forEach((tl, idx) => {
+                    let evType = 'INQUIRY';
+                    if (tl.title.toLowerCase().includes('visit')) evType = 'VISIT';
+                    else if (tl.title.toLowerCase().includes('negotiat') || tl.title.toLowerCase().includes('offer') || tl.title.toLowerCase().includes('sheet')) evType = 'NEGOTIATION';
+                    else if (tl.title.toLowerCase().includes('token') || tl.title.toLowerCase().includes('payment')) evType = 'PAYMENT';
+                    else if (tl.title.toLowerCase().includes('legal')) evType = 'LEGAL';
+                    else if (tl.title.toLowerCase().includes('agreement')) evType = 'DOCUMENT';
+                    else if (tl.title.toLowerCase().includes('registration') || tl.title.toLowerCase().includes('registrar')) evType = 'REGISTRATION';
+
+                    events.push({
+                        id: 'proj_timeline_' + p.id + '_' + idx,
+                        event_type: evType,
+                        title: tl.title,
+                        property_name: p.project_name || 'Unassigned Property',
+                        client_name: p.client_name,
+                        current_stage: p.deal_stage || 'Inquiry',
+                        waiting_on: p.waiting_on && p.waiting_on.length > 0 ? p.waiting_on[0].item : '',
+                        status: 'Logged',
+                        timestamp: tl.timestamp
+                    });
+                });
+
+                // Document uploads
+                (p.documents || []).forEach(d => {
+                    events.push({
+                        id: 'proj_doc_' + p.id + '_' + d.id,
+                        event_type: 'DOCUMENT',
+                        title: `Property agreement uploaded: ${d.name}`,
+                        property_name: p.project_name || 'Unassigned Property',
+                        client_name: p.client_name,
+                        current_stage: p.deal_stage || 'Inquiry',
+                        waiting_on: p.waiting_on && p.waiting_on.length > 0 ? p.waiting_on[0].item : '',
+                        status: d.status || 'Uploaded',
+                        timestamp: d.uploaded_at
+                    });
+                });
+
+                // Team Thread chat notes
+                (p.team_thread || []).forEach((msg, idx) => {
+                    events.push({
+                        id: 'proj_msg_' + p.id + '_' + idx,
+                        event_type: 'COMMUNICATION',
+                        title: `Broker Note: "${msg.message}"`,
+                        property_name: p.project_name || 'Unassigned Property',
+                        client_name: p.client_name,
+                        current_stage: p.deal_stage || 'Inquiry',
+                        waiting_on: p.waiting_on && p.waiting_on.length > 0 ? p.waiting_on[0].item : '',
+                        status: 'Posted',
+                        timestamp: msg.timestamp
+                    });
                 });
             });
 
-            // 2. Leads
+            // 2. Leads (prospects who don't have workspaces yet)
             (DB.tables.leads || []).forEach(l => {
-                if (l.created_at) {
+                const hasProj = (DB.tables.projects || []).some(p => p.lead_id === l.id);
+                if (!hasProj && l.created_at) {
                     events.push({
                         id: 'lead_create_' + l.id,
-                        module_type: 'LEAD',
-                        title: 'New inquiry captured',
-                        related_entity: l.name,
-                        status: l.status === 'new' ? 'Awaiting follow-up' : l.status.toUpperCase(),
+                        event_type: 'INQUIRY',
+                        title: 'New buyer inquiry captured',
+                        property_name: 'Search Pending',
+                        client_name: l.name,
+                        current_stage: 'Inquiry',
+                        waiting_on: 'Broker Assigned Pending',
+                        status: 'Awaiting Follow-up',
                         timestamp: l.created_at
                     });
                 }
             });
 
-            // 3. Meetings
-            (DB.tables.meetings || []).forEach(m => {
-                if (m.time) {
-                    const isPast = new Date(m.time).getTime() < Date.now();
-                    let leadName = 'Client';
-                    if (m.lead_id) {
-                        const lead = (DB.tables.leads || []).find(l => l.id === m.lead_id);
-                        if (lead) leadName = lead.name;
-                    }
-                    events.push({
-                        id: 'meet_' + m.id,
-                        module_type: 'MEETING',
-                        title: m.title,
-                        related_entity: leadName,
-                        status: isPast ? 'Completed' : 'Scheduled',
-                        timestamp: new Date(m.time).toISOString()
-                    });
-                }
-            });
-
-            // 4. Invoices
-            (DB.tables.invoices || []).forEach(i => {
-                if (i.created_at) {
-                    events.push({
-                        id: 'inv_create_' + i.id,
-                        module_type: 'INVOICE',
-                        title: `Invoice created (${i.payment_mode || 'Standard'})`,
-                        related_entity: i.lead_name + ' - ' + i.project_name,
-                        status: 'Sent',
-                        timestamp: i.created_at
-                    });
-                    if (i.paid_now_amount > 0) {
-                        events.push({
-                            id: 'inv_pay_' + i.id,
-                            module_type: 'INVOICE',
-                            title: `Payment received (${i.currency || 'INR'} ${i.paid_now_amount})`,
-                            related_entity: i.lead_name,
-                            status: 'Paid',
-                            timestamp: i.created_at
-                        });
-                    }
-                }
-            });
-
-            // 5. Automations
-            (DB.tables.automations || []).forEach(a => {
-                if (a.timestamp) {
-                    events.push({
-                        id: 'auto_' + a.id,
-                        module_type: 'AUTOMATION',
-                        title: a.title,
-                        related_entity: a.related_entity || 'System',
-                        status: a.status || 'Successful',
-                        timestamp: a.timestamp
-                    });
-                }
-            });
-
-            // Sort events by timestamp descending (newest first)
+            // Sort by timestamp descending
             events.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-
-            // If empty, fall back to mock data
-            if (events.length === 0) {
-                const now = new Date();
-                events = [
-                    {
-                        id: 'mock_1',
-                        module_type: 'PROJECT',
-                        title: 'Workspace activated',
-                        related_entity: 'Raga Designers',
-                        status: 'Active',
-                        timestamp: new Date(now.getTime() - 2 * 60000).toISOString()
-                    },
-                    {
-                        id: 'mock_2',
-                        module_type: 'LEAD',
-                        title: 'New inquiry captured',
-                        related_entity: 'Elevate Consulting',
-                        status: 'Awaiting follow-up',
-                        timestamp: new Date(now.getTime() - 5 * 60000).toISOString()
-                    },
-                    {
-                        id: 'mock_3',
-                        module_type: 'MEETING',
-                        title: 'Discovery call booked',
-                        related_entity: 'Third Eye Blind Productions',
-                        status: 'Scheduled',
-                        timestamp: new Date(now.getTime() - 11 * 60000).toISOString()
-                    },
-                    {
-                        id: 'mock_4',
-                        module_type: 'TASK',
-                        title: 'Homepage automation approved by Chira',
-                        related_entity: 'Chira',
-                        status: 'Completed',
-                        timestamp: new Date(now.getTime() - 16 * 60000).toISOString()
-                    },
-                    {
-                        id: 'mock_5',
-                        module_type: 'AUTOMATION',
-                        title: 'Invoice reminder workflow executed',
-                        related_entity: 'Techasoft Pvt Ltd',
-                        status: 'Successful',
-                        timestamp: new Date(now.getTime() - 22 * 60000).toISOString()
-                    }
-                ];
-            }
 
             return events;
         }
@@ -1908,28 +2271,48 @@
             
             container.innerHTML = events.map((ev, index) => {
                 const isNewest = index === 0;
-                let badgeClass = 'badge-' + ev.module_type.toLowerCase();
+                let badgeClass = 'badge-' + (ev.event_type || 'inquiry').toLowerCase();
                 
+                // fallback style colors for brutalist real estate flow badges
+                let customStyle = '';
+                if (ev.event_type === 'LISTING') customStyle = 'background:#e3f2fd; color:#0d47a1;';
+                else if (ev.event_type === 'VISIT') customStyle = 'background:#e8f5e9; color:#1b5e20;';
+                else if (ev.event_type === 'NEGOTIATION') customStyle = 'background:#fff3e0; color:#e65100;';
+                else if (ev.event_type === 'PAYMENT') customStyle = 'background:#f3e5f5; color:#4a148c;';
+                else if (ev.event_type === 'LEGAL') customStyle = 'background:#ffe0b2; color:#e65100;';
+                else if (ev.event_type === 'DOCUMENT') customStyle = 'background:#e0f7fa; color:#006064;';
+                else if (ev.event_type === 'REGISTRATION') customStyle = 'background:#f1f8e9; color:#33691e;';
+                else if (ev.event_type === 'COMMUNICATION') customStyle = 'background:#eceff1; color:#37474f;';
+                else if (ev.event_type === 'INQUIRY') customStyle = 'background:#efebe9; color:#4e342e;';
+
                 return `
                     <div class="flow-card">
                         <div class="flow-node">
                             <div class="flow-bullet ${isNewest ? 'active-pulse' : ''}"></div>
                             <div class="flow-line"></div>
                         </div>
-                        <div class="flow-card-content">
+                        <div class="flow-card-content" style="border: 2px solid var(--border-color); border-radius: 0;">
                             <div class="flow-card-meta">
-                                <span class="flow-badge ${badgeClass}">[${ev.module_type}]</span>
-                                <span class="flow-time">${formatRelativeTime(ev.timestamp)}</span>
+                                <span class="flow-badge ${badgeClass}" style="${customStyle} border: 1.5px solid var(--border-color); font-weight:800; font-size:9px;">[${ev.event_type}]</span>
+                                <span class="flow-time" style="font-weight:700;">${formatRelativeTime(ev.timestamp)}</span>
                             </div>
-                            <div class="flow-card-title">${ev.title}</div>
-                            <div class="flow-card-footer">
-                                <span style="font-size: 10px; font-weight: 700; opacity: 0.8; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                    ${ev.related_entity}
-                                </span>
-                                <span class="flow-status" style="color: ${ev.status === 'Completed' || ev.status === 'Successful' || ev.status === 'Paid' ? '#10B981' : 'var(--text-color)'}">
-                                    ${ev.status}
-                                </span>
+                            <div class="flow-card-title" style="font-weight: 800; font-size: 12px; margin-top: 6px; line-height: 1.3;">${ev.title}</div>
+                            
+                            <div style="font-size: 11px; font-weight: 700; margin-top: 6px;">
+                                Client: <span style="opacity:0.8;">${ev.client_name}</span>
                             </div>
+                            <div style="font-size: 11px; font-weight: 700; margin-top: 2px;">
+                                Property: <span style="color: var(--accent-color);">${ev.property_name}</span>
+                            </div>
+                            <div style="font-size: 10px; margin-top: 6px; border-top: 1.5px solid var(--border-color); padding-top: 4px; display:flex; justify-content:space-between; align-items:center;">
+                                <span>STAGE: <strong>${ev.current_stage.toUpperCase()}</strong></span>
+                                <span style="font-size: 9px; font-weight:800; text-transform:uppercase;">${ev.status}</span>
+                            </div>
+                            ${ev.waiting_on ? `
+                                <div style="font-size: 9px; color: #ff3c00; font-weight: 900; margin-top: 6px; background: #fff3f3; padding: 4px; border: 1.5px dashed #ff3c00; text-transform: uppercase;">
+                                    ⚠️ WAITING ON: ${ev.waiting_on}
+                                </div>
+                            ` : ''}
                         </div>
                     </div>
                 `;
@@ -1939,7 +2322,7 @@
         function renderAll() {
             DB.load();
             sortAllTablesNewestFirst();
-            renderHomeMetrics(); renderLeads(); renderPlanner(); renderProjects(); renderTeam(); renderKnowledge(); renderFeedback(); renderFlowTracker(); renderRevenuePipeline();
+            renderHomeMetrics(); renderLeads(); renderPlanner(); renderProjects(); renderTeam(); renderKnowledge(); renderFeedback(); renderFlowTracker(); renderRevenuePipeline(); renderPlaybooks();
         }
 
         function renderHomeMetrics() {
@@ -2305,6 +2688,49 @@
         }
 
         function renderFeedback() { document.getElementById('feedback-table-body').innerHTML = DB.tables.feedback.map(f => `<tr><td><span class="badge">${f.type}</span></td><td>${f.description}</td></tr>`).join(''); }
+
+        function renderPlaybooks() {
+            if (!DB.tables.playbooks) DB.tables.playbooks = [];
+            const tbody = document.getElementById('playbooks-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = DB.tables.playbooks.map(pb => {
+                const badgeBg = pb.active ? 'var(--accent-color)' : '#eee';
+                const badgeText = pb.active ? 'var(--bg-color)' : '#666';
+                const btnText = pb.active ? 'DEACTIVATE' : 'ACTIVATE';
+                const btnStyle = pb.active ? 'background:#ffcccc; color:#111;' : 'background:#ccffcc; color:#111;';
+                return `
+                    <tr>
+                        <td><strong>${pb.name}</strong></td>
+                        <td><div style="font-weight: 800; font-size: 11px;">${pb.trigger}</div></td>
+                        <td><div style="font-size: 12px; font-weight: 600; line-height: 1.4;">${pb.actions}</div></td>
+                        <td>
+                            <div style="font-weight: 700; font-size: 11px;">${pb.operator}</div>
+                            <div style="font-size: 10px; color: #555; text-transform: uppercase; font-weight: 700;">Scope: ${pb.linked_project}</div>
+                        </td>
+                        <td>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="badge" style="background: ${badgeBg}; color: ${badgeText}; font-weight: 800; border: 2px solid #111;">
+                                    ${pb.active ? 'ACTIVE' : 'INACTIVE'}
+                                </span>
+                                <button class="btn btn-small" onclick="togglePlaybook('${pb.id}')" style="${btnStyle} font-weight: 800; padding: 4px 8px; font-size: 10px; box-shadow: 2px 2px 0 var(--border-color);">
+                                    ${btnText}
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.togglePlaybook = function(pbId) {
+            if (!DB.tables.playbooks) DB.tables.playbooks = [];
+            const pb = DB.tables.playbooks.find(x => x.id === pbId);
+            if (pb) {
+                pb.active = !pb.active;
+                DB.save();
+                renderAll();
+            }
+        }
         window.triggerAutomation = function(action) { 
             if (!DB.tables.automations) DB.tables.automations = [];
             DB.tables.automations.push({
@@ -2407,176 +2833,119 @@
         }
 
         function hydrateInvoiceFormFromHistory(leadId, projectId) {
-            const latestInvoice = getLatestInvoiceContext(leadId, projectId);
             const setVal = (id, val) => {
                 const el = document.getElementById(id);
                 if (el) el.value = val;
             };
 
-            if (!latestInvoice) {
-                setVal('invoice-base-amount', '0');
-                setVal('invoice-addon-amount', '0');
-                setVal('invoice-upfront-percent', '25');
-                setVal('invoice-partial-percent', '50');
+            const latestInvoice = getLatestInvoiceContext(leadId, projectId);
+            if (latestInvoice) {
+                setVal('invoice-base-amount', String(latestInvoice.total_amount || 0));
+                setVal('invoice-paid-amount', String(latestInvoice.paid_amount || 0));
+                setVal('invoice-token-advance', String(latestInvoice.token_advance || 0));
+                setVal('invoice-registration-payment', String(latestInvoice.registration_payment || 0));
+                setVal('invoice-commission-amount', String(latestInvoice.commission_amount || 0));
+                setVal('invoice-payment-status', latestInvoice.payment_status || 'Token Pending');
+                setVal('invoice-currency', latestInvoice.currency || 'INR');
+                setVal('invoice-payment-method', latestInvoice.payment_method || 'upi');
+                setVal('invoice-notes', latestInvoice.notes || '');
+                setVal('invoice-link', latestInvoice.invoice_link || '');
+                invoiceModalState.paymentMethod = latestInvoice.payment_method || 'upi';
+            } else {
+                const proj = DB.tables.projects.find(p => p.id === projectId);
+                const dealVal = proj ? (proj.deal_value || 0) : 0;
+                const commPercent = proj ? (proj.commission_percent || 2.0) : 2.0;
+                const commAmt = Math.round(dealVal * (commPercent / 100));
+                const tokenAmt = Math.round(dealVal * 0.05);
+                const regAmt = Math.round(dealVal * 0.01);
+                
+                setVal('invoice-base-amount', String(dealVal));
+                setVal('invoice-paid-amount', '0');
+                setVal('invoice-token-advance', String(tokenAmt));
+                setVal('invoice-registration-payment', String(regAmt));
+                setVal('invoice-commission-amount', String(commAmt));
+                setVal('invoice-payment-status', 'Token Pending');
                 setVal('invoice-currency', 'INR');
                 setVal('invoice-payment-method', 'upi');
                 setVal('invoice-notes', '');
                 setVal('invoice-link', '');
                 invoiceModalState.paymentMethod = 'upi';
-                return;
             }
-
-            // Keep locked total sticky by default when user reopens scheduler.
-            setVal('invoice-base-amount', String(roundMoney(latestInvoice.locked_total_amount || 0)));
-            setVal('invoice-addon-amount', '0');
-            setVal('invoice-upfront-percent', String(clampPercent(latestInvoice.upfront_percent, 0, 100)));
-            setVal('invoice-partial-percent', String(clampPercent(latestInvoice.partial_percent_of_upfront, 0, 100)));
-            setVal('invoice-currency', String(latestInvoice.currency || 'INR'));
-
-            const paymentMethod = normalizePaymentMethod(latestInvoice.payment_method);
-            setVal('invoice-payment-method', paymentMethod);
-            invoiceModalState.paymentMethod = paymentMethod;
-            setVal('invoice-notes', latestInvoice.notes || '');
-            setVal('invoice-link', latestInvoice.invoice_link || '');
         }
 
         function getInvoiceComputation() {
             const { selectedProjectId } = getSelectedInvoiceProjectRef();
-            const paymentMode = normalizeInvoicePaymentMode(invoiceModalState.paymentMode);
-            const baseAmount = Math.max(0, roundMoney(document.getElementById('invoice-base-amount')?.value));
-            const addonAmount = Math.max(0, roundMoney(document.getElementById('invoice-addon-amount')?.value));
-            const upfrontPercent = clampPercent(document.getElementById('invoice-upfront-percent')?.value, 0, 100);
-            const partialPercent = clampPercent(document.getElementById('invoice-partial-percent')?.value, 0, 100);
-
-            const contextInvoices = (DB.tables.invoices || []).filter(i => i.lead_id === invoiceModalState.leadId && i.project_id === selectedProjectId);
-            const latestInvoice = sortNewestFirst(contextInvoices, 'created_at')[0] || null;
-            const previousLockedTotal = latestInvoice ? roundMoney(latestInvoice.locked_total_amount) : 0;
-            const hasPriorInvoice = Boolean(latestInvoice);
-
-            let currentChargeBase = roundMoney(baseAmount + addonAmount);
-            let lockedTotal = currentChargeBase;
-            if (paymentMode === 'add_another_invoice' && hasPriorInvoice) {
-                currentChargeBase = addonAmount;
-                lockedTotal = roundMoney(previousLockedTotal + addonAmount);
-            }
-
-            const upfrontAmount = roundMoney(lockedTotal * (upfrontPercent / 100));
-            const upfrontOnCurrentCharge = roundMoney(currentChargeBase * (upfrontPercent / 100));
-
-            let dueNow = upfrontAmount;
-            if (paymentMode === 'pay_full_now') {
-                dueNow = roundMoney(lockedTotal);
-            }
-            if (paymentMode === 'pay_partial_of_upfront') {
-                dueNow = roundMoney(upfrontAmount * (partialPercent / 100));
-            }
-            if (paymentMode === 'add_another_invoice') {
-                dueNow = roundMoney(upfrontOnCurrentCharge);
-            }
-
-            dueNow = Math.max(0, Math.min(roundMoney(lockedTotal), dueNow));
-            const paidNowAmount = dueNow;
-            const remainingAmount = roundMoney(Math.max(0, lockedTotal - paidNowAmount));
+            const baseAmount = Math.max(0, Number(document.getElementById('invoice-base-amount')?.value || 0));
+            const paidAmount = Math.max(0, Number(document.getElementById('invoice-paid-amount')?.value || 0));
+            const remainingAmount = Math.max(0, baseAmount - paidAmount);
+            const tokenAdvance = Math.max(0, Number(document.getElementById('invoice-token-advance')?.value || 0));
+            const regPayment = Math.max(0, Number(document.getElementById('invoice-registration-payment')?.value || 0));
+            const commAmount = Math.max(0, Number(document.getElementById('invoice-commission-amount')?.value || 0));
+            const paymentStatus = document.getElementById('invoice-payment-status')?.value || 'Token Pending';
 
             return {
                 selectedProjectId,
-                paymentMode,
                 baseAmount,
-                addonAmount,
-                upfrontPercent,
-                partialPercent,
-                previousLockedTotal,
-                hasPriorInvoice,
-                currentChargeBase,
-                lockedTotal,
-                upfrontAmount,
-                dueNow,
-                paidNowAmount,
-                remainingAmount
+                paidAmount,
+                remainingAmount,
+                tokenAdvance,
+                regPayment,
+                commAmount,
+                paymentStatus
             };
         }
 
         function refreshInvoicePreview() {
             const calc = getInvoiceComputation();
-            const mode = calc.paymentMode;
-            const paymentMethod = normalizePaymentMethod(document.getElementById('invoice-payment-method')?.value);
+            const paymentMethod = document.getElementById('invoice-payment-method')?.value || 'UPI';
             invoiceModalState.paymentMethod = paymentMethod;
-            const partialInput = document.getElementById('invoice-partial-percent');
-            if (partialInput) partialInput.disabled = mode !== 'pay_partial_of_upfront';
-
-            const total = calc.lockedTotal;
-            const paid = calc.paidNowAmount;
-            const remaining = Math.max(0, total - paid);
-
-            let paymentStatus = 'Payment Pending';
-            if (paid > 0 && remaining > 0) paymentStatus = 'Partial Payment';
-            else if (remaining === 0) paymentStatus = 'Fully Paid';
 
             const setText = (id, value) => {
                 const el = document.getElementById(id);
                 if (el) el.innerText = String(value);
             };
-            setText('invoice-preview-locked', total.toFixed(2));
-            setText('invoice-preview-charge-base', calc.currentChargeBase.toFixed(2));
-            setText('invoice-preview-paid', paid.toFixed(2));
-            setText('invoice-preview-remaining', remaining.toFixed(2));
-            setText('invoice-preview-due', calc.dueNow.toFixed(2));
-            setText('invoice-preview-payment-status', paymentStatus);
+            
+            setText('invoice-preview-total', calc.baseAmount.toLocaleString());
+            setText('invoice-preview-paid', calc.paidAmount.toLocaleString());
+            setText('invoice-preview-remaining', calc.remainingAmount.toLocaleString());
+            setText('invoice-preview-commission', calc.commAmount.toLocaleString());
+            setText('invoice-preview-token', calc.tokenAdvance.toLocaleString());
+            setText('invoice-preview-registration', calc.regPayment.toLocaleString());
+            setText('invoice-preview-payment-status', calc.paymentStatus);
             setText('invoice-preview-invoice-status', 'Sent');
-            setText('invoice-preview-mode', getInvoiceModeLabel(mode));
             setText('invoice-preview-method', paymentMethod.toUpperCase());
 
-            const stageSent = document.getElementById('pipeline-stage-sent');
+            const stageToken = document.getElementById('pipeline-stage-token');
             const stagePartial = document.getElementById('pipeline-stage-partial');
-            const stageFull = document.getElementById('pipeline-stage-full');
-            
-            if (stageSent && stagePartial && stageFull) {
-                [stageSent, stagePartial, stageFull].forEach(el => {
+            const stageSettled = document.getElementById('pipeline-stage-settled');
+
+            if (stageToken && stagePartial && stageSettled) {
+                [stageToken, stagePartial, stageSettled].forEach(el => {
                     el.style.background = '#fff';
                     el.style.color = '#888';
                     el.style.borderColor = '#bbb';
                     el.style.boxShadow = 'none';
                 });
 
-                if (paymentStatus === 'Payment Pending') {
-                    stageSent.style.background = '#ffdd00';
-                    stageSent.style.color = '#000';
-                    stageSent.style.borderColor = 'var(--border-color)';
-                    stageSent.style.boxShadow = '2px 2px 0 #000';
-                } else if (paymentStatus === 'Partial Payment') {
+                if (calc.paymentStatus === 'Token Pending') {
+                    stageToken.style.background = '#ffdd00';
+                    stageToken.style.color = '#000';
+                    stageToken.style.borderColor = 'var(--border-color)';
+                    stageToken.style.boxShadow = '2px 2px 0 #000';
+                } else if (calc.paymentStatus === 'Fully Settled') {
+                    stageSettled.style.background = '#10B981';
+                    stageSettled.style.color = '#fff';
+                    stageSettled.style.borderColor = 'var(--border-color)';
+                    stageSettled.style.boxShadow = '2px 2px 0 #000';
+                } else {
                     stagePartial.style.background = '#ff8a65';
                     stagePartial.style.color = '#fff';
                     stagePartial.style.borderColor = 'var(--border-color)';
                     stagePartial.style.boxShadow = '2px 2px 0 #000';
-                } else if (paymentStatus === 'Fully Paid') {
-                    stageFull.style.background = '#10B981';
-                    stageFull.style.color = '#fff';
-                    stageFull.style.borderColor = 'var(--border-color)';
-                    stageFull.style.boxShadow = '2px 2px 0 #000';
                 }
             }
 
             refreshInvoiceSendEligibility();
-        }
-
-        window.setInvoicePaymentMode = function(mode) {
-            invoiceModalState.paymentMode = normalizeInvoicePaymentMode(mode);
-            const modes = [
-                ['mode-add-25', 'add_25_now'],
-                ['mode-pay-full', 'pay_full_now'],
-                ['mode-pay-partial', 'pay_partial_of_upfront'],
-                ['mode-add-another', 'add_another_invoice']
-            ];
-            modes.forEach(([id, val]) => {
-                const btn = document.getElementById(id);
-                if (!btn) return;
-                if (val === invoiceModalState.paymentMode) {
-                    btn.classList.add('btn-primary');
-                } else {
-                    btn.classList.remove('btn-primary');
-                }
-            });
-            refreshInvoicePreview();
         }
 
         window.closeInvoiceModal = function() {
@@ -2599,7 +2968,7 @@
                 sendBtn.style.opacity = '1';
                 return;
             }
-            sendBtn.textContent = 'SEND';
+            sendBtn.textContent = 'SUBMIT & SEND INVOICE';
             refreshInvoiceSendEligibility();
         }
 
@@ -2608,17 +2977,9 @@
 
             const leadName = String(document.getElementById('invoice-lead-name')?.value || '').trim();
             const projectId = String(document.getElementById('invoice-project')?.value || '').trim();
-            const currency = String(document.getElementById('invoice-currency')?.value || '').trim();
-            const paymentMethod = String(document.getElementById('invoice-payment-method')?.value || '').trim();
-            const notes = String(document.getElementById('invoice-notes')?.value || '').trim();
-            if (!leadName || !projectId || !currency || !paymentMethod || !notes) return false;
-
-            const calc = getInvoiceComputation();
-            if (!calc || calc.lockedTotal <= 0) return false;
-            if (calc.baseAmount < 0 || calc.addonAmount < 0) return false;
-            if (calc.paymentMode === 'add_another_invoice' && (!calc.hasPriorInvoice || calc.addonAmount <= 0)) return false;
-            if (calc.paymentMode === 'pay_partial_of_upfront' && calc.partialPercent <= 0) return false;
-
+            const total = Number(document.getElementById('invoice-base-amount')?.value || 0);
+            
+            if (!leadName || !projectId || total <= 0) return false;
             return true;
         }
 
@@ -2650,7 +3011,7 @@
             invoiceModalState = {
                 leadId,
                 clientName: clientName || 'Unknown Client',
-                paymentMode: 'add_25_now',
+                paymentMode: 'milestone',
                 paymentMethod: 'upi'
             };
 
@@ -2677,7 +3038,7 @@
                 }
             }
 
-            ['invoice-project', 'invoice-base-amount', 'invoice-addon-amount', 'invoice-upfront-percent', 'invoice-partial-percent', 'invoice-currency', 'invoice-payment-method', 'invoice-notes', 'invoice-link']
+            ['invoice-project', 'invoice-base-amount', 'invoice-paid-amount', 'invoice-token-advance', 'invoice-registration-payment', 'invoice-commission-amount', 'invoice-payment-status', 'invoice-currency', 'invoice-payment-method', 'invoice-notes', 'invoice-link']
                 .forEach((id) => {
                     const el = document.getElementById(id);
                     if (!el) return;
@@ -2696,8 +3057,8 @@
 
             const { selectedProjectId } = getSelectedInvoiceProjectRef();
             hydrateInvoiceFormFromHistory(invoiceModalState.leadId, selectedProjectId);
+            refreshInvoicePreview();
 
-            window.setInvoicePaymentMode('add_25_now');
             const modal = document.getElementById('invoiceModal');
             if (modal) modal.style.display = 'flex';
         }
@@ -2705,11 +3066,10 @@
         function buildInvoiceRecordFromForm() {
             const { selectedProjectId, selectedProjectName } = getSelectedInvoiceProjectRef();
             const calc = getInvoiceComputation();
-            const leadContext = buildLeadInvoiceModules(invoiceModalState.leadId, selectedProjectId);
             const leadRecord = (DB.tables.leads || []).find((l) => l.id === invoiceModalState.leadId) || null;
             const currencyRaw = document.getElementById('invoice-currency')?.value || 'INR';
             const currency = String(currencyRaw).trim().toUpperCase().slice(0, 8) || 'INR';
-            const paymentMethod = normalizePaymentMethod(document.getElementById('invoice-payment-method')?.value);
+            const paymentMethod = document.getElementById('invoice-payment-method')?.value || 'upi';
             const notes = document.getElementById('invoice-notes')?.value || '';
             const invoiceLink = document.getElementById('invoice-link')?.value || '';
 
@@ -2723,29 +3083,10 @@
                 return null;
             }
 
-            if (calc.lockedTotal <= 0) {
-                alert('Locked total must be greater than 0.');
+            if (calc.baseAmount <= 0) {
+                alert('Total Deal Value must be greater than 0.');
                 return null;
             }
-
-            if (calc.paymentMode === 'add_another_invoice' && !calc.hasPriorInvoice) {
-                alert('No previous invoice found for this project. Use ADD 25% or PAY FULL for the first invoice.');
-                return null;
-            }
-
-            if (calc.paymentMode === 'add_another_invoice' && calc.addonAmount <= 0) {
-                alert('Add-on amount must be greater than 0 for ADD ANOTHER INVOICE mode.');
-                return null;
-            }
-
-            invoiceModalState.paymentMethod = paymentMethod;
-
-            const total = Number(calc.lockedTotal || 0);
-            const paid = Number(calc.paidNowAmount || 0);
-            const remaining = Math.max(0, total - paid);
-            let payStatus = 'Payment Pending';
-            if (paid > 0 && remaining > 0) payStatus = 'Partial Payment';
-            else if (remaining === 0) payStatus = 'Fully Paid';
 
             return {
                 id: generateId(),
@@ -2754,27 +3095,16 @@
                 lead_email: leadRecord ? (leadRecord.email || '') : '',
                 project_id: selectedProjectId,
                 project_name: selectedProjectName,
-                project_ids: leadContext.projectIds,
-                project_names: leadContext.projectNames,
-                modules: leadContext.modules,
-                payment_mode: calc.paymentMode,
-                payment_method: paymentMethod,
-                base_amount: calc.baseAmount,
-                addon_amount: calc.addonAmount,
-                previous_locked_total: calc.previousLockedTotal,
-                current_charge_base: calc.currentChargeBase,
-                locked_total_amount: total,
-                upfront_percent: calc.upfrontPercent,
-                upfront_amount: calc.upfrontAmount,
-                partial_percent_of_upfront: calc.partialPercent,
-                due_now_amount: calc.dueNow,
-                paid_now_amount: paid,
-                remaining_amount: remaining,
-                total_amount: total,
-                paid_amount: paid,
+                total_amount: calc.baseAmount,
+                paid_amount: calc.paidAmount,
+                remaining_amount: calc.remainingAmount,
+                commission_amount: calc.commAmount,
+                token_advance: calc.tokenAdvance,
+                registration_payment: calc.regPayment,
+                payment_status: calc.paymentStatus,
                 invoice_status: 'Sent',
-                payment_status: payStatus,
                 currency,
+                payment_method: paymentMethod,
                 notes,
                 invoice_link: invoiceLink,
                 created_at: new Date().toISOString()
@@ -3105,42 +3435,55 @@
 
             const invoices = DB.tables.invoices || [];
             if (invoices.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; font-weight:700; opacity:0.5; padding:16px;">No invoices found.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; font-weight:700; opacity:0.5; padding:16px;">No property deals found.</td></tr>';
                 return;
             }
 
             tbody.innerHTML = invoices.map(i => {
-                const total = Number(i.total_amount || i.locked_total_amount || 0);
-                const paid = Number(i.paid_amount || i.paid_now_amount || 0);
+                const total = Number(i.total_amount || 0);
+                const paid = Number(i.paid_amount || 0);
                 const remaining = Math.max(0, total - paid);
+                const token = Number(i.token_advance || 0);
+                const registration = Number(i.registration_payment || 0);
+                const commission = Number(i.commission_amount || 0);
                 
-                let paymentStatus = i.payment_status;
-                if (!paymentStatus) {
-                    paymentStatus = paid === 0 ? 'Payment Pending' : (remaining > 0 ? 'Partial Payment' : 'Fully Paid');
-                }
+                let paymentStatus = i.payment_status || 'Token Pending';
 
-                let badgeColor = '#ffdd00'; // Pending = yellow
+                let badgeColor = '#ffdd00'; // Token Pending = yellow
                 let textColor = '#000';
-                if (paymentStatus === 'Partial Payment') {
-                    badgeColor = '#ff8a65'; // Partial = orange
+                if (paymentStatus === 'Partial Paid') {
+                    badgeColor = '#ff8a65'; // Orange
                     textColor = '#fff';
-                } else if (paymentStatus === 'Fully Paid') {
-                    badgeColor = '#10B981'; // Fully Paid = green
+                } else if (paymentStatus === 'Legal Hold') {
+                    badgeColor = '#f44336'; // Red
+                    textColor = '#fff';
+                } else if (paymentStatus === 'Final Payment Pending') {
+                    badgeColor = '#ffa726'; // Dark Yellow/Orange
+                    textColor = '#fff';
+                } else if (paymentStatus === 'Registration Complete') {
+                    badgeColor = '#29b6f6'; // Light Blue
+                    textColor = '#fff';
+                } else if (paymentStatus === 'Fully Settled') {
+                    badgeColor = '#10B981'; // Green
                     textColor = '#fff';
                 }
 
-                const displayTotal = `${i.currency || 'INR'} ${total.toFixed(2)}`;
-                const displayPaid = `${i.currency || 'INR'} ${paid.toFixed(2)}`;
-                const displayRemaining = `${i.currency || 'INR'} ${remaining.toFixed(2)}`;
+                const displayTotal = `${i.currency || 'INR'} ${total.toLocaleString()}`;
+                const displayToken = `${i.currency || 'INR'} ${token.toLocaleString()}`;
+                const displayPaid = `${i.currency || 'INR'} ${paid.toLocaleString()}`;
+                const displayRemaining = `${i.currency || 'INR'} ${remaining.toLocaleString()}`;
+                const displayReg = `${i.currency || 'INR'} ${registration.toLocaleString()}`;
+                const displayComm = `${i.currency || 'INR'} ${commission.toLocaleString()}`;
 
                 return `<tr>
-                    <td><strong>${i.lead_name}</strong></td>
-                    <td>${i.project_name || 'Unassigned'}</td>
-                    <td>${displayTotal}</td>
-                    <td>${displayPaid}</td>
-                    <td>${displayRemaining}</td>
-                    <td><span class="badge" style="background:#000; color:#fff; border:none;">${i.invoice_status || 'Sent'}</span></td>
-                    <td><span class="badge" style="background:${badgeColor}; color:${textColor}; border:none;">${paymentStatus}</span></td>
+                    <td><strong>${i.lead_name}</strong><br><small style="color:var(--accent-color); font-weight:800; text-transform:uppercase; font-size:10px;">${i.project_name || 'Unassigned'}</small></td>
+                    <td><strong>${displayTotal}</strong></td>
+                    <td>${displayToken}</td>
+                    <td style="color:#10B981; font-weight:800;">${displayPaid}</td>
+                    <td style="color:#ff3c00; font-weight:800;">${displayRemaining}</td>
+                    <td>${displayReg}</td>
+                    <td>${displayComm}</td>
+                    <td><span class="badge" style="background:${badgeColor}; color:${textColor}; border:none; font-weight:900; font-size:9px;">${paymentStatus}</span></td>
                     <td><button class="btn btn-primary" style="padding:4px 8px; font-size:10px;" onclick="recordPayment('${i.id}')">RECORD PAYMENT</button></td>
                 </tr>`;
             }).join('');
@@ -3150,25 +3493,49 @@
             const inv = DB.tables.invoices.find(i => i.id === invoiceId);
             if (!inv) return;
             
-            const total = Number(inv.total_amount || inv.locked_total_amount || 0);
-            const currentPaid = Number(inv.paid_amount || inv.paid_now_amount || 0);
+            const total = Number(inv.total_amount || 0);
+            const currentPaid = Number(inv.paid_amount || 0);
 
-            openModal("RECORD PAYMENT", [
-                {id: 'paid_amount', label: `Amount Paid So Far (Total: ${inv.currency || 'INR'} ${total.toFixed(2)})`, type: 'number', val: currentPaid}
+            openModal("RECORD MILESTONE PAYMENT", [
+                {id: 'paid_amount', label: `Total Amount Paid So Far (Total Deal: ${inv.currency || 'INR'} ${total.toLocaleString()})`, type: 'number', val: currentPaid},
+                {
+                    id: 'payment_status', 
+                    label: 'Payment Milestone Status', 
+                    type: 'select', 
+                    options: ['Token Pending', 'Partial Paid', 'Legal Hold', 'Final Payment Pending', 'Registration Complete', 'Fully Settled'], 
+                    val: inv.payment_status || 'Token Pending'
+                }
             ], (res) => {
                 const paid = Math.max(0, Number(res.paid_amount || 0));
                 const remaining = Math.max(0, total - paid);
                 
-                let paymentStatus = 'Payment Pending';
-                if (paid > 0 && remaining > 0) paymentStatus = 'Partial Payment';
-                else if (remaining === 0) paymentStatus = 'Fully Paid';
+                let paymentStatus = res.payment_status;
+                if (!paymentStatus) {
+                    if (paid === 0) paymentStatus = 'Token Pending';
+                    else if (paid > 0 && remaining > 0) paymentStatus = 'Partial Paid';
+                    else if (remaining === 0) paymentStatus = 'Fully Settled';
+                }
 
                 Object.assign(inv, {
                     paid_amount: paid,
-                    paid_now_amount: paid,
+                    paid_now_amount: paid, // for backwards compat
                     remaining_amount: remaining,
                     payment_status: paymentStatus
                 });
+
+                // Also update the workspace current stage/pipeline and timeline if it maps to stage changes
+                const proj = DB.tables.projects.find(p => p.id === inv.project_id);
+                if (proj) {
+                    if (paymentStatus === 'Fully Settled') {
+                        proj.deal_stage = 'Completed';
+                        if (!proj.client_timeline) proj.client_timeline = [];
+                        proj.client_timeline.push({ title: 'Deal Fully Settled (Payment Cleared)', timestamp: new Date().toISOString() });
+                    } else if (paymentStatus === 'Registration Complete') {
+                        proj.deal_stage = 'Registration';
+                        if (!proj.client_timeline) proj.client_timeline = [];
+                        proj.client_timeline.push({ title: 'Registration Payment Confirmed', timestamp: new Date().toISOString() });
+                    }
+                }
 
                 DB.save();
                 renderAll();
