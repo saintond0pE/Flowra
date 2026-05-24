@@ -239,32 +239,74 @@
         </div>
     </div>
 
-    <!-- Mega Project Generator Modal -->
+    <!-- Create Transaction File Modal -->
     <div id="projectGeneratorModal">
         <div class="modal-content" style="width: 800px; max-width: 95%;">
             <div class="flex-between" style="border-bottom: 3px solid var(--border-color); padding-bottom: 12px; margin-bottom: 24px;">
-                <h2 style="margin: 0; border: none; padding: 0;">WORKSPACE GENERATOR</h2>
+                <h2 style="margin: 0; border: none; padding: 0;">CREATE TRANSACTION FILE</h2>
                 <button class="btn" onclick="document.getElementById('projectGeneratorModal').style.display='none'" style="padding: 4px 8px;">X</button>
             </div>
             
-            <div class="grid-2">
-                <div class="form-group"><label>Client Name & Details</label><input type="text" id="gen-client" placeholder="e.g. Acme Corp"></div>
-                <div class="form-group"><label>Project Target / Goal</label><input type="text" id="gen-title" placeholder="e.g. Voice Agent 1.0"></div>
+            <div style="font-size: 13px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase; color: var(--accent-color);">
+                Step 1: Select Transaction Type
             </div>
-
-            <label style="margin-bottom:12px; font-size:14px;">1. Select Modules to Auto-Generate Checklists:</label>
-            <div id="category-module-picker" style="background:#fff; border: 3px solid var(--border-color); max-height: 300px; overflow-y: auto; padding: 16px; margin-bottom: 24px;">
-                <!-- Generated dynamically -->
-            </div>
-
             <div class="form-group">
-                <label>2. Additional Custom Notes / Exceptions</label>
-                <textarea id="gen-notes" rows="3" placeholder="Paste any specific meeting notes, custom deliverables, or anomalies here to automatically add them to the checklist project board..."></textarea>
+                <label>Transaction Type *</label>
+                <select id="gen-transaction-type" style="font-weight: 700;">
+                    <option value="Property Sale">Property Sale</option>
+                    <option value="Property Purchase">Property Purchase</option>
+                    <option value="Rental Agreement">Rental Agreement</option>
+                    <option value="Commercial Lease">Commercial Lease</option>
+                    <option value="Land Acquisition">Land Acquisition</option>
+                    <option value="Builder Project">Builder Project</option>
+                    <option value="Brokerage Deal">Brokerage Deal</option>
+                </select>
+            </div>
+
+            <div style="font-size: 13px; font-weight: 700; margin-top: 24px; margin-bottom: 16px; text-transform: uppercase; color: var(--accent-color);">
+                Step 2: Basic Property Information
+            </div>
+            <div class="grid-2">
+                <div class="form-group"><label>Property Name *</label><input type="text" id="gen-property-name" placeholder="e.g. Greenwood Townhouse #14"></div>
+                <div class="form-group"><label>Property Address *</label><input type="text" id="gen-property-address" placeholder="e.g. 14 Spruce Street"></div>
+            </div>
+            <div class="grid-3">
+                <div class="form-group">
+                    <label>Property Type *</label>
+                    <select id="gen-property-type">
+                        <option value="Townhouse">Townhouse</option>
+                        <option value="Condo">Condo</option>
+                        <option value="Villa">Villa</option>
+                        <option value="Apartment">Apartment</option>
+                        <option value="Commercial Space">Commercial Space</option>
+                        <option value="Land">Land</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Locality / Area *</label><input type="text" id="gen-locality" placeholder="e.g. Suburban Sector 4"></div>
+                <div class="form-group"><label>Inquiry Date *</label><input type="date" id="gen-inquiry-date"></div>
+            </div>
+            <div class="grid-3">
+                <div class="form-group"><label>Seller Name *</label><input type="text" id="gen-seller-name" placeholder="e.g. Johnathan Davis"></div>
+                <div class="form-group"><label>Buyer Name (Optional)</label><input type="text" id="gen-buyer-name" placeholder="e.g. Sarah Jenkins"></div>
+                <div class="form-group"><label>Assigned Broker *</label><input type="text" id="gen-assigned-broker" placeholder="e.g. Marcus Vance"></div>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Lead Source *</label>
+                    <select id="gen-lead-source">
+                        <option value="Website Inquiry">Website Inquiry</option>
+                        <option value="Broker Referral">Broker Referral</option>
+                        <option value="Direct Walk-In">Direct Walk-In</option>
+                        <option value="Property Portal">Property Portal</option>
+                        <option value="Social Media">Social Media</option>
+                    </select>
+                </div>
+                <div class="form-group" style="display:none;"><input type="text" id="gen-client"></div> <!-- hidden dummy for backward compatibility -->
             </div>
 
             <div class="flex-between" style="margin-top:24px; margin-bottom:0;">
                 <button class="btn" onclick="document.getElementById('projectGeneratorModal').style.display='none'">CANCEL</button>
-                <button class="btn btn-primary" onclick="submitProjectGeneration()">✔ GENERATE CHECKLISTS</button>
+                <button class="btn btn-primary" onclick="submitProjectGeneration()">✔ CREATE TRANSACTION FILE</button>
             </div>
         </div>
     </div>
@@ -283,7 +325,7 @@
                     <input id="invoice-lead-name" type="text" disabled>
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
-                    <label>Property Workspace</label>
+                    <label>Property Transaction</label>
                     <select id="invoice-project"></select>
                 </div>
             </div>
@@ -401,7 +443,7 @@
             <div class="nav-item" onclick="switchView('leads')">Leads & Clients</div>
             <div class="nav-item" onclick="switchView('planner')">Meetings & Deals</div>
             <div class="nav-item" onclick="switchView('team')">Team Ops</div>
-            <div class="nav-item" onclick="switchView('automation')">Operational Playbooks</div>
+            <div class="nav-item" onclick="switchView('automation')">AUTOMATED WORKFLOWS</div>
             <div class="nav-item" onclick="switchView('knowledge')">Knowledge Base</div>
             <div class="nav-item" onclick="switchView('feedback')">System Registry</div>
         </div>
@@ -427,7 +469,7 @@
             <div>
                 <span id="sync-status" style="font-weight:800; font-size:11px; margin-right:16px;"></span>
                 <span id="admin-email" style="font-weight:800; font-size:12px; margin-right:16px;">LOCAL_MODE</span>
-                <button class="btn btn-primary" onclick="openProjectGenerator()">+ DEV PROJECT</button>
+                <button class="btn btn-primary" onclick="openProjectGenerator()">+ CREATE TRANSACTION FILE</button>
                 <button class="btn" style="margin-left: 8px;" onclick="if(window.logout) window.logout()">LOGOUT</button>
             </div>
         </div>
@@ -439,14 +481,14 @@
                     <div class="card stat-card"><span class="stat-value" id="metric-leads-count">0</span><span class="stat-label">Total Leads</span></div>
                     <div class="card stat-card"><span class="stat-value" id="metric-pending-count">0</span><span class="stat-label">Pending Tasks</span></div>
                     <div class="card stat-card"><span class="stat-value" id="metric-completed-count">0</span><span class="stat-label">Completed Tasks</span></div>
-                    <div class="card stat-card"><span class="stat-value" id="metric-tasks-today">0</span><span class="stat-label">Active Workspaces</span></div>
+                    <div class="card stat-card"><span class="stat-value" id="metric-tasks-today">0</span><span class="stat-label">Active Transactions</span></div>
                 </div>
                 
                 <div class="flex-between">
                     <h2>Recent Actionable Tasks</h2>
                 </div>
                 <table>
-                    <thead><tr><th>Project</th><th>Category / Module</th><th>Task Detail</th><th>Status</th></tr></thead>
+                    <thead><tr><th>Property Transaction</th><th>Category / Module</th><th>Task Detail</th><th>Status</th></tr></thead>
                     <tbody id="home-recent-tasks-body"></tbody>
                 </table>
             </div>
@@ -478,8 +520,8 @@
             <!-- 3. Projects -->
             <div id="view-projects" class="view-section">
                 <div class="flex-between">
-                    <h2>Client Project Workspaces</h2>
-                    <button class="btn btn-primary" onclick="openProjectGenerator()">+ NEW PROJECT</button>
+                    <h2>Property Transactions</h2>
+                    <button class="btn btn-primary" onclick="openProjectGenerator()">+ CREATE TRANSACTION FILE</button>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr; gap: 24px; margin-bottom: 24px;" id="projects-grid"></div>
             </div>
@@ -553,26 +595,26 @@
                 </table>
             </div>
 
-            <!-- 6. Operational Playbooks -->
+            <!-- 6. Automated Workflows -->
             <div id="view-automation" class="view-section">
                 <div class="flex-between" style="margin-bottom: 16px;">
                     <div>
-                        <h2>Operational Playbooks</h2>
-                        <p style="font-weight: 700; font-size: 12px; text-transform: uppercase;">Active pipeline templates and event-driven workflows.</p>
+                        <h2>AUTOMATED WORKFLOWS</h2>
+                        <p style="font-weight: 700; font-size: 12px; text-transform: uppercase;">Active operational templates and event-driven workflows.</p>
                     </div>
                 </div>
                 <div class="card" style="margin-bottom: 24px; border-color: var(--accent-color);">
-                    <div style="font-weight: 800;">Real Estate Transaction Playbooks:</div>
-                    <div style="font-size: 13px; font-weight: 600; margin-top: 4px;">These playbooks are automatically active in the background. You can toggle their operational status below.</div>
+                    <div style="font-weight: 800;">Real Estate Automated Workflows:</div>
+                    <div style="font-size: 13px; font-weight: 600; margin-top: 4px;">These workflows are automatically active in the background. You can toggle their operational status below.</div>
                 </div>
                 <table>
                     <thead>
                         <tr>
-                            <th>Playbook Workflow</th>
+                            <th>Workflow Name</th>
                             <th>Trigger Event</th>
                             <th>Target Actions</th>
                             <th>Scope / Operator</th>
-                            <th>Operational Status</th>
+                            <th>Active Status</th>
                         </tr>
                     </thead>
                     <tbody id="playbooks-table-body"></tbody>
@@ -1197,13 +1239,28 @@
                 });
                 if (DB.tables.projects) {
                     DB.tables.projects.forEach(p => {
-                        if (p.tasks) {
-                            p.tasks.forEach(t => {
-                                if (t.category) {
-                                    t.category = cleanCategory(t.category);
-                                }
-                            });
-                        }
+                        p.transaction_type = p.transaction_type || 'Property Sale';
+                        p.property_address = p.property_address || '';
+                        p.property_type = p.property_type || 'Townhouse';
+                        p.locality = p.locality || '';
+                        p.seller_name = p.seller_name || '';
+                        p.buyer_name = p.buyer_name || '';
+                        p.assigned_broker = p.assigned_broker || '';
+                        p.lead_source = p.lead_source || 'Website Inquiry';
+                        p.inquiry_date = p.inquiry_date || new Date().toISOString().split('T')[0];
+                        p.deal_health_status = p.deal_health_status || 'ON TRACK';
+                        
+                        p.waiting_on = Array.isArray(p.waiting_on) ? p.waiting_on : [];
+                        p.documents = Array.isArray(p.documents) ? p.documents : [];
+                        p.team_thread = Array.isArray(p.team_thread) ? p.team_thread : [];
+                        p.client_timeline = Array.isArray(p.client_timeline) ? p.client_timeline : [];
+                        p.tasks = Array.isArray(p.tasks) ? p.tasks : [];
+
+                        p.tasks.forEach(t => {
+                            if (t.category) {
+                                t.category = cleanCategory(t.category);
+                            }
+                        });
                     });
                 }
             },
@@ -1260,36 +1317,42 @@
                     projects: [
                         {
                             id: "proj_re_1",
+                            transaction_type: "Property Sale",
                             client_name: "Sarah Jenkins",
                             project_name: "Greenwood Townhouse #14",
+                            property_address: "14 Spruce Street",
+                            property_type: "Townhouse",
+                            locality: "Greenwood Sector 4",
                             lead_id: "lead_re_1",
                             seller_name: "Johnathan Davis",
                             buyer_name: "Sarah Jenkins",
                             assigned_broker: "Marcus Vance",
-                            property_type: "Townhouse",
+                            lead_source: "Website Inquiry",
+                            inquiry_date: "2026-05-16",
+                            deal_stage: "Agreement Drafting",
+                            deal_health_status: "DOCUMENT PENDING",
                             deal_value: 9500000,
                             commission_percent: 2.0,
-                            deal_stage: "Agreement Drafting",
                             registration_deadline: "2026-06-15",
                             waiting_on: [
-                                { item: "Buyer signature on draft agreement", responsible: "Sarah Jenkins (Buyer)", duration: "2 days", urgency: "High" }
+                                { item: "Buyer signature on draft agreement", responsible: "Sarah Jenkins (Buyer)", duration: "2 days", urgency: "High", stage: "Agreement Drafting" }
                             ],
                             documents: [
-                                { id: "doc_re_1", name: "Title_Deed_Greenwood.pdf", category: "Ownership Documents", uploaded_at: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Marcus Vance (Broker)", status: "Approved", visibility: "Public", version: "v1.0" },
-                                { id: "doc_re_2", name: "Property_Tax_Clearance_2025.pdf", category: "Government Approvals", uploaded_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Marcus Vance (Broker)", status: "Approved", visibility: "Public", version: "v1.0" },
-                                { id: "doc_re_3", name: "Buyer_Aadhaar_PAN.pdf", category: "Buyer/Seller KYC", uploaded_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Sarah Jenkins (Buyer)", status: "Approved", visibility: "Private", version: "v1.0" },
-                                { id: "doc_re_4", name: "Draft_Sale_Agreement_v1.2.pdf", category: "Agreements", uploaded_at: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Elena Ross (Legal)", status: "Pending Approval", visibility: "Public", version: "v1.2" }
+                                { id: "doc_re_1", name: "Title_Deed_Greenwood.pdf", category: "Ownership Documents", uploaded_at: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Marcus Vance (Broker)", status: "Approved", visibility: "Public", version: "v1.0", stage: "Legal Verification" },
+                                { id: "doc_re_2", name: "Property_Tax_Clearance_2025.pdf", category: "Government Approvals", uploaded_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Marcus Vance (Broker)", status: "Approved", visibility: "Public", version: "v1.0", stage: "Legal Verification" },
+                                { id: "doc_re_3", name: "Buyer_Aadhaar_PAN.pdf", category: "Buyer/Seller KYC", uploaded_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Sarah Jenkins (Buyer)", status: "Approved", visibility: "Private", version: "v1.0", stage: "Inquiry" },
+                                { id: "doc_re_4", name: "Draft_Sale_Agreement_v1.2.pdf", category: "Agreements", uploaded_at: new Date(Date.now() - 1 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Elena Ross (Legal)", status: "Pending Approval", visibility: "Public", version: "v1.2", stage: "Agreement Drafting" }
                             ],
                             team_thread: [
-                                { id: "msg_1", sender: "Marcus Vance", message: "Client requested minor adjustment to the hand-over schedule. Updated draft v1.2 uploaded.", timestamp: new Date(Date.now() - 24 * 3600 * 1000).toISOString() },
-                                { id: "msg_2", sender: "Elena Ross (Legal)", message: "Adjusted penalty fee in Clause 6. Ready for buyer review and signature.", timestamp: new Date(Date.now() - 20 * 3600 * 1000).toISOString() }
+                                { id: "msg_1", sender: "Marcus Vance", role: "Broker", message: "Client requested minor adjustment to the hand-over schedule. Updated draft v1.2 uploaded.", timestamp: new Date(Date.now() - 24 * 3600 * 1000).toISOString(), stage: "Agreement Drafting" },
+                                { id: "msg_2", sender: "Elena Ross (Legal)", role: "Legal Counsel", message: "Adjusted penalty fee in Clause 6. Ready for buyer review and signature.", timestamp: new Date(Date.now() - 20 * 3600 * 1000).toISOString(), stage: "Agreement Drafting" }
                             ],
                             client_timeline: [
-                                { title: "New buyer inquiry captured", timestamp: new Date(Date.now() - 8 * 24 * 3600 * 1000).toISOString() },
-                                { title: "Site visit completed", timestamp: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString() },
-                                { title: "Price term sheet signed", timestamp: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString() },
-                                { title: "Token advance payment received", timestamp: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString() },
-                                { title: "Legal review initiated", timestamp: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString() }
+                                { title: "New buyer inquiry captured", timestamp: new Date(Date.now() - 8 * 24 * 3600 * 1000).toISOString(), stage: "Inquiry" },
+                                { title: "Site visit completed", timestamp: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString(), stage: "Site Visit" },
+                                { title: "Price term sheet signed", timestamp: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(), stage: "Negotiation" },
+                                { title: "Token advance payment received", timestamp: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString(), stage: "Token Advance" },
+                                { title: "Legal review initiated", timestamp: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(), stage: "Legal Verification" }
                             ],
                             created_at: new Date(Date.now() - 8 * 24 * 3600 * 1000).toISOString(),
                             tasks: [
@@ -1297,37 +1360,43 @@
                                 { id: "t_re_2", category: "🏡 REAL ESTATE WORKFLOW", module: "Site Visit", name: "Conduct physical site walk-through", notes: "Greenwood location visit", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString() },
                                 { id: "t_re_3", category: "🏡 REAL ESTATE WORKFLOW", module: "Negotiation", name: "Sign term sheet", notes: "Locked at 95L", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString() },
                                 { id: "t_re_4", category: "🏡 REAL ESTATE WORKFLOW", module: "Token Advance", name: "Confirm token receipt in bank", notes: "9.5L received", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString() },
-                                { id: "t_re_5", category: "🏡 REAL ESTATE WORKFLOW", module: "Legal Review", name: "Search title deed history", notes: "Cleared by Elena", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString() },
+                                { id: "t_re_5", category: "🏡 REAL ESTATE WORKFLOW", module: "Legal Verification", name: "Search title deed history", notes: "Cleared by Elena", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString() },
                                 { id: "t_re_6", category: "🏡 REAL ESTATE WORKFLOW", module: "Agreement Drafting", name: "Draft purchase agreement copy", notes: "", done: false, updated_at: new Date().toISOString() },
                                 { id: "t_re_7", category: "🏡 REAL ESTATE WORKFLOW", module: "Registration", name: "Book registrar office slot", notes: "", done: false, updated_at: new Date().toISOString() }
                             ]
                         },
                         {
                             id: "proj_re_2",
+                            transaction_type: "Property Purchase",
                             client_name: "David Miller",
                             project_name: "Bellevue Condo Suite 4B",
+                            property_address: "Suite 4B, Bellevue Complex",
+                            property_type: "Condo",
+                            locality: "Downtown",
                             lead_id: "lead_re_2",
                             seller_name: "David Miller",
                             buyer_name: "Rajesh Kumar",
                             assigned_broker: "Clara Sterling",
-                            property_type: "Condo",
-                            deal_value: 18000000,
-                            commission_percent: 2.5,
+                            lead_source: "Broker Referral",
+                            inquiry_date: "2026-05-18",
                             deal_stage: "Site Visit",
-                            registration_deadline: "2026-07-20",
+                            deal_health_status: "WAITING ON CLIENT",
+                            deal_value: 0,
+                            commission_percent: 2.5,
+                            registration_deadline: "",
                             waiting_on: [
-                                { item: "Buyer confirmation post visit", responsible: "Rajesh Kumar (Buyer)", duration: "1 day", urgency: "Medium" }
+                                { item: "Buyer confirmation post visit", responsible: "Rajesh Kumar (Buyer)", duration: "1 day", urgency: "Medium", stage: "Site Visit" }
                             ],
                             documents: [
-                                { id: "doc_re_5", name: "RERA_Condo_Certificate.pdf", category: "Government Approvals", uploaded_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(), uploaded_by: "David Miller (Seller)", status: "Approved", visibility: "Public", version: "v1.0" },
-                                { id: "doc_re_6", name: "Condo_Floor_Plan.jpg", category: "Property Media", uploaded_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(), uploaded_by: "David Miller (Seller)", status: "Approved", visibility: "Public", version: "v1.0" }
+                                { id: "doc_re_5", name: "RERA_Condo_Certificate.pdf", category: "Government Approvals", uploaded_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(), uploaded_by: "David Miller (Seller)", status: "Approved", visibility: "Public", version: "v1.0", stage: "Legal Verification" },
+                                { id: "doc_re_6", name: "Condo_Floor_Plan.jpg", category: "Property Media", uploaded_at: new Date(Date.now() - 5 * 24 * 3600 * 1000).toISOString(), uploaded_by: "David Miller (Seller)", status: "Approved", visibility: "Public", version: "v1.0", stage: "Site Visit" }
                             ],
                             team_thread: [
-                                { id: "msg_3", sender: "Clara Sterling", message: "Conducted virtual tour. Rajesh wants to do a physical visit this Saturday.", timestamp: new Date(Date.now() - 12 * 3600 * 1000).toISOString() }
+                                { id: "msg_3", sender: "Clara Sterling", role: "Broker", message: "Conducted virtual tour. Rajesh wants to do a physical visit this Saturday.", timestamp: new Date(Date.now() - 12 * 3600 * 1000).toISOString(), stage: "Site Visit" }
                             ],
                             client_timeline: [
-                                { title: "Property listing activated", timestamp: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString() },
-                                { title: "Site visit scheduled", timestamp: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString() }
+                                { title: "Property listing activated", timestamp: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString(), stage: "Inquiry" },
+                                { title: "Site visit scheduled", timestamp: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(), stage: "Site Visit" }
                             ],
                             created_at: new Date(Date.now() - 6 * 24 * 3600 * 1000).toISOString(),
                             tasks: [
@@ -1337,33 +1406,39 @@
                         },
                         {
                             id: "proj_re_3",
+                            transaction_type: "Commercial Lease",
                             client_name: "Zenith Tech Solutions",
                             project_name: "Oakridge Commercial Complex",
+                            property_address: "Building A, Oakridge Tech Park",
+                            property_type: "Commercial Space",
+                            locality: "IT Corridor",
                             lead_id: "lead_re_4",
                             seller_name: "Sterling Assets Ltd",
                             buyer_name: "Zenith Tech Solutions",
                             assigned_broker: "Marcus Vance",
-                            property_type: "Commercial Space",
+                            lead_source: "Corporate Portal",
+                            inquiry_date: "2026-05-09",
+                            deal_stage: "Legal Verification",
+                            deal_health_status: "LEGAL DELAY",
                             deal_value: 42000000,
                             commission_percent: 1.5,
-                            deal_stage: "Legal Review",
                             registration_deadline: "2026-06-30",
                             waiting_on: [
-                                { item: "Building occupancy clearance certificate", responsible: "Sterling Assets (Seller)", duration: "5 days", urgency: "High" }
+                                { item: "Building occupancy clearance certificate", responsible: "Sterling Assets (Seller)", duration: "5 days", urgency: "High", stage: "Legal Verification" }
                             ],
                             documents: [
-                                { id: "doc_re_7", name: "Commercial_Layout_NOC.pdf", category: "Government Approvals", uploaded_at: new Date(Date.now() - 14 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Sterling Assets (Seller)", status: "Approved", visibility: "Public", version: "v1.0" },
-                                { id: "doc_re_8", name: "Corporate_Trade_License.pdf", category: "Buyer/Seller KYC", uploaded_at: new Date(Date.now() - 12 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Zenith Tech (Buyer)", status: "Approved", visibility: "Private", version: "v1.0" },
-                                { id: "doc_re_9", name: "Title_Search_Report.pdf", category: "Legal Verification", uploaded_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Elena Ross (Legal)", status: "Pending Review", visibility: "Public", version: "v1.1" }
+                                { id: "doc_re_7", name: "Commercial_Layout_NOC.pdf", category: "Government Approvals", uploaded_at: new Date(Date.now() - 14 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Sterling Assets (Seller)", status: "Approved", visibility: "Public", version: "v1.0", stage: "Legal Verification" },
+                                { id: "doc_re_8", name: "Corporate_Trade_License.pdf", category: "Buyer/Seller KYC", uploaded_at: new Date(Date.now() - 12 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Zenith Tech (Buyer)", status: "Approved", visibility: "Private", version: "v1.0", stage: "Inquiry" },
+                                { id: "doc_re_9", name: "Title_Search_Report.pdf", category: "Legal Verification", uploaded_at: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(), uploaded_by: "Elena Ross (Legal)", status: "Pending Review", visibility: "Public", version: "v1.1", stage: "Legal Verification" }
                             ],
                             team_thread: [
-                                { id: "msg_4", sender: "Marcus Vance", message: "Seller rep promised occupancy certificate scan by Monday morning.", timestamp: new Date(Date.now() - 4 * 3600 * 1000).toISOString() }
+                                { id: "msg_4", sender: "Marcus Vance", role: "Broker", message: "Seller rep promised occupancy certificate scan by Monday morning.", timestamp: new Date(Date.now() - 4 * 3600 * 1000).toISOString(), stage: "Legal Verification" }
                             ],
                             client_timeline: [
-                                { title: "Corporate inquiry captured", timestamp: new Date(Date.now() - 15 * 24 * 3600 * 1000).toISOString() },
-                                { title: "Site visit completed", timestamp: new Date(Date.now() - 12 * 24 * 3600 * 1000).toISOString() },
-                                { title: "Token advance payment received", timestamp: new Date(Date.now() - 8 * 24 * 3600 * 1000).toISOString() },
-                                { title: "Legal review initiated", timestamp: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString() }
+                                { title: "Corporate inquiry captured", timestamp: new Date(Date.now() - 15 * 24 * 3600 * 1000).toISOString(), stage: "Inquiry" },
+                                { title: "Site visit completed", timestamp: new Date(Date.now() - 12 * 24 * 3600 * 1000).toISOString(), stage: "Site Visit" },
+                                { title: "Token advance payment received", timestamp: new Date(Date.now() - 8 * 24 * 3600 * 1000).toISOString(), stage: "Token Advance" },
+                                { title: "Legal review initiated", timestamp: new Date(Date.now() - 3 * 24 * 3600 * 1000).toISOString(), stage: "Legal Verification" }
                             ],
                             created_at: new Date(Date.now() - 15 * 24 * 3600 * 1000).toISOString(),
                             tasks: [
@@ -1371,7 +1446,7 @@
                                 { id: "t_re_11", category: "🏡 REAL ESTATE WORKFLOW", module: "Site Visit", name: "Conduct physical site walk-through", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 12 * 24 * 3600 * 1000).toISOString() },
                                 { id: "t_re_12", category: "🏡 REAL ESTATE WORKFLOW", module: "Negotiation", name: "Sign term sheet", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 10 * 24 * 3600 * 1000).toISOString() },
                                 { id: "t_re_13", category: "🏡 REAL ESTATE WORKFLOW", module: "Token Advance", name: "Confirm token receipt in bank", done: true, completed_by: "Operator", updated_at: new Date(Date.now() - 8 * 24 * 3600 * 1000).toISOString() },
-                                { id: "t_re_14", category: "🏡 REAL ESTATE WORKFLOW", module: "Legal Review", name: "Verify property tax clearance", done: false, updated_at: new Date().toISOString() }
+                                { id: "t_re_14", category: "🏡 REAL ESTATE WORKFLOW", module: "Legal Verification", name: "Verify property tax clearance", done: false, updated_at: new Date().toISOString() }
                             ]
                         }
                     ],
@@ -1431,24 +1506,6 @@
                             created_at: new Date(Date.now() - 4 * 24 * 3600 * 1000).toISOString()
                         },
                         {
-                            id: "inv_re_2",
-                            project_id: "proj_re_2",
-                            lead_id: "lead_re_2",
-                            lead_name: "David Miller",
-                            project_name: "Bellevue Condo Suite 4B",
-                            currency: "INR",
-                            total_amount: 18000000,
-                            paid_amount: 0,
-                            remaining_amount: 18000000,
-                            commission_amount: 450000,
-                            token_advance: 1800000,
-                            registration_payment: 0,
-                            invoice_status: "Sent",
-                            payment_status: "Token Pending",
-                            notes: "Awaiting site visit completion to negotiate token deposit.",
-                            created_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString()
-                        },
-                        {
                             id: "inv_re_3",
                             project_id: "proj_re_3",
                             lead_id: "lead_re_4",
@@ -1483,7 +1540,7 @@
                             trigger: "Site Visit marked completed + 24 hrs",
                             actions: "1. Send automated feedback form link<br>2. Request buyer rating on property<br>3. Task broker to call client",
                             operator: "Relationship Manager",
-                            linked_project: "Active Buyer Workspaces",
+                            linked_project: "Active Buyer Transactions",
                             active: true
                         },
                         {
@@ -1510,7 +1567,7 @@
                             trigger: "Agreement Drafting stage activated",
                             actions: "1. Send automated email requesting KYC list<br>2. Generate secure document upload link<br>3. Log verification task",
                             operator: "Compliance Officer",
-                            linked_project: "Agreement Workspace",
+                            linked_project: "Agreement Phase",
                             active: false
                         }
                     ],
@@ -1539,152 +1596,274 @@
            PROJECT GENERATION ENGINE 
            -------------------------------------- */
 
+        /* Helper function to generate default real-estate assets based on transaction type and stage */
+        function getDetailsForTransactionType(type, stage) {
+            let checklist = [];
+            let documents = [];
+            let bottlenecks = [];
+
+            // Define default stages for standard deal models
+            const stagesList = ["Inquiry", "Site Visit", "Negotiation", "Token Advance", "Legal Verification", "Agreement Drafting", "Registration", "Closed"];
+
+            // 1. Generate default documents based on type
+            const baseDocsList = {
+                "Property Sale": [
+                    { name: "Title_Deed_Greenwood.pdf", cat: "Ownership Documents", uploadedBy: "Seller Representative", status: "Approved" },
+                    { name: "Property_Tax_Clearance_2025.pdf", cat: "Government Approvals", uploadedBy: "Seller Representative", status: "Approved" },
+                    { name: "Draft_Sale_Agreement.pdf", cat: "Agreements", uploadedBy: "Elena Ross (Legal)", status: "Pending Upload" }
+                ],
+                "Property Purchase": [
+                    { name: "Title_Search_Audit.pdf", cat: "Legal Verification", uploadedBy: "Elena Ross (Legal)", status: "Approved" },
+                    { name: "Buyer_KYC_ID.pdf", cat: "Buyer/Seller KYC", uploadedBy: "Sarah Jenkins (Buyer)", status: "Approved" }
+                ],
+                "Rental Agreement": [
+                    { name: "Tenant_KYC_Verification.pdf", cat: "Buyer/Seller KYC", uploadedBy: "Operator", status: "Approved" },
+                    { name: "Standard_Lease_Agreement_Draft.pdf", cat: "Agreements", uploadedBy: "Marcus Vance (Broker)", status: "Pending Upload" }
+                ],
+                "Commercial Lease": [
+                    { name: "Occupancy_Certificate_OC.pdf", cat: "Government Approvals", uploadedBy: "Seller Representative", status: "Approved" },
+                    { name: "Fire_Safety_NOC.pdf", cat: "Government Approvals", uploadedBy: "Compliance Officer", status: "Approved" },
+                    { name: "Draft_Commercial_Lease_v1.0.pdf", cat: "Agreements", uploadedBy: "Elena Ross (Legal)", status: "Pending Upload" }
+                ],
+                "Land Acquisition": [
+                    { name: "Survey_Drawing_Boundary.pdf", cat: "Property Media", uploadedBy: "Surveyor", status: "Approved" },
+                    { name: "Zoning_Clearance_JDA.pdf", cat: "Government Approvals", uploadedBy: "Compliance Officer", status: "Approved" },
+                    { name: "Title_Deed_Search_30Yrs.pdf", cat: "Legal Verification", uploadedBy: "Elena Ross (Legal)", status: "Approved" }
+                ],
+                "Builder Project": [
+                    { name: "RERA_Allotment_Letter.pdf", cat: "Government Approvals", uploadedBy: "Builder Representative", status: "Approved" },
+                    { name: "Builder_Buyer_Agreement_Draft.pdf", cat: "Agreements", uploadedBy: "Builder Representative", status: "Pending Upload" }
+                ],
+                "Brokerage Deal": [
+                    { name: "Commission_Payout_Mandate.pdf", cat: "Agreements", uploadedBy: "Marcus Vance (Broker)", status: "Approved" },
+                    { name: "Brokerage_Invoice_Milestone1.pdf", cat: "Agreements", uploadedBy: "Marcus Vance (Broker)", status: "Pending Upload" }
+                ]
+            };
+
+            const docsTemplate = baseDocsList[type] || baseDocsList["Property Sale"];
+            documents = docsTemplate.map((d, index) => ({
+                id: "doc_" + generateId() + "_" + index,
+                name: d.name,
+                category: d.cat,
+                uploaded_at: new Date(Date.now() - 2 * 24 * 3600 * 1000).toISOString(),
+                uploaded_by: d.uploadedBy,
+                status: d.status,
+                visibility: "Public",
+                version: "v1.0",
+                stage: stage
+            }));
+
+            // 2. Generate checklists dynamically based on stage and type
+            const checklistsByType = {
+                "Property Sale": {
+                    "Inquiry": ["Review buyer inquiry details", "Qualify financial capability", "Log property requirements"],
+                    "Site Visit": ["Schedule site walk-through", "Conduct physical site walk-through", "Log buyer feedback"],
+                    "Negotiation": ["Negotiate price and terms", "Sign term sheet", "Approve final pricing and commission"],
+                    "Token Advance": ["Confirm token receipt in bank", "Issue token payment receipt", "Verify advance clearance"],
+                    "Legal Verification": ["Search title deed history", "Verify property tax clearance", "Check NOC documents", "Verify encumbrance certificate"],
+                    "Agreement Drafting": ["Draft purchase agreement copy", "Collect buyer & seller signatures", "Approve agreement terms"],
+                    "Registration": ["Book registrar office slot", "Pay stamp duty and registration fees", "Complete registration at registrar office"],
+                    "Closed": ["Handover keys to buyer", "Collect final broker commission", "Archive transaction file"]
+                },
+                "Property Purchase": {
+                    "Inquiry": ["Identify buyer requirements", "Search matching database listings", "Share property portfolios"],
+                    "Site Visit": ["Arrange property showing", "Conduct physical walkthroughs", "Note client preferences"],
+                    "Negotiation": ["Submit purchase offer", "Negotiate seller discount", "Agree on token deposit"],
+                    "Token Advance": ["Arrange token payment", "Obtain receipt from seller", "Log transaction details"],
+                    "Legal Verification": ["Request title documents from seller", "Submit to legal panel for audit", "Verify building approval plan"],
+                    "Agreement Drafting": ["Review draft sale agreement", "Request corrections in clauses", "Confirm final layout plan"],
+                    "Registration": ["Schedule registration appointment", "Submit stamp duty payment receipt", "Execute final deed"],
+                    "Closed": ["Take property possession", "Receive title deeds", "Close file"]
+                },
+                "Rental Agreement": {
+                    "Inquiry": ["Verify tenant employment", "Check rental budget suitability", "Share tenant profiles"],
+                    "Site Visit": ["Conduct property showing", "Verify property condition checklist", "Confirm utility operations"],
+                    "Negotiation": ["Agree on monthly rent", "Agree on maintenance fees", "Define security deposit amount"],
+                    "Token Advance": ["Collect security deposit token", "Verify advance receipt", "Lock property listing"],
+                    "Legal Verification": ["Conduct police verification of tenant", "Verify landlord ownership deed", "Check Society rules"],
+                    "Agreement Drafting": ["Draft standard 11-month lease", "Incorporate building rules", "Collect e-signatures"],
+                    "Registration": ["Notarize agreement copy", "Complete biometrics if required", "Submit copy to society office"],
+                    "Closed": ["Handover keys", "Record utility meter readings", "Process deposit settlement"]
+                },
+                "Commercial Lease": {
+                    "Inquiry": ["Assess company business registration", "Review spatial/HVAC requirements", "Qualify lease terms"],
+                    "Site Visit": ["Inspect corporate park amenities", "Check backup power systems", "Verify parking options"],
+                    "Negotiation": ["Negotiate fit-out period duration", "Agree on annual lease escalation", "Define security deposit months"],
+                    "Token Advance": ["Secure earnest money deposit", "Issue corporate receipt", "Hold complex space"],
+                    "Legal Verification": ["Verify commercial occupancy certificate", "Audit fire safety clearances", "Verify municipal taxes paid"],
+                    "Agreement Drafting": ["Draft corporate lease agreement", "Legal counsel review", "Execute company seal signatures"],
+                    "Registration": ["Register lease deed at sub-registrar", "Pay commercial stamp duty", "Obtain registered index copy"],
+                    "Closed": ["Handover space for fit-outs", "Confirm security deposit settlement", "Activate lease timeline"]
+                },
+                "Land Acquisition": {
+                    "Inquiry": ["Assess zoning clearance", "Check land survey numbers", "Review land acreage"],
+                    "Site Visit": ["Conduct survey boundary verification", "Inspect road access accessibility", "Verify water table source"],
+                    "Negotiation": ["Negotiate price per acre", "Define payment timeline structure", "Agree on boundary wall construction costs"],
+                    "Token Advance": ["Pay land token earnest deposit", "Execute agreement to sell term sheet", "Publish public notice of acquisition"],
+                    "Legal Verification": ["Audit land revenue records", "Check 30-year search report", "Verify land conversion approvals"],
+                    "Agreement Drafting": ["Draft sale agreement to sell", "Verify joint development agreement if applicable", "Verify power of attorney"],
+                    "Registration": ["Present deed at registrar office", "Submit land survey drawings", "Obtain registered deed copy"],
+                    "Closed": ["Take physical land possession", "Update land revenue mutation records", "Erect boundary fencing"]
+                },
+                "Builder Project": {
+                    "Inquiry": ["Check builder RERA registration status", "Verify construction timeline", "Qualify booking prices"],
+                    "Site Visit": ["Visit project marketing office", "Inspect sample show apartment", "Verify construction progress"],
+                    "Negotiation": ["Select floor rise premium discounts", "Agree on customized payment plan", "Negotiate car parking slot charge"],
+                    "Token Advance": ["Pay official builder booking advance", "Obtain booking allotment letter", "Secure receipt copy"],
+                    "Legal Verification": ["Verify project bank escrow account", "Check RERA quarterly reports", "Inspect title clearance certificate"],
+                    "Agreement Drafting": ["Execute builder-buyer agreement (BBA)", "Verify RERA compliant agreement draft", "Sign BBA copy"],
+                    "Registration": ["Register BBA at registrar office", "Schedule registration appointment", "Obtain registered copy"],
+                    "Closed": ["Await project completion handover", "Obtain occupancy certificate", "Possession handover"]
+                },
+                "Brokerage Deal": {
+                    "Inquiry": ["Qualify client brokerage agreement", "Identify transaction participants", "Verify commission structure"],
+                    "Site Visit": ["Coordinate showing with co-brokers", "Record client interest rating", "Check listing details"],
+                    "Negotiation": ["Finalize deal brokerage terms", "Sign commission invoice agreement", "Record deal settlement figures"],
+                    "Token Advance": ["Confirm token advance settlement", "Verify co-broker brokerage shares", "Log advance confirmation"],
+                    "Legal Verification": ["Review transaction agreement clauses", "Verify commission payout clearances", "Conduct basic document review"],
+                    "Agreement Drafting": ["Draft commission clearance mandate", "Collect signatures from brokers", "Confirm bank payout details"],
+                    "Registration": ["Support main deal registration", "Verify title transfer execution", "Collect mutation copy"],
+                    "Closed": ["Confirm commission receipt", "Disburse co-broker splits", "Archive deal file"]
+                }
+            };
+
+            const targetMap = checklistsByType[type] || checklistsByType["Property Sale"];
+            
+            // Build task checklists for all stages in order
+            stagesList.forEach(st => {
+                const tasksForStage = targetMap[st] || [];
+                tasksForStage.forEach((tName, tIdx) => {
+                    checklist.push({
+                        id: "task_" + generateId() + "_" + st + "_" + tIdx,
+                        category: "🏡 REAL ESTATE WORKFLOW",
+                        module: st,
+                        name: tName,
+                        notes: "",
+                        done: false,
+                        updated_at: new Date().toISOString()
+                    });
+                });
+            });
+
+            // 3. Generate default bottleneck based on type
+            bottlenecks = [
+                { item: `Awaiting basic KYC verification for ${type}`, responsible: "Operator", duration: "1 day", urgency: "Medium", stage: "Inquiry" }
+            ];
+
+            return { checklist, documents, bottlenecks };
+        }
+
         let activeLeadIdForGen = null;
         window.openProjectGenerator = function(clientName = '', leadId = null) {
             activeLeadIdForGen = leadId;
-            document.getElementById('gen-client').value = clientName || '';
-            document.getElementById('gen-title').value = '';
-            document.getElementById('gen-notes').value = '';
             
-            let html = '';
-            Object.keys(TASK_STRUCTURE).forEach((cat) => {
-                const modules = TASK_STRUCTURE[cat];
-                html += `
-                    <div style="margin-bottom: 24px;">
-                        <h3 style="background:#eee; padding:8px; border:2px solid #111; font-size:14px; margin-bottom:12px;">${cat}</h3>
-                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; padding-left:12px;">
-                            ${Object.keys(modules).map(mod => `
-                                <label style="display:flex; align-items:center; cursor:pointer; font-size:13px; font-weight:700;">
-                                    <input type="checkbox" class="proj-mod-checkbox" value="${cat}|||${mod}" style="width:16px; height:16px; margin-right:8px; border:2px solid #000;">
-                                    ${mod}
-                                </label>
-                            `).join('')}
-                        </div>
-                    </div>`;
-            });
-
-            document.getElementById('category-module-picker').innerHTML = html;
+            // Set default date to today
+            document.getElementById('gen-inquiry-date').value = new Date().toISOString().split('T')[0];
+            
+            // Prefill property info defaults
+            document.getElementById('gen-property-name').value = '';
+            document.getElementById('gen-property-address').value = '';
+            document.getElementById('gen-locality').value = '';
+            document.getElementById('gen-seller-name').value = '';
+            document.getElementById('gen-buyer-name').value = '';
+            document.getElementById('gen-assigned-broker').value = 'Marcus Vance';
+            
+            if (leadId) {
+                const lead = DB.tables.leads.find(l => l.id === leadId);
+                if (lead) {
+                    if (lead.message && lead.message.includes('PROPERTY LISTING')) {
+                        document.getElementById('gen-seller-name').value = lead.name;
+                        document.getElementById('gen-buyer-name').value = '';
+                        document.getElementById('gen-transaction-type').value = 'Property Sale';
+                    } else {
+                        document.getElementById('gen-buyer-name').value = lead.name;
+                        document.getElementById('gen-seller-name').value = '';
+                        document.getElementById('gen-transaction-type').value = 'Property Purchase';
+                    }
+                }
+            }
+            
             document.getElementById('projectGeneratorModal').style.display = 'flex';
         }
 
         window.submitProjectGeneration = function() {
-            const client = document.getElementById('gen-client').value || 'Unknown Client';
-            const title = document.getElementById('gen-title').value || 'Custom Workspace';
-            const globalNotes = document.getElementById('gen-notes').value;
+            const transactionType = document.getElementById('gen-transaction-type').value;
+            const propertyName = document.getElementById('gen-property-name').value || 'TBD Property';
+            const propertyAddress = document.getElementById('gen-property-address').value || 'TBD Address';
+            const propertyType = document.getElementById('gen-property-type').value;
+            const locality = document.getElementById('gen-locality').value || 'TBD Locality';
+            const inquiryDate = document.getElementById('gen-inquiry-date').value || new Date().toISOString().split('T')[0];
+            const sellerName = document.getElementById('gen-seller-name').value || 'TBD Seller';
+            const buyerName = document.getElementById('gen-buyer-name').value || '';
+            const assignedBroker = document.getElementById('gen-assigned-broker').value || 'Marcus Vance';
+            const leadSource = document.getElementById('gen-lead-source').value;
 
-            let combinedTasks = [];
-            
-            // Generate tasks from checked modules
-            const checkboxes = document.querySelectorAll('.proj-mod-checkbox');
-            checkboxes.forEach(chk => {
-                if(chk.checked) {
-                    const parts = chk.value.split("|||");
-                    const cat = parts[0];
-                    const mod = parts[1];
-                    const defaultTasks = TASK_STRUCTURE[cat][mod];
-                    
-                    defaultTasks.forEach(taskName => {
-                        combinedTasks.push({
-                            id: generateId(),
-                            category: cat,
-                            module: mod,
-                            name: taskName,
-                            notes: '',
-                            done: false,
-                            updated_at: new Date().toISOString()
-                        });
-                    });
-                }
-            });
+            // Generate stages, documents, checkpoints, bottlenecks, checklists based on transaction type selection
+            const details = getDetailsForTransactionType(transactionType, "Inquiry");
 
-            // Handle additional notes provided during generation
-            if(globalNotes.trim() !== "") {
-                combinedTasks.push({
-                    id: generateId(),
-                    category: "⬜ CUSTOM REQUEST",
-                    module: "Client Notes & Additions",
-                    name: "Execute Custom Scope given by Client",
-                    notes: globalNotes,
-                    done: false,
-                    updated_at: new Date().toISOString()
-                });
-            }
+            const newTransaction = {
+                id: activeLeadIdForGen || generateId(),
+                transaction_type: transactionType,
+                client_name: buyerName || sellerName,
+                project_name: propertyName,
+                property_address: propertyAddress,
+                property_type: propertyType,
+                locality: locality,
+                lead_id: activeLeadIdForGen || null,
+                seller_name: sellerName,
+                buyer_name: buyerName,
+                assigned_broker: assignedBroker,
+                lead_source: leadSource,
+                inquiry_date: inquiryDate,
+                deal_stage: "Inquiry",
+                deal_health_status: "ON TRACK",
+                deal_value: 0,
+                commission_percent: 2.0,
+                registration_deadline: "",
+                waiting_on: details.bottlenecks,
+                documents: details.documents,
+                team_thread: [
+                    { id: "msg_" + generateId(), sender: "System", role: "Auditor", message: `Transaction file initialized for type: ${transactionType}`, timestamp: new Date().toISOString(), stage: "Inquiry" }
+                ],
+                client_timeline: [
+                    { title: "Inquiry captured & transaction file opened", timestamp: new Date().toISOString(), stage: "Inquiry" }
+                ],
+                tasks: details.checklist,
+                created_at: new Date().toISOString()
+            };
 
-            // Fallback if absolutely nothing is selected
-            if(combinedTasks.length === 0) {
-                combinedTasks.push({ id: generateId(), category: "⬜ CUSTOM", module: "General Setup", name: "Configure Project", notes: '', done: false, updated_at: new Date().toISOString() });
-            }
-
-            // Keep project ID stable per lead so all tasks for a client map to one project key.
-            let projectIdForPayload = null;
+            // Add transaction to database
             if (activeLeadIdForGen) {
-                const existingLeadProject = DB.tables.projects.find(p => p.lead_id === activeLeadIdForGen);
-                if (existingLeadProject) {
-                    projectIdForPayload = existingLeadProject.id;
-                    existingLeadProject.client_name = client;
-                    existingLeadProject.project_name = title;
-                    existingLeadProject.lead_id = activeLeadIdForGen;
-                    if (!Array.isArray(existingLeadProject.tasks)) existingLeadProject.tasks = [];
-                    existingLeadProject.tasks = existingLeadProject.tasks.concat(combinedTasks);
+                const existing = DB.tables.projects.find(p => p.lead_id === activeLeadIdForGen);
+                if (existing) {
+                    Object.assign(existing, newTransaction);
                 } else {
-                    projectIdForPayload = activeLeadIdForGen;
-                    DB.tables.projects.unshift({
-                        id: projectIdForPayload,
-                        client_name: client,
-                        project_name: title,
-                        tasks: combinedTasks,
-                        lead_id: activeLeadIdForGen,
-                        created_at: new Date().toISOString()
-                    });
+                    DB.tables.projects.unshift(newTransaction);
                 }
+                const lead = DB.tables.leads.find(l => l.id === activeLeadIdForGen);
+                if (lead) lead.status = 'working';
+                activeLeadIdForGen = null;
             } else {
-                projectIdForPayload = generateId();
-                DB.tables.projects.unshift({
-                    id: projectIdForPayload,
-                    client_name: client,
-                    project_name: title,
-                    tasks: combinedTasks,
-                    lead_id: null,
-                    created_at: new Date().toISOString()
-                });
+                DB.tables.projects.unshift(newTransaction);
             }
 
-            // Trigger n8n Automation on Project Generation for Invoice/Task scaling
+            // Sync with Supabase (mock)
             try {
                 if (!DB.tables.automations) DB.tables.automations = [];
                 DB.tables.automations.push({
                     id: generateId(),
-                    title: 'Project creation workflow executed',
-                    related_entity: client,
+                    title: 'Property Transaction File Created',
+                    related_entity: propertyName,
                     status: 'Successful',
                     timestamp: new Date().toISOString()
                 });
-                DB.save();
-
-                const projectPayload = new URLSearchParams();
-                projectPayload.append('event', 'dev_project_created');
-                projectPayload.append('project_id', projectIdForPayload);
-                projectPayload.append('lead_id', activeLeadIdForGen || 'none');
-                projectPayload.append('client_name', client);
-                projectPayload.append('project_name', title);
-                projectPayload.append('tasks_json', JSON.stringify(combinedTasks));
-
-                fetch('YOUR_NEW_WEBHOOK_URL_HERE', {
-                    method: 'POST',
-                    body: projectPayload
-                }).catch(e => console.error("Webhook error:", e));
             } catch(e) {
                 console.error(e);
             }
 
-            // If this was started from a lead, update the lead status
-            if (activeLeadIdForGen) {
-                const lead = DB.tables.leads.find(l => l.id === activeLeadIdForGen);
-                if (lead) lead.status = 'working';
-                activeLeadIdForGen = null; 
-            }
-
-            DB.save(); syncToSupabase(); renderAll();
+            DB.save(); 
+            syncToSupabase(); 
+            renderAll();
             document.getElementById('projectGeneratorModal').style.display = 'none';
         }
 
@@ -1709,11 +1888,12 @@
             if (!proj.client_timeline) proj.client_timeline = [];
             proj.client_timeline.push({
                 title: `Deal stage shifted to ${newStage}`,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                stage: newStage
             });
 
             // Auto-complete or revert checklist tasks based on new stage index
-            const stages = ["Inquiry", "Site Visit", "Negotiation", "Token Advance", "Legal Review", "Agreement Drafting", "Registration", "Completed"];
+            const stages = ["Inquiry", "Site Visit", "Negotiation", "Token Advance", "Legal Verification", "Agreement Drafting", "Registration", "Closed"];
             const targetIdx = stages.indexOf(newStage);
             
             (proj.tasks || []).forEach(t => {
@@ -1731,21 +1911,47 @@
             if (proj.lead_id) {
                 const lead = DB.tables.leads.find(l => l.id === proj.lead_id);
                 if (lead) {
-                    lead.status = (newStage === 'Completed') ? 'finished' : 'working';
+                    lead.status = (newStage === 'Closed') ? 'finished' : 'working';
                 }
+            }
+
+            // Trigger Automated Workflows
+            if (DB.tables.playbooks) {
+                DB.tables.playbooks.forEach(pb => {
+                    if (pb.active) {
+                        let triggered = false;
+                        if (pb.id === 'pb_5' && newStage === 'Agreement Drafting') triggered = true;
+                        if (pb.id === 'pb_2' && newStage === 'Site Visit' && oldStage !== 'Site Visit') triggered = true;
+                        if (pb.id === 'pb_3' && newStage === 'Site Visit' && oldStage !== 'Site Visit') triggered = true;
+                        if (pb.id === 'pb_4' && newStage === 'Token Advance') triggered = true;
+                        
+                        if (triggered) {
+                            if (!DB.tables.automations) DB.tables.automations = [];
+                            DB.tables.automations.push({
+                                id: generateId(),
+                                title: `${pb.name} triggered`,
+                                related_entity: proj.project_name,
+                                status: "Successful",
+                                timestamp: new Date().toISOString()
+                            });
+                        }
+                    }
+                });
             }
 
             // Sync invoice payment status if appropriate
             const inv = (DB.tables.invoices || []).find(i => i.project_id === proj.id);
             if (inv) {
-                if (newStage === 'Completed') {
+                if (newStage === 'Closed') {
                     inv.payment_status = 'Fully Settled';
                     inv.paid_amount = inv.total_amount;
                     inv.remaining_amount = 0;
                 } else if (newStage === 'Registration') {
-                    inv.payment_status = 'Registration Complete';
-                } else if (newStage === 'Legal Review') {
+                    inv.payment_status = 'Registration Pending';
+                } else if (newStage === 'Legal Verification') {
                     inv.payment_status = 'Legal Hold';
+                } else if (newStage === 'Token Advance') {
+                    inv.payment_status = 'Token Pending';
                 }
             }
 
@@ -1873,7 +2079,7 @@
 
             const projects = DB.tables.projects || [];
             if (projects.length === 0) {
-                grid.innerHTML = '<div class="card" style="text-align:center; font-weight:700; padding:48px; opacity:0.5;">No active properties in pipeline.</div>';
+                grid.innerHTML = '<div class="card" style="text-align:center; font-weight:700; padding:48px; opacity:0.5;">No active property transactions in pipeline.</div>';
                 return;
             }
 
@@ -1882,16 +2088,29 @@
                 const doneCount = tasks.filter(t => t.done).length;
                 const progress = tasks.length > 0 ? Math.round((doneCount / tasks.length) * 100) : 0;
                 
-                const stages = ["Inquiry", "Site Visit", "Negotiation", "Token Advance", "Legal Review", "Agreement Drafting", "Registration", "Completed"];
+                const stages = ["Inquiry", "Site Visit", "Negotiation", "Token Advance", "Legal Verification", "Agreement Drafting", "Registration", "Closed"];
                 const docCategories = [
                     "Ownership Documents", 
                     "Government Approvals", 
                     "Buyer/Seller KYC", 
                     "Legal Verification", 
-                    "Payment Receipts", 
                     "Agreements", 
-                    "Property Media"
+                    "Payment Receipts", 
+                    "Property Media",
+                    "Registration Records"
                 ];
+
+                const catEmptyStates = {
+                    "Ownership Documents": "Awaiting ownership documents from seller.",
+                    "Government Approvals": "Pending legal verification approvals.",
+                    "Buyer/Seller KYC": "Awaiting buyer/seller identity verification records.",
+                    "Legal Verification": "Pending legal title search report upload.",
+                    "Agreements": "Awaiting agreement drafting notes.",
+                    "Payment Receipts": "No payment tokens logged yet.",
+                    "Property Media": "Awaiting property inspection photos.",
+                    "Registration Records": "Awaiting final registrar slot confirmation document."
+                };
+
                 const blockers = proj.waiting_on || [];
 
                 // Pipeline html
@@ -1918,16 +2137,28 @@
                     }).join('')}
                 </div>`;
 
-                // Property Info Grid HTML
+                // Health status details
+                let healthColor = '#10B981'; // green for ON TRACK
+                let healthText = '#fff';
+                if (proj.deal_health_status === 'WAITING ON CLIENT') { healthColor = '#ffb74d'; healthText = '#000'; }
+                else if (proj.deal_health_status === 'LEGAL DELAY') { healthColor = '#e53935'; healthText = '#fff'; }
+                else if (proj.deal_health_status === 'PAYMENT BLOCKED') { healthColor = '#ff7043'; healthText = '#fff'; }
+                else if (proj.deal_health_status === 'DOCUMENT PENDING') { healthColor = '#ab47bc'; healthText = '#fff'; }
+
+                // Property Summary Section HTML
                 const infoGridHtml = `<div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:12px; margin-bottom:20px; border-bottom: 2px solid var(--border-color); padding-bottom:16px;">
                     <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Property Type</span><div style="font-weight:900; font-size:14px;">${proj.property_type || 'Unknown'}</div></div>
-                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Deal Value</span><div style="font-weight:900; font-size:14px; color: #10B981;">INR ${(proj.deal_value || 0).toLocaleString()}</div></div>
-                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Commission</span><div style="font-weight:900; font-size:14px;">${proj.commission_percent || 0}% (INR ${Math.round((proj.deal_value || 0) * ((proj.commission_percent || 0)/100)).toLocaleString()})</div></div>
-                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Reg Deadline</span><div style="font-weight:900; font-size:14px;">${proj.registration_deadline || 'N/A'}</div></div>
-                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Seller Name</span><div style="font-weight:900; font-size:14px;">${proj.seller_name || 'N/A'}</div></div>
-                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Buyer Name</span><div style="font-weight:900; font-size:14px;">${proj.buyer_name || proj.client_name || 'N/A'}</div></div>
+                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Transaction Type</span><div style="font-weight:900; font-size:14px; color: var(--accent-color);">${proj.transaction_type || 'Property Sale'}</div></div>
+                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Seller</span><div style="font-weight:900; font-size:14px;">${proj.seller_name || 'N/A'}</div></div>
+                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Buyer</span><div style="font-weight:900; font-size:14px;">${proj.buyer_name || 'N/A'}</div></div>
                     <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Assigned Broker</span><div style="font-weight:900; font-size:14px; color: var(--accent-color);">${proj.assigned_broker || 'Unassigned'}</div></div>
-                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Overall Checklist</span><div style="font-weight:900; font-size:14px;">${doneCount}/${tasks.length} Done (${progress}%)</div></div>
+                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Deal Health</span>
+                        <div style="margin-top:2px;">
+                            <span class="badge" style="background:${healthColor}; color:${healthText}; border: 1.5px solid var(--border-color); font-size:10px; padding:2px 6px; font-weight:900;">${proj.deal_health_status || 'ON TRACK'}</span>
+                        </div>
+                    </div>
+                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Registration Deadline</span><div style="font-weight:900; font-size:14px;">${proj.registration_deadline || 'Negotiation Pending'}</div></div>
+                    <div><span style="font-size:10px; font-weight:800; opacity:0.6; text-transform:uppercase;">Checklist Progress</span><div style="font-weight:900; font-size:14px;">${doneCount}/${tasks.length} Done (${progress}%)</div></div>
                 </div>`;
 
                 // Blockers list HTML
@@ -1936,7 +2167,7 @@
                         <h4 style="font-size:12px; text-transform:uppercase; color:#ff3c00; font-weight:900; margin:0;">⚠️ Operational Bottlenecks</h4>
                         <button class="btn" style="padding:2px 6px; font-size:9px; border-color:#ff3c00; color:#ff3c00;" onclick="addProjectBlocker('${proj.id}')">+ ADD BOTTLENECK</button>
                     </div>
-                    ${blockers.length === 0 ? `<div style="font-size:12px; font-weight:700; color:#777; padding:4px;">No active operational bottlenecks. Deal is moving smoothly.</div>` : `
+                    ${blockers.length === 0 ? `<div style="font-size:12px; font-weight:700; color:#555; padding:8px; background:#fff; border: 1.5px dashed var(--border-color); text-align:center;">Transaction currently moving without operational blockers.</div>` : `
                         <div style="display:flex; flex-direction:column; gap:6px;">
                             ${blockers.map((b, bIdx) => {
                                 let urgencyBg = '#ffeb3b';
@@ -1947,7 +2178,7 @@
                                         <div style="font-size:12px; font-weight:700;">
                                             <span class="badge" style="background:${urgencyBg}; color:${urgencyFg}; border:none; padding:2px 4px; font-size:8px; margin-right:6px;">${b.urgency}</span>
                                             <strong>${b.item}</strong> (Responsible: ${b.responsible})
-                                            <span style="font-size:10px; opacity:0.6; margin-left:8px;">Pending: ${b.duration}</span>
+                                            <span style="font-size:10px; opacity:0.6; margin-left:8px;">Stage: ${b.stage || proj.deal_stage} | Pending: ${b.duration || '1 day'}</span>
                                         </div>
                                         <button class="btn btn-primary" style="padding:2px 6px; font-size:9px; background:#10B981;" onclick="resolveProjectBlocker('${proj.id}', ${bIdx})">✔ RESOLVED</button>
                                     </div>
@@ -1958,27 +2189,35 @@
                 </div>`;
 
                 // Documents Vault HTML
-                const docsVaultHtml = `<div style="background:#f9f9f9; border: 2.5px solid var(--border-color); padding: 12px;">
+                const docsVaultHtml = `<div style="background:#f9f9f9; border: 2.5px solid var(--border-color); padding: 12px; display:flex; flex-direction:column; height: 320px;">
                     <div class="flex-between" style="margin-bottom:8px; border-bottom:1.5px solid var(--border-color); padding-bottom:4px;">
                         <h4 style="font-size:12px; text-transform:uppercase; font-weight:900; margin:0;">📄 Document Vault</h4>
                         <button class="btn btn-primary" style="padding:2px 6px; font-size:9px;" onclick="addProjectDocument('${proj.id}')">+ UPLOAD DOCUMENT</button>
                     </div>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; max-height:220px; overflow-y:auto;">
+                    <div style="flex:1; display:grid; grid-template-columns: 1fr 1fr; gap:10px; overflow-y:auto; padding-right:4px;">
                         ${docCategories.map(cat => {
                             const catDocs = (proj.documents || []).filter(d => d.category === cat);
+                            const emptyMsg = catEmptyStates[cat] || "Awaiting document uploads.";
                             return `
-                                <div style="background:#fff; border:1.5px solid var(--border-color); padding:8px;">
-                                    <div style="font-size:10px; font-weight:900; text-transform:uppercase; border-bottom:1px solid #eee; padding-bottom:2px; margin-bottom:6px; color:#555;">📁 ${cat}</div>
-                                    ${catDocs.length === 0 ? `<div style="font-size:10px; opacity:0.5; font-weight:700;">No documents uploaded.</div>` : `
-                                        <div style="display:flex; flex-direction:column; gap:4px;">
-                                            ${catDocs.map(d => `
-                                                <div style="font-size:11px; font-weight:700; display:flex; justify-content:space-between; align-items:center;">
-                                                    <span title="${d.name}">${d.name.length > 20 ? d.name.slice(0,18)+'...' : d.name} <span style="font-size:8px; opacity:0.5;">(${d.version})</span></span>
-                                                    <span class="badge" style="font-size:8px; padding:1px 3px; background:${d.status==='Approved'?'#e8f5e9':'#ffe0b2'}; border:none;">${d.status}</span>
-                                                </div>
-                                            `).join('')}
-                                        </div>
-                                    `}
+                                <div style="background:#fff; border:1.5px solid var(--border-color); padding:8px; min-height:80px; display:flex; flex-direction:column; justify-content:space-between;">
+                                    <div>
+                                        <div style="font-size:10px; font-weight:900; text-transform:uppercase; border-bottom:1px solid #eee; padding-bottom:2px; margin-bottom:6px; color:#555;">📁 ${cat}</div>
+                                        ${catDocs.length === 0 ? `<div style="font-size:9.5px; color:#888; font-weight:700; line-height:1.2;">${emptyMsg}</div>` : `
+                                            <div style="display:flex; flex-direction:column; gap:4px;">
+                                                ${catDocs.map(d => `
+                                                    <div style="font-size:11px; font-weight:700; display:flex; flex-direction:column; border-bottom:1px dashed #eee; padding-bottom:3px; margin-bottom:3px;">
+                                                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                                                            <span title="${d.name}" style="word-break:break-all;">${d.name.length > 20 ? d.name.slice(0,18)+'...' : d.name} <span style="font-size:8px; opacity:0.5;">(${d.version || 'v1.0'})</span></span>
+                                                            <span class="badge" style="font-size:8px; padding:1px 3px; background:${d.status==='Approved'?'#e8f5e9':'#ffe0b2'}; border:none;">${d.status}</span>
+                                                        </div>
+                                                        <div style="font-size:8px; opacity:0.6; margin-top:2px;">
+                                                            Uploaded by: ${d.uploaded_by || 'Unknown'} | Stage: ${d.stage || 'Inquiry'}
+                                                        </div>
+                                                    </div>
+                                                `).join('')}
+                                            </div>
+                                        `}
+                                    </div>
                                 </div>
                             `;
                         }).join('')}
@@ -1986,17 +2225,18 @@
                 </div>`;
 
                 // Chat Thread HTML
-                const chatThreadHtml = `<div style="background:#f4f4f4; border: 2.5px solid var(--border-color); padding: 12px; display:flex; flex-direction:column; height: 280px;">
+                const chatThreadHtml = `<div style="background:#f4f4f4; border: 2.5px solid var(--border-color); padding: 12px; display:flex; flex-direction:column; height: 320px;">
                     <h4 style="font-size:12px; text-transform:uppercase; font-weight:900; margin-bottom:6px; border-bottom:1.5px solid var(--border-color); padding-bottom:4px;">💬 Internal Team Thread (Secure Broker Logs)</h4>
                     <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding:6px; background:#fff; border:1.5px solid var(--border-color); margin-bottom:8px;" id="chat_messages_${proj.id}">
-                        ${(proj.team_thread || []).length === 0 ? `<div style="font-size:11px; opacity:0.5; text-align:center; font-weight:700; padding-top:40px;">No message logs. Start coordinating with brokers/legal teams.</div>` : `
+                        ${(proj.team_thread || []).length === 0 ? `<div style="font-size:11px; opacity:0.5; text-align:center; font-weight:700; padding-top:40px;">No internal messages. Record a broker log or legal instruction.</div>` : `
                             ${(proj.team_thread || []).map(msg => `
                                 <div style="font-size:11px; border-bottom:1px solid #f0f0f0; padding-bottom:4px;">
                                     <div style="display:flex; justify-content:space-between; font-weight:800; font-size:9px; color:#555;">
-                                        <span>${msg.sender}</span>
+                                        <span>${msg.sender} (${msg.role || 'Broker'})</span>
                                         <span>${formatRelativeTime(msg.timestamp)}</span>
                                     </div>
                                     <div style="font-weight:700; margin-top:2px;">${msg.message}</div>
+                                    ${msg.stage ? `<div style="font-size:8px; color:var(--accent-color); font-weight:800; text-transform:uppercase; margin-top:2px;">Linked Stage: ${msg.stage}</div>` : ''}
                                 </div>
                             `).join('')}
                         `}
@@ -2008,28 +2248,31 @@
                 </div>`;
 
                 // Client Timeline HTML
-                const clientTimelineHtml = `<div style="background:#fffebc; border: 2.5px solid var(--border-color); padding: 12px;">
+                const clientTimelineHtml = `<div style="background:#fffebc; border: 2.5px solid var(--border-color); padding: 12px; height: 280px; display:flex; flex-direction:column;">
                     <h4 style="font-size:12px; text-transform:uppercase; font-weight:900; margin-bottom:6px; border-bottom:1.5px solid var(--border-color); padding-bottom:4px;">⏳ Relationship Lifecycle</h4>
-                    <div style="display:flex; flex-direction:column; gap:6px; padding:4px; max-height:220px; overflow-y:auto;">
+                    <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding:4px;">
                         ${(proj.client_timeline || []).map(tl => `
-                            <div style="display:flex; gap:8px; font-size:11px; font-weight:700;">
-                                <span style="color:var(--accent-color);">➔</span>
-                                <div>${tl.title} <span style="font-size:9px; opacity:0.5; margin-left:6px;">${formatRelativeTime(tl.timestamp)}</span></div>
+                            <div style="display:flex; gap:8px; font-size:11px; font-weight:700; border-bottom: 1.5px dashed rgba(0,0,0,0.1); padding-bottom:4px;">
+                                <span style="color:var(--text-color);">➔</span>
+                                <div>
+                                    <strong style="text-transform:uppercase; font-size:10px; color:#555;">${tl.stage || 'Movement'}:</strong> ${tl.title}
+                                    <div style="font-size:9px; opacity:0.5; margin-top:1px;">${formatRelativeTime(tl.timestamp)}</div>
+                                </div>
                             </div>
                         `).join('')}
                     </div>
                 </div>`;
 
-                // Checklist Tasks HTML
-                const tasksHtml = `<div style="background:#fff; border: 2.5px solid var(--border-color); padding: 12px;">
+                // Stage Checklist HTML
+                const tasksHtml = `<div style="background:#fff; border: 2.5px solid var(--border-color); padding: 12px; height: 280px; display:flex; flex-direction:column;">
                     <div class="flex-between" style="border-bottom:1.5px solid var(--border-color); padding-bottom:4px; margin-bottom:12px;">
                         <h4 style="font-size:12px; text-transform:uppercase; font-weight:900; margin:0;">📋 Stage Checklist (${proj.deal_stage})</h4>
                         <button class="btn btn-primary" style="padding:2px 6px; font-size:9px;" onclick="addCustomTask('${proj.id}')">+ ADD TASK</button>
                     </div>
-                    <div style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto;">
-                        ${tasks.filter(t => t.module === proj.deal_stage).length === 0 ? `<div style="font-size:11px; opacity:0.5; font-weight:700;">No tasks defined for this stage. Add an ad-hoc action item above.</div>` : `
+                    <div style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding-right:4px;">
+                        ${tasks.filter(t => t.module === proj.deal_stage).length === 0 ? `<div style="font-size:11.5px; opacity:0.6; font-weight:700; line-height:1.4; padding:8px; border: 1.5px dashed var(--border-color); text-align:center;">No tasks defined for stage: ${proj.deal_stage}. Add a custom action above.</div>` : `
                             ${tasks.filter(t => t.module === proj.deal_stage).map(t => `
-                                <div style="display:flex; flex-direction:column; padding-bottom:8px; border-bottom: 1px solid #f0f0f0;">
+                                <div style="display:flex; flex-direction:column; padding-bottom:6px; border-bottom: 1px solid #f0f0f0;">
                                     <label style="display:flex; align-items:center; cursor:pointer; font-weight: 700; font-size:13px; text-decoration: ${t.done?'line-through':'none'}; opacity: ${t.done?0.5:1}">
                                         <input type="checkbox" ${t.done?'checked':''} onchange="toggleProjectTask('${proj.id}', '${t.id}')" style="width:16px; height:16px; margin-right:10px; cursor:pointer; border: 2px solid #000;">
                                         <span>${t.name}</span>
@@ -2174,67 +2417,85 @@
                 if (p.created_at) {
                     events.push({
                         id: 'proj_create_' + p.id,
-                        event_type: 'LISTING',
-                        title: `Property Listing Activated: ${p.property_type}`,
+                        event_type: 'INQUIRY',
+                        title: `New inquiry created`,
                         property_name: p.project_name || 'Unassigned Property',
                         client_name: p.client_name,
                         current_stage: p.deal_stage || 'Inquiry',
                         waiting_on: p.waiting_on && p.waiting_on.length > 0 ? p.waiting_on[0].item : '',
-                        status: 'Active',
+                        status: 'ACTIVE',
                         timestamp: p.created_at
                     });
+                    
+                    if (p.assigned_broker) {
+                        events.push({
+                            id: 'proj_broker_' + p.id,
+                            event_type: 'BROKER',
+                            title: `Broker assigned: ${p.assigned_broker}`,
+                            property_name: p.project_name || 'Unassigned Property',
+                            client_name: p.client_name,
+                            current_stage: p.deal_stage || 'Inquiry',
+                            waiting_on: p.waiting_on && p.waiting_on.length > 0 ? p.waiting_on[0].item : '',
+                            status: 'LOGGED',
+                            timestamp: p.created_at
+                        });
+                    }
                 }
                 
                 // client relationship timeline
                 (p.client_timeline || []).forEach((tl, idx) => {
-                    let evType = 'INQUIRY';
-                    if (tl.title.toLowerCase().includes('visit')) evType = 'VISIT';
-                    else if (tl.title.toLowerCase().includes('negotiat') || tl.title.toLowerCase().includes('offer') || tl.title.toLowerCase().includes('sheet')) evType = 'NEGOTIATION';
-                    else if (tl.title.toLowerCase().includes('token') || tl.title.toLowerCase().includes('payment')) evType = 'PAYMENT';
-                    else if (tl.title.toLowerCase().includes('legal')) evType = 'LEGAL';
-                    else if (tl.title.toLowerCase().includes('agreement')) evType = 'DOCUMENT';
-                    else if (tl.title.toLowerCase().includes('registration') || tl.title.toLowerCase().includes('registrar')) evType = 'REGISTRATION';
+                    let evType = '';
+                    let titleLower = tl.title.toLowerCase();
+                    
+                    if (titleLower.includes('visit') || titleLower.includes('showing')) evType = 'VISIT';
+                    else if (titleLower.includes('negotiat') || titleLower.includes('offer') || titleLower.includes('sheet')) evType = 'NEGOTIATION';
+                    else if (titleLower.includes('token') || titleLower.includes('payment') || titleLower.includes('advance')) evType = 'PAYMENT';
+                    else if (titleLower.includes('legal') || titleLower.includes('deed') || titleLower.includes('title')) evType = 'LEGAL';
+                    else if (titleLower.includes('agreement') || titleLower.includes('draft') || titleLower.includes('contract')) evType = 'DOCUMENT';
+                    else if (titleLower.includes('registration') || titleLower.includes('registrar') || titleLower.includes('appointment')) evType = 'REGISTRATION';
+                    else if (titleLower.includes('kyc')) evType = 'KYC';
+                    else if (titleLower.includes('buyer') || titleLower.includes('seller') || titleLower.includes('client')) evType = 'CLIENT';
 
-                    events.push({
-                        id: 'proj_timeline_' + p.id + '_' + idx,
-                        event_type: evType,
-                        title: tl.title,
-                        property_name: p.project_name || 'Unassigned Property',
-                        client_name: p.client_name,
-                        current_stage: p.deal_stage || 'Inquiry',
-                        waiting_on: p.waiting_on && p.waiting_on.length > 0 ? p.waiting_on[0].item : '',
-                        status: 'Logged',
-                        timestamp: tl.timestamp
-                    });
+                    // Only push if it maps to a valid operational category
+                    if (evType) {
+                        // Map status
+                        let opStatus = 'LOGGED';
+                        if (evType === 'KYC' || evType === 'DOCUMENT') opStatus = 'DOCUMENT REQUIRED';
+                        if (evType === 'LEGAL') opStatus = 'PENDING APPROVAL';
+                        if (p.waiting_on && p.waiting_on.length > 0) opStatus = 'WAITING';
+
+                        events.push({
+                            id: 'proj_timeline_' + p.id + '_' + idx,
+                            event_type: evType,
+                            title: tl.title,
+                            property_name: p.project_name || 'Unassigned Property',
+                            client_name: p.client_name,
+                            current_stage: p.deal_stage || 'Inquiry',
+                            waiting_on: p.waiting_on && p.waiting_on.length > 0 ? p.waiting_on[0].item : '',
+                            status: opStatus,
+                            timestamp: tl.timestamp
+                        });
+                    }
                 });
 
                 // Document uploads
-                (p.documents || []).forEach(d => {
+                (p.documents || []).forEach((d, idx) => {
+                    let evType = 'DOCUMENT';
+                    if (d.category && d.category.includes('Ownership')) evType = 'OWNERSHIP';
+                    else if (d.category && d.category.includes('KYC')) evType = 'KYC';
+                    
+                    let opStatus = d.status === 'Approved' ? 'ACTIVE' : 'PENDING APPROVAL';
+                    
                     events.push({
-                        id: 'proj_doc_' + p.id + '_' + d.id,
-                        event_type: 'DOCUMENT',
-                        title: `Property agreement uploaded: ${d.name}`,
+                        id: 'proj_doc_' + p.id + '_' + d.id + '_' + idx,
+                        event_type: evType,
+                        title: `${d.category || 'File'} uploaded: ${d.name}`,
                         property_name: p.project_name || 'Unassigned Property',
                         client_name: p.client_name,
                         current_stage: p.deal_stage || 'Inquiry',
                         waiting_on: p.waiting_on && p.waiting_on.length > 0 ? p.waiting_on[0].item : '',
-                        status: d.status || 'Uploaded',
+                        status: opStatus,
                         timestamp: d.uploaded_at
-                    });
-                });
-
-                // Team Thread chat notes
-                (p.team_thread || []).forEach((msg, idx) => {
-                    events.push({
-                        id: 'proj_msg_' + p.id + '_' + idx,
-                        event_type: 'COMMUNICATION',
-                        title: `Broker Note: "${msg.message}"`,
-                        property_name: p.project_name || 'Unassigned Property',
-                        client_name: p.client_name,
-                        current_stage: p.deal_stage || 'Inquiry',
-                        waiting_on: p.waiting_on && p.waiting_on.length > 0 ? p.waiting_on[0].item : '',
-                        status: 'Posted',
-                        timestamp: msg.timestamp
                     });
                 });
             });
@@ -2250,8 +2511,8 @@
                         property_name: 'Search Pending',
                         client_name: l.name,
                         current_stage: 'Inquiry',
-                        waiting_on: 'Broker Assigned Pending',
-                        status: 'Awaiting Follow-up',
+                        waiting_on: '',
+                        status: 'ACTIVE',
                         timestamp: l.created_at
                     });
                 }
@@ -2282,8 +2543,12 @@
                 else if (ev.event_type === 'LEGAL') customStyle = 'background:#ffe0b2; color:#e65100;';
                 else if (ev.event_type === 'DOCUMENT') customStyle = 'background:#e0f7fa; color:#006064;';
                 else if (ev.event_type === 'REGISTRATION') customStyle = 'background:#f1f8e9; color:#33691e;';
-                else if (ev.event_type === 'COMMUNICATION') customStyle = 'background:#eceff1; color:#37474f;';
                 else if (ev.event_type === 'INQUIRY') customStyle = 'background:#efebe9; color:#4e342e;';
+                else if (ev.event_type === 'BROKER') customStyle = 'background:#eceff1; color:#37474f;';
+                else if (ev.event_type === 'KYC') customStyle = 'background:#fce4ec; color:#880e4f;';
+                else if (ev.event_type === 'OWNERSHIP') customStyle = 'background:#efebe9; color:#3e2723;';
+                else if (ev.event_type === 'CLIENT') customStyle = 'background:#e0f2f1; color:#004d40;';
+                else customStyle = 'background:#eee; color:#333;';
 
                 return `
                     <div class="flow-card">
@@ -2306,7 +2571,7 @@
                             </div>
                             <div style="font-size: 10px; margin-top: 6px; border-top: 1.5px solid var(--border-color); padding-top: 4px; display:flex; justify-content:space-between; align-items:center;">
                                 <span>STAGE: <strong>${ev.current_stage.toUpperCase()}</strong></span>
-                                <span style="font-size: 9px; font-weight:800; text-transform:uppercase;">${ev.status}</span>
+                                <span style="font-size: 9px; font-weight:900; text-transform:uppercase; color:var(--text-color);">${ev.status}</span>
                             </div>
                             ${ev.waiting_on ? `
                                 <div style="font-size: 9px; color: #ff3c00; font-weight: 900; margin-top: 6px; background: #fff3f3; padding: 4px; border: 1.5px dashed #ff3c00; text-transform: uppercase;">
@@ -3008,6 +3273,16 @@
 
         window.openInvoiceScheduler = function(clientName = '', leadId = null) {
             const leadProjects = (DB.tables.projects || []).filter(p => p.lead_id === leadId);
+            const stages = ["Inquiry", "Site Visit", "Negotiation", "Token Advance", "Legal Verification", "Agreement Drafting", "Registration", "Closed"];
+            const eligibleProjects = leadProjects.filter(p => {
+                return stages.indexOf(p.deal_stage) >= stages.indexOf('Negotiation');
+            });
+
+            if (leadId && eligibleProjects.length === 0) {
+                alert("Cannot schedule payments/invoices for deals in 'Inquiry' or 'Site Visit' stages. The property transaction must reach the 'Negotiation' stage or beyond.");
+                return;
+            }
+
             invoiceModalState = {
                 leadId,
                 clientName: clientName || 'Unknown Client',
@@ -3023,17 +3298,17 @@
             const projectSelect = document.getElementById('invoice-project');
             if (projectSelect) {
                 projectSelect.innerHTML = '';
-                if (leadProjects.length > 0) {
-                    leadProjects.forEach((p) => {
+                if (eligibleProjects.length > 0) {
+                    eligibleProjects.forEach((p) => {
                         const opt = document.createElement('option');
                         opt.value = p.id;
-                        opt.textContent = p.project_name || 'Unnamed Project';
+                        opt.textContent = p.project_name || 'Unnamed Transaction';
                         projectSelect.appendChild(opt);
                     });
                 } else {
                     const opt = document.createElement('option');
                     opt.value = '';
-                    opt.textContent = 'No Linked Project';
+                    opt.textContent = 'No Linked Transaction';
                     projectSelect.appendChild(opt);
                 }
             }
@@ -3080,6 +3355,13 @@
 
             if (!selectedProjectId) {
                 alert('Please select a project before creating an invoice.');
+                return null;
+            }
+
+            const selectedProj = (DB.tables.projects || []).find(p => p.id === selectedProjectId);
+            const stages = ["Inquiry", "Site Visit", "Negotiation", "Token Advance", "Legal Verification", "Agreement Drafting", "Registration", "Closed"];
+            if (selectedProj && stages.indexOf(selectedProj.deal_stage) < stages.indexOf('Negotiation')) {
+                alert("Cannot create invoice for deals in 'Inquiry' or 'Site Visit' stages. The property transaction must reach the 'Negotiation' stage or beyond.");
                 return null;
             }
 
@@ -3434,12 +3716,20 @@
             if (!tbody) return;
 
             const invoices = DB.tables.invoices || [];
-            if (invoices.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; font-weight:700; opacity:0.5; padding:16px;">No property deals found.</td></tr>';
+            const filteredInvoices = invoices.filter(i => {
+                const proj = (DB.tables.projects || []).find(p => p.id === i.project_id);
+                if (proj) {
+                    return proj.deal_stage !== 'Inquiry' && proj.deal_stage !== 'Site Visit';
+                }
+                return false;
+            });
+
+            if (filteredInvoices.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; font-weight:700; opacity:0.5; padding:16px;">No property deals in payment phases.</td></tr>';
                 return;
             }
 
-            tbody.innerHTML = invoices.map(i => {
+            tbody.innerHTML = filteredInvoices.map(i => {
                 const total = Number(i.total_amount || 0);
                 const paid = Number(i.paid_amount || 0);
                 const remaining = Math.max(0, total - paid);
