@@ -501,7 +501,13 @@
                 </div>
                 
                 <div style="margin-bottom: 32px;">
-                    <h3 style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px; text-transform: uppercase;">⚡ Prospects & Leads</h3>
+                    <div class="flex-between" style="border-bottom: 3px solid var(--border-color); padding-bottom: 8px; margin-bottom: 16px;">
+                        <h3 style="margin:0; padding:0; border:none; text-transform: uppercase;">⚡ Prospects & Leads</h3>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn btn-primary" onclick="triggerMassFollowUp()" style="background:#ccffcc; color:#111; font-weight:800; border:2px solid var(--border-color); box-shadow:2px 2px 0 var(--border-color); font-size:11px; padding:6px 12px;">⚡ MASS FOLLOW-UP (n8n)</button>
+                            <button class="btn btn-primary" onclick="triggerCallRecovery()" style="background:#ffebc1; color:#111; font-weight:800; border:2px solid var(--border-color); box-shadow:2px 2px 0 var(--border-color); font-size:11px; padding:6px 12px;">📞 CALL RECOVERY ENGINE</button>
+                        </div>
+                    </div>
                     <table>
                         <thead><tr><th>Category</th><th>Name</th><th>Email</th><th>Number</th><th>Message Snippet</th><th>Status</th><th>Actions</th></tr></thead>
                         <tbody id="leads-prospects-table-body"></tbody>
@@ -3206,6 +3212,132 @@
                 DB.save();
                 renderAll();
             });
+        };
+
+        window.triggerMassFollowUp = async function() {
+            const allLeads = DB.tables.leads || [];
+            const prospects = allLeads.filter(l => !['working', 'finished', 'closed'].includes(l.status));
+            
+            if (prospects.length === 0) {
+                alert("There are no prospects or leads to follow up with at this time.");
+                return;
+            }
+
+            const payload = {
+                event: "mass_follow_up_trigger",
+                prospect_count: prospects.length,
+                timestamp: new Date().toISOString(),
+                prospects: prospects.map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    email: p.email,
+                    number: p.number,
+                    status: p.status,
+                    last_message: p.message || 'No message snippet available'
+                }))
+            };
+
+            if (!DB.tables.automations) DB.tables.automations = [];
+            const logId = generateId();
+            const logEntry = {
+                id: logId,
+                title: "Mass Follow-Up Triggered",
+                trigger: "Manual Prospects Button",
+                related_entity: `${prospects.length} Prospects`,
+                status: 'Triggering...',
+                payload: JSON.stringify(payload),
+                timestamp: new Date().toISOString()
+            };
+            DB.tables.automations.unshift(logEntry);
+            DB.save();
+            renderAll();
+
+            try {
+                const response = await fetch('https://havslayer.app.n8n.cloud/webhook/2190b590-cd74-4e51-af86-a1308e78c940', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const log = DB.tables.automations.find(x => x.id === logId);
+                if (log) {
+                    log.status = response.ok ? 'Success' : 'Error';
+                }
+            } catch (err) {
+                console.error("Mass Follow-Up Webhook failed:", err);
+                const log = DB.tables.automations.find(x => x.id === logId);
+                if (log) {
+                    log.status = 'Failed';
+                }
+            }
+            DB.save();
+            renderAll();
+            alert(`Mass Follow-Up webhook dispatched to n8n for ${prospects.length} prospects! Check the execution registry below.`);
+        };
+
+        window.triggerCallRecovery = async function() {
+            const allLeads = DB.tables.leads || [];
+            const prospects = allLeads.filter(l => !['working', 'finished', 'closed'].includes(l.status));
+            
+            if (prospects.length === 0) {
+                alert("There are no prospects or leads available for call recovery at this time.");
+                return;
+            }
+
+            const payload = {
+                event: "call_recovery_trigger",
+                prospect_count: prospects.length,
+                timestamp: new Date().toISOString(),
+                prospects: prospects.map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    email: p.email,
+                    number: p.number,
+                    status: p.status,
+                    last_message: p.message || 'Missed Call / Recovery needed'
+                }))
+            };
+
+            if (!DB.tables.automations) DB.tables.automations = [];
+            const logId = generateId();
+            const logEntry = {
+                id: logId,
+                title: "Call Recovery Dispatched",
+                trigger: "Manual Prospects Button",
+                related_entity: `${prospects.length} Prospects`,
+                status: 'Triggering...',
+                payload: JSON.stringify(payload),
+                timestamp: new Date().toISOString()
+            };
+            DB.tables.automations.unshift(logEntry);
+            DB.save();
+            renderAll();
+
+            try {
+                const response = await fetch('https://havslayer.app.n8n.cloud/webhook/2190b590-cd74-4e51-af86-a1308e78c940', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const log = DB.tables.automations.find(x => x.id === logId);
+                if (log) {
+                    log.status = response.ok ? 'Success' : 'Error';
+                }
+            } catch (err) {
+                console.error("Call Recovery Webhook failed:", err);
+                const log = DB.tables.automations.find(x => x.id === logId);
+                if (log) {
+                    log.status = 'Failed';
+                }
+            }
+            DB.save();
+            renderAll();
+            alert(`Call Recovery webhook dispatched to n8n for ${prospects.length} prospects! Check the execution registry below.`);
         };
 
         window.triggerAutomation = function(action) { 
